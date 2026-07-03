@@ -39,7 +39,7 @@ export default async function VendorsPage({
   if (params.q) {
     const q = params.q.replace(/[%_]/g, '\\$&')
     vendorQuery = vendorQuery.or(
-      `name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%,vendor_categories.name.ilike.%${q}%`
+      `name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`
     )
   }
   if (params.city) {
