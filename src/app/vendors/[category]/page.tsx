@@ -41,7 +41,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
   let vendorQuery = supabase
     .from('vendors')
-    .select('*')
+    .select('*, vendor_categories(name)')
     .eq('category_id', cat.id)
     .eq('is_published', true)
     .order('is_featured', { ascending: false })
@@ -49,8 +49,9 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     .order('name')
 
   if (sp.q) {
+    const q = sp.q.replace(/[%_]/g, '\\$&')
     vendorQuery = vendorQuery.or(
-      `name.ilike.%${sp.q}%,description.ilike.%${sp.q}%,city.ilike.%${sp.q}%`
+      `name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`
     )
   }
   if (sp.city) {
@@ -135,7 +136,19 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             </div>
           ) : (
             <div className="text-center py-16">
-              <p className="text-charcoal/50">No vendors found in this category.</p>
+              <p className="text-charcoal/50">
+                {sp.q || sp.city
+                  ? 'No vendors match your search. Try adjusting your filters.'
+                  : 'No vendors found in this category.'}
+              </p>
+              {(sp.q || sp.city) && (
+                <Link
+                  href={`/vendors/${category}`}
+                  className="mt-4 inline-block text-sm text-rose-gold hover:underline"
+                >
+                  Clear filters
+                </Link>
+              )}
             </div>
           )}
         </div>

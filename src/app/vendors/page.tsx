@@ -17,31 +17,36 @@ export default async function VendorsPage({
   const params = await searchParams
   const supabase = await createClient()
 
-  const { data: categories } = await supabase
-    .from('vendor_categories')
-    .select('*')
-    .order('display_order')
+  const [{ data: categories }, { data: allCities }] = await Promise.all([
+    supabase.from('vendor_categories').select('*').order('display_order'),
+    supabase
+      .from('vendors')
+      .select('city')
+      .eq('is_published', true)
+      .order('city'),
+  ])
+
+  const cities = [...new Set((allCities ?? []).map((v) => v.city))].sort()
 
   let vendorQuery = supabase
     .from('vendors')
-    .select('*')
+    .select('*, vendor_categories(name)')
     .eq('is_published', true)
     .order('is_featured', { ascending: false })
     .order('priority')
     .order('name')
 
   if (params.q) {
+    const q = params.q.replace(/[%_]/g, '\\$&')
     vendorQuery = vendorQuery.or(
-      `name.ilike.%${params.q}%,description.ilike.%${params.q}%,city.ilike.%${params.q}%`
+      `name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%,vendor_categories.name.ilike.%${q}%`
     )
   }
   if (params.city) {
     vendorQuery = vendorQuery.ilike('city', `%${params.city}%`)
   }
 
-  const { data: vendors } = await vendorQuery.limit(100)
-
-  const cities = [...new Set(vendors?.map((v) => v.city) ?? [])].sort()
+  const { data: vendors } = await vendorQuery
 
   return (
     <>
@@ -110,6 +115,10 @@ export default async function VendorsPage({
           )}
 
           {/* Results */}
+          <p className="text-sm text-charcoal/50 mb-6">
+            {vendors?.length ?? 0} vendor{(vendors?.length ?? 0) !== 1 ? 's' : ''} found
+          </p>
+
           {vendors && vendors.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {vendors.map((vendor) => (
@@ -121,6 +130,14 @@ export default async function VendorsPage({
               <p className="text-charcoal/50">
                 No vendors found. Try adjusting your search or filters.
               </p>
+              {(params.q || params.city) && (
+                <Link
+                  href="/vendors"
+                  className="mt-4 inline-block text-sm text-rose-gold hover:underline"
+                >
+                  Clear filters
+                </Link>
+              )}
             </div>
           )}
         </div>
