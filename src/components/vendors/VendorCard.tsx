@@ -12,7 +12,6 @@ interface VendorCardProps {
     pricing_range: string | null
     is_featured: boolean
   }
-  categorySlug?: string
 }
 
 export default function VendorCard({ vendor }: VendorCardProps) {

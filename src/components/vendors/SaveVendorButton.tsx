@@ -47,6 +47,8 @@ export default function SaveVendorButton({ vendorId, initialSaved, userId }: Pro
     <button
       onClick={handleToggle}
       disabled={loading}
+      aria-label={saved ? 'Remove from saved vendors' : 'Save vendor'}
+      aria-pressed={saved}
       className={cn(
         'flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all',
         saved
@@ -54,7 +56,7 @@ export default function SaveVendorButton({ vendorId, initialSaved, userId }: Pro
           : 'border-2 border-peach-light text-charcoal/60 hover:border-rose-gold hover:text-rose-gold'
       )}
     >
-      <Bookmark className="h-4 w-4" fill={saved ? 'currentColor' : 'none'} />
+      <Bookmark className="h-4 w-4" fill={saved ? 'currentColor' : 'none'} aria-hidden="true" />
       {saved ? 'Saved' : 'Save'}
     </button>
   )

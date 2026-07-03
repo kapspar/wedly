@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Heart } from 'lucide-react'
 
 export default function Footer() {
   return (
@@ -7,9 +6,8 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2 mb-3">
-              <Heart className="h-5 w-5 text-peach" fill="currentColor" />
-              <span className="font-[family-name:var(--font-script)] text-xl text-white">
+            <div className="mb-3">
+              <span className="font-[family-name:var(--font-logo)] text-2xl italic font-light tracking-wide text-white">
                 Wedly
               </span>
             </div>

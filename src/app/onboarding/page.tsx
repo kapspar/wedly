@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Heart, ArrowRight, ArrowLeft, Check } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Check } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -129,9 +129,8 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-ivory flex flex-col">
-      <div className="flex items-center justify-center gap-2 py-6">
-        <Heart className="h-6 w-6 text-rose-gold" fill="currentColor" />
-        <span className="font-[family-name:var(--font-script)] text-2xl text-charcoal">Wedly</span>
+      <div className="flex items-center justify-center py-6">
+        <span className="font-[family-name:var(--font-logo)] text-3xl italic font-light tracking-wide text-charcoal">Wedly</span>
       </div>
 
       {/* Progress */}

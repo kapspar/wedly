@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { Menu, X, Heart, LogOut, LayoutDashboard, User } from 'lucide-react'
+import { Menu, X, LogOut, LayoutDashboard, User } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import type { UserRole } from '@/lib/types/database'
@@ -48,9 +48,8 @@ export default function Navbar() {
     <nav className="bg-white/80 backdrop-blur-md border-b border-peach-light/50 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="flex items-center gap-2">
-            <Heart className="h-6 w-6 text-rose-gold" fill="currentColor" />
-            <span className="font-[family-name:var(--font-script)] text-2xl text-charcoal">
+          <Link href="/" className="flex items-center">
+            <span className="font-[family-name:var(--font-logo)] text-[1.65rem] italic font-light tracking-wide text-charcoal leading-none">
               Wedly
             </span>
           </Link>
@@ -116,8 +115,10 @@ export default function Navbar() {
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden p-2 text-charcoal"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
           >
-            {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {menuOpen ? <X className="h-6 w-6" aria-hidden="true" /> : <Menu className="h-6 w-6" aria-hidden="true" />}
           </button>
         </div>
 

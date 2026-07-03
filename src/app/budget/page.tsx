@@ -51,12 +51,14 @@ export default function BudgetPage() {
   const handleSave = async () => {
     setSaving(true)
     const supabase = createClient()
-    for (const item of items) {
-      await supabase
-        .from('budget_categories')
-        .update({ budgeted: item.budgeted, spent: item.spent, is_enabled: item.is_enabled })
-        .eq('id', item.id)
-    }
+    await Promise.all(
+      items.map((item) =>
+        supabase
+          .from('budget_categories')
+          .update({ budgeted: item.budgeted, spent: item.spent, is_enabled: item.is_enabled })
+          .eq('id', item.id)
+      )
+    )
     setSaving(false)
   }
 
