@@ -70,50 +70,72 @@ export default async function VendorPage({ params }: Props) {
     icon: string | null
   }
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+
+  function getPhotoUrl(storagePath: string) {
+    return `${supabaseUrl}/storage/v1/object/public/vendor-photos/${storagePath}`
+  }
+
+  const hasPhotos = photos && photos.length > 0
+
   return (
     <>
       <Navbar />
       <main className="flex-1">
-        {/* Hero */}
+        {/* Hero banner */}
         <div className="relative">
-          <div className="h-56 sm:h-72 bg-gradient-to-br from-peach-light via-peach/30 to-rose-gold/10 flex items-center justify-center">
-            {photos && photos.length > 0 ? (
-              <div className="absolute inset-0 bg-charcoal/20" />
+          <div
+            className={`h-64 sm:h-80 ${
+              hasPhotos
+                ? 'bg-charcoal/10'
+                : 'bg-gradient-to-br from-peach-light via-peach/30 to-rose-gold/10'
+            } overflow-hidden`}
+          >
+            {hasPhotos && photos[0] ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={getPhotoUrl(photos[0].storage_path)}
+                alt={photos[0].alt_text ?? vendor.name}
+                className="w-full h-full object-cover"
+              />
             ) : (
-              <span className="font-[family-name:var(--font-script)] text-6xl sm:text-8xl text-rose-gold/20">
-                {vendor.name.charAt(0)}
-              </span>
+              <div className="w-full h-full flex items-center justify-center">
+                <span className="font-[family-name:var(--font-logo)] text-8xl sm:text-9xl italic font-light text-rose-gold/15">
+                  {vendor.name.charAt(0)}
+                </span>
+              </div>
             )}
+            {hasPhotos && <div className="absolute inset-0 bg-charcoal/30" />}
           </div>
 
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-10">
-            <Card className="p-6 sm:p-8">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
+            <Card className="p-6 sm:p-8 shadow-md">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div>
                   <Link
                     href={`/vendors/${category.slug}`}
-                    className="inline-flex items-center gap-1 text-xs text-charcoal/50 hover:text-charcoal mb-2"
+                    className="inline-flex items-center gap-1 text-xs text-charcoal/50 hover:text-rose-gold transition-colors mb-3"
                   >
                     <ChevronLeft className="h-3 w-3" />
                     <VendorCategoryIcon icon={category.icon} className="h-3 w-3" />
                     {category.name}
                   </Link>
-                  <h1 className="font-[family-name:var(--font-heading)] text-2xl sm:text-3xl text-charcoal">
+                  <h1 className="font-[family-name:var(--font-heading)] text-2xl sm:text-3xl text-charcoal mb-2">
                     {vendor.name}
                   </h1>
-                  <div className="flex flex-wrap items-center gap-3 mt-2">
+                  <div className="flex flex-wrap items-center gap-3">
                     <span className="flex items-center gap-1 text-sm text-charcoal/60">
-                      <MapPin className="h-4 w-4" />
+                      <MapPin className="h-4 w-4 text-rose-gold" />
                       {vendor.city}
                       {vendor.area && `, ${vendor.area}`}
                     </span>
                     {vendor.pricing_range && (
-                      <span className="text-sm text-charcoal/50 bg-peach-light/50 px-2 py-0.5 rounded-full">
+                      <span className="text-sm text-charcoal/70 bg-peach-light/60 px-3 py-0.5 rounded-full font-medium">
                         {vendor.pricing_range}
                       </span>
                     )}
                     {vendor.is_featured && (
-                      <span className="text-xs text-white bg-rose-gold px-2 py-0.5 rounded-full">
+                      <span className="text-xs text-white bg-rose-gold px-2.5 py-0.5 rounded-full font-medium">
                         Featured
                       </span>
                     )}
@@ -125,37 +147,44 @@ export default async function VendorPage({ params }: Props) {
           </div>
         </div>
 
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {/* About */}
               {vendor.description && (
-                <Card className="p-6">
-                  <h2 className="font-[family-name:var(--font-heading)] text-lg text-charcoal mb-3">
+                <Card className="p-6 sm:p-8">
+                  <h2 className="font-[family-name:var(--font-heading)] text-xl text-charcoal mb-4">
                     About
                   </h2>
-                  <p className="text-sm text-charcoal/70 leading-relaxed whitespace-pre-line">
+                  <p className="text-charcoal/70 leading-relaxed whitespace-pre-line">
                     {vendor.description}
                   </p>
                 </Card>
               )}
 
               {/* Gallery */}
-              {photos && photos.length > 0 && (
-                <Card className="p-6">
-                  <h2 className="font-[family-name:var(--font-heading)] text-lg text-charcoal mb-4">
+              {hasPhotos && (
+                <Card className="p-6 sm:p-8">
+                  <h2 className="font-[family-name:var(--font-heading)] text-xl text-charcoal mb-5">
                     Gallery
                   </h2>
-                  <div className="grid grid-cols-2 gap-3">
-                    {photos.map((photo) => (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {photos.map((photo, idx) => (
                       <div
                         key={photo.id}
-                        className="aspect-[4/3] bg-peach-light/30 rounded-xl overflow-hidden"
+                        className={`bg-peach-light/30 rounded-xl overflow-hidden ${
+                          idx === 0 ? 'col-span-2 sm:col-span-2 aspect-video' : 'aspect-square'
+                        }`}
                       >
-                        <div className="w-full h-full flex items-center justify-center text-xs text-charcoal/30">
-                          {photo.alt_text || 'Photo'}
-                        </div>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={getPhotoUrl(photo.storage_path)}
+                          alt={photo.alt_text ?? `${vendor.name} photo ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                          loading={idx === 0 ? 'eager' : 'lazy'}
+                        />
                       </div>
                     ))}
                   </div>
@@ -163,20 +192,28 @@ export default async function VendorPage({ params }: Props) {
               )}
 
               {/* Inquiry Form */}
-              <Card className="p-6">
-                <h2 className="font-[family-name:var(--font-heading)] text-lg text-charcoal mb-4">
+              <Card className="p-6 sm:p-8">
+                <h2 className="font-[family-name:var(--font-heading)] text-xl text-charcoal mb-2">
                   Send an Inquiry
                 </h2>
-                <InquiryForm vendorId={vendor.id} vendorName={vendor.name} userId={user?.id} />
+                <p className="text-sm text-charcoal/50 mb-5">
+                  Tell {vendor.name} about your wedding and what you&apos;re looking for.
+                </p>
+                <InquiryForm
+                  vendorId={vendor.id}
+                  vendorName={vendor.name}
+                  vendorSlug={vendor.slug}
+                  userId={user?.id}
+                />
               </Card>
             </div>
 
             {/* Sidebar */}
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Contact Info */}
               <Card className="p-6">
                 <h3 className="font-[family-name:var(--font-heading)] text-base text-charcoal mb-4">
-                  Contact Information
+                  Contact
                 </h3>
                 <div className="space-y-3">
                   {vendor.website_url && (
@@ -184,28 +221,28 @@ export default async function VendorPage({ params }: Props) {
                       href={vendor.website_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-charcoal/70 hover:text-rose-gold transition-colors"
+                      className="flex items-center gap-2.5 text-sm text-charcoal/70 hover:text-rose-gold transition-colors group"
                     >
-                      <Globe className="h-4 w-4 text-rose-gold" />
-                      <span className="truncate">Website</span>
-                      <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
+                      <Globe className="h-4 w-4 text-rose-gold flex-shrink-0" />
+                      <span className="truncate flex-1">Website</span>
+                      <ExternalLink className="h-3 w-3 opacity-40 group-hover:opacity-100 flex-shrink-0" />
                     </a>
                   )}
                   {vendor.phone && (
                     <a
                       href={`tel:${vendor.phone}`}
-                      className="flex items-center gap-2 text-sm text-charcoal/70 hover:text-rose-gold transition-colors"
+                      className="flex items-center gap-2.5 text-sm text-charcoal/70 hover:text-rose-gold transition-colors"
                     >
-                      <Phone className="h-4 w-4 text-rose-gold" />
+                      <Phone className="h-4 w-4 text-rose-gold flex-shrink-0" />
                       {vendor.phone}
                     </a>
                   )}
                   {vendor.email && (
                     <a
                       href={`mailto:${vendor.email}`}
-                      className="flex items-center gap-2 text-sm text-charcoal/70 hover:text-rose-gold transition-colors"
+                      className="flex items-center gap-2.5 text-sm text-charcoal/70 hover:text-rose-gold transition-colors"
                     >
-                      <Mail className="h-4 w-4 text-rose-gold" />
+                      <Mail className="h-4 w-4 text-rose-gold flex-shrink-0" />
                       <span className="truncate">{vendor.email}</span>
                     </a>
                   )}
@@ -214,16 +251,16 @@ export default async function VendorPage({ params }: Props) {
                       href={vendor.instagram_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-charcoal/70 hover:text-rose-gold transition-colors"
+                      className="flex items-center gap-2.5 text-sm text-charcoal/70 hover:text-rose-gold transition-colors group"
                     >
-                      <AtSign className="h-4 w-4 text-rose-gold" />
-                      Instagram
-                      <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
+                      <AtSign className="h-4 w-4 text-rose-gold flex-shrink-0" />
+                      <span className="flex-1">Instagram</span>
+                      <ExternalLink className="h-3 w-3 opacity-40 group-hover:opacity-100 flex-shrink-0" />
                     </a>
                   )}
                   {!vendor.website_url && !vendor.phone && !vendor.email && !vendor.instagram_url && (
                     <p className="text-sm text-charcoal/40">
-                      Use the inquiry form to get in touch
+                      Use the inquiry form below to get in touch.
                     </p>
                   )}
                 </div>
@@ -234,12 +271,34 @@ export default async function VendorPage({ params }: Props) {
                 <h3 className="font-[family-name:var(--font-heading)] text-base text-charcoal mb-3">
                   Location
                 </h3>
-                <div className="flex items-center gap-2 text-sm text-charcoal/70">
-                  <MapPin className="h-4 w-4 text-rose-gold" />
-                  {vendor.city}
-                  {vendor.area && `, ${vendor.area}`}
+                <div className="flex items-start gap-2.5 text-sm text-charcoal/70">
+                  <MapPin className="h-4 w-4 text-rose-gold flex-shrink-0 mt-0.5" />
+                  <span>
+                    {vendor.area && `${vendor.area}, `}{vendor.city}
+                  </span>
                 </div>
               </Card>
+
+              {/* Pricing */}
+              {vendor.pricing_range && (
+                <Card className="p-6">
+                  <h3 className="font-[family-name:var(--font-heading)] text-base text-charcoal mb-3">
+                    Pricing
+                  </h3>
+                  <p className="text-sm text-charcoal/70">{vendor.pricing_range}</p>
+                </Card>
+              )}
+
+              {/* Back to category */}
+              <div className="pt-2">
+                <Link
+                  href={`/vendors/${category.slug}`}
+                  className="flex items-center gap-1.5 text-sm text-charcoal/50 hover:text-rose-gold transition-colors"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  All {category.name}
+                </Link>
+              </div>
             </div>
           </div>
         </div>

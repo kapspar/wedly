@@ -10,10 +10,11 @@ import Input from '@/components/ui/Input'
 interface Props {
   vendorId: string
   vendorName: string
+  vendorSlug: string
   userId?: string
 }
 
-export default function InquiryForm({ vendorId, vendorName, userId }: Props) {
+export default function InquiryForm({ vendorId, vendorName, vendorSlug, userId }: Props) {
   const router = useRouter()
   const [message, setMessage] = useState('')
   const [eventDate, setEventDate] = useState('')
@@ -31,7 +32,7 @@ export default function InquiryForm({ vendorId, vendorName, userId }: Props) {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => router.push(`/auth/login?redirect=/vendor/${vendorId}`)}
+          onClick={() => router.push(`/auth/login?redirect=/vendor/${vendorSlug}`)}
         >
           Sign in
         </Button>

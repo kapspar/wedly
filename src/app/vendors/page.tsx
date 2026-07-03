@@ -82,7 +82,7 @@ export default async function VendorsPage({
           {cities.length > 1 && (
             <div className="flex flex-wrap gap-2 mb-6">
               <Link
-                href="/vendors"
+                href={params.q ? `/vendors?q=${encodeURIComponent(params.q)}` : '/vendors'}
                 className={cn(
                   'px-3 py-1 rounded-full text-xs transition-colors',
                   !params.city
@@ -95,7 +95,7 @@ export default async function VendorsPage({
               {cities.map((city) => (
                 <Link
                   key={city}
-                  href={`/vendors?city=${encodeURIComponent(city)}`}
+                  href={`/vendors?${params.q ? `q=${encodeURIComponent(params.q)}&` : ''}city=${encodeURIComponent(city)}`}
                   className={cn(
                     'px-3 py-1 rounded-full text-xs transition-colors',
                     params.city === city

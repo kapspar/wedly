@@ -96,7 +96,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           {cities.length > 1 && (
             <div className="flex flex-wrap gap-2 mb-6">
               <Link
-                href={`/vendors/${category}`}
+                href={sp.q ? `/vendors/${category}?q=${encodeURIComponent(sp.q)}` : `/vendors/${category}`}
                 className={cn(
                   'px-3 py-1 rounded-full text-xs transition-colors',
                   !sp.city
@@ -109,7 +109,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
               {cities.map((city) => (
                 <Link
                   key={city}
-                  href={`/vendors/${category}?city=${encodeURIComponent(city)}`}
+                  href={`/vendors/${category}?${sp.q ? `q=${encodeURIComponent(sp.q)}&` : ''}city=${encodeURIComponent(city)}`}
                   className={cn(
                     'px-3 py-1 rounded-full text-xs transition-colors',
                     sp.city === city
@@ -130,7 +130,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           {vendors && vendors.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {vendors.map((vendor) => (
-                <VendorCard key={vendor.id} vendor={vendor} categorySlug={category} />
+                <VendorCard key={vendor.id} vendor={vendor} />
               ))}
             </div>
           ) : (

@@ -3,7 +3,6 @@
 import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { Heart } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -12,9 +11,12 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect') || '/dashboard'
+  const authError = searchParams.get('error')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+  const [error, setError] = useState(
+    authError === 'auth_failed' ? 'Google sign-in failed. Please try again.' : ''
+  )
   const [loading, setLoading] = useState(false)
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -111,9 +113,8 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center px-4 bg-ivory">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <Heart className="h-8 w-8 text-rose-gold" fill="currentColor" />
-            <span className="font-[family-name:var(--font-script)] text-3xl text-charcoal">
+          <Link href="/" className="inline-block mb-4">
+            <span className="font-[family-name:var(--font-logo)] text-4xl italic font-light tracking-wide text-charcoal">
               Wedly
             </span>
           </Link>
