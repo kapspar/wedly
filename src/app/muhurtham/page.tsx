@@ -10,9 +10,9 @@ import Button from '@/components/ui/Button'
 
 const steps = [
   { icon: Users, title: 'Tell us about your wedding', detail: 'Both partners share their relevant birth information, wedding location, date preferences and family traditions in a private consultation intake.' },
-  { icon: CalendarHeart, title: 'Review candidate dates', detail: 'A participating Tamil Hindu priest uses their established panchangam and customary method to identify appropriate dates and times.' },
+  { icon: CalendarHeart, title: 'Review candidate dates', detail: 'A participating Tamil Hindu priest reviews the request using their established panchangam and customary method, and may recommend alternatives or decline to confirm a date.' },
   { icon: Clock3, title: 'Consult with your priest', detail: 'Discuss recommended options and choose a ceremony time with the priest. Different traditions may reach different recommendations.' },
-  { icon: FileCheck2, title: 'Receive priest confirmation', detail: 'After the priest approves, receive a dated, verifiable confirmation. Temple endorsement is included only when explicitly authorized.' },
+  { icon: FileCheck2, title: 'Receive priest confirmation', detail: 'After review, the priest signs the recommendation, identifying their temple when authorized. No separate temple signature is required.' },
 ]
 
 export default function MuhurthamPage() {
@@ -27,7 +27,7 @@ export default function MuhurthamPage() {
           <div className="text-center max-w-2xl mx-auto">
             <p className="text-xs uppercase tracking-[0.2em] font-semibold text-rose-gold mb-3">PlanWedly · Service preview</p>
             <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-5xl text-charcoal">Find your Muhurtham</h1>
-            <p className="text-charcoal/75 mt-4 leading-relaxed">Explore a priest-guided way to choose an auspicious Tamil Hindu wedding date, with a personalized consultation and an optional signed confirmation.</p>
+            <p className="text-charcoal/75 mt-4 leading-relaxed">Explore priest-reviewed Tamil Hindu wedding dates, from a simple date confirmation to a personalized consultation or full ceremony booking.</p>
             <div className="mt-5 inline-flex gap-2 items-center bg-peach-light/50 text-charcoal rounded-full px-4 py-2 text-xs font-medium">
               <ShieldCheck className="h-4 w-4 text-rose-gold" /> Preview only — bookings and payments are not yet available
             </div>
@@ -43,11 +43,25 @@ export default function MuhurthamPage() {
             <Card className="p-6 border-rose-gold/30">
               <p className="text-xs uppercase tracking-wide text-rose-gold font-semibold">Optional paid service</p>
               <h2 className="font-[family-name:var(--font-heading)] text-2xl mt-2">Priest-verified consultation</h2>
-              <p className="text-sm text-charcoal/75 mt-2">A qualified participating priest reviews the couple's details, recommends a date and time, and can issue a signed confirmation. Priests choose whether to charge and set their own fees.</p>
+              <p className="text-sm text-charcoal/75 mt-2">Choose a simple date confirmation or detailed consultation. The priest reviews and signs the recommendation. Wedly collects payment and pays the priest or temple under their agreement.</p>
               <p className="mt-5 text-xs font-medium text-charcoal/70">Coming soon · No payment collected</p>
             </Card>
           </div>
 
+          <h2 className="font-[family-name:var(--font-heading)] text-2xl text-charcoal mt-12 mb-5">Choose your service</h2>
+          <div className="grid sm:grid-cols-3 gap-4 mb-10">
+            {[
+              { title: 'Date confirmation', detail: 'A few suggested dates and times reviewed and signed by a priest. The priest may request more information or decline confirmation.', price: 'Illustrative $20–$40' },
+              { title: 'Personalized consultation', detail: 'A detailed review of both partners’ relevant details and family traditions, with a signed recommendation.', price: 'Illustrative $60–$100' },
+              { title: 'Book a wedding priest', detail: 'Arrange the officiant for the ceremony. Date selection may already be included in the ceremony package.', price: 'Price quoted by priest or temple' },
+            ].map(service => (
+              <Card className="p-5" key={service.title}>
+                <h3 className="font-[family-name:var(--font-heading)] text-lg">{service.title}</h3>
+                <p className="text-sm text-charcoal/75 mt-2">{service.detail}</p>
+                <p className="text-xs font-semibold text-rose-gold mt-4">{service.price}</p>
+              </Card>
+            ))}
+          </div>
           <h2 className="font-[family-name:var(--font-heading)] text-2xl text-charcoal mt-12 mb-5">How it will work</h2>
           <div className="grid sm:grid-cols-2 gap-4">
             {steps.map((step, i) => (
@@ -64,15 +78,14 @@ export default function MuhurthamPage() {
 
           <Card className="p-6 mt-10">
             <h2 className="font-[family-name:var(--font-heading)] text-2xl">Confirmation certificate preview</h2>
-            <p className="text-sm text-charcoal/75 mt-2">A proposed document for the couple, signed by the reviewing priest after the consultation. A temple can countersign only if it agrees to participate.</p>
+            <p className="text-sm text-charcoal/75 mt-2">A proposed document signed by the reviewing priest. The priest may sign on behalf of a temple only when authorized by that temple. Wedly facilitates the service, not the religious decision.</p>
             <div className="mt-5 border-2 border-[#C7A67B] bg-[#FAF5EC] text-[#49382D] p-6 sm:p-10 text-center rounded-lg">
-              <p className="uppercase tracking-[0.25em] text-xs">PlanWedly · Sample only</p>
+              <p className="uppercase tracking-[0.25em] text-xs">Wedly · Sample only</p>
               <h3 className="font-[family-name:var(--font-heading)] text-2xl sm:text-3xl mt-3">Muhurtham Confirmation</h3>
               <p className="mt-4 text-sm">For: Couple's names to be confirmed</p>
               <p className="text-sm mt-1">Recommended date & time: Pending priest review</p>
-              <div className="grid grid-cols-2 gap-5 mt-10 text-xs">
-                <div className="border-t border-[#C7A67B] pt-2">Priest signature</div>
-                <div className="border-t border-[#C7A67B] pt-2">Authorized temple signature (optional)</div>
+              <div className="max-w-sm mx-auto mt-10 text-xs">
+                <div className="border-t border-[#C7A67B] pt-2">Reviewing priest signature · Temple represented (if authorized)</div>
               </div>
               <p className="text-xs mt-8">Not a valid religious or temple-issued certificate</p>
             </div>
@@ -80,7 +93,7 @@ export default function MuhurthamPage() {
 
           <Card className="p-6 mt-8">
             <h2 className="font-[family-name:var(--font-heading)] text-xl">Proposed priest-first pricing</h2>
-            <p className="text-sm text-charcoal/75 mt-2">This interactive illustration is for planning the business model. It does not set a price or process a payment.</p>
+            <p className="text-sm text-charcoal/75 mt-2">The couple pays Wedly. Wedly retains its agreed fee and pays the priest or temple under their partnership agreement. This illustration does not process a payment.</p>
             <div className="grid sm:grid-cols-2 gap-4 mt-5">
               <label className="text-sm font-medium">Sample consultation fee (CAD)
                 <input type="number" min="0" max="10000" step="5" value={price} onChange={e => setPrice(Math.max(0, Math.min(10000, Number(e.target.value) || 0)))} className="mt-1 block w-full rounded-xl border border-peach-light px-3 py-2.5" />
@@ -98,7 +111,7 @@ export default function MuhurthamPage() {
 
           <div className="mt-8 flex items-start gap-2 text-sm text-charcoal/75">
             <CheckCircle2 className="h-5 w-5 text-sage-dark shrink-0" />
-            <p>We will not collect birth details or offer calculated auspicious dates until the privacy, priest review, and calculation processes are ready. The priest—not PlanWedly—makes the religious recommendation.</p>
+            <p>We will not collect birth details or offer calculated auspicious dates until the privacy, priest review, and calculation processes are ready. The priest makes the religious recommendation; Wedly operates the service and payment flow.</p>
           </div>
           <div className="mt-8"><Link href="/dashboard"><Button variant="outline">Back to dashboard</Button></Link></div>
         </div>
