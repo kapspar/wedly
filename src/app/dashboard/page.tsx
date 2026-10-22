@@ -9,6 +9,7 @@ import {
   CheckSquare,
   ArrowRight,
   CalendarDays,
+  CalendarHeart,
   ListChecks,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
@@ -252,6 +253,7 @@ export default async function DashboardPage() {
               { href: '/saved', label: 'Saved Vendors', icon: Bookmark },
               { href: '/budget', label: 'Budget', icon: DollarSign },
               { href: '/events', label: 'Events', icon: CalendarDays },
+              { href: '/muhurtham', label: 'Muhurtham Preview', icon: CalendarHeart },
             ].map((link) => (
               <Link key={link.href} href={link.href}>
                 <Card className="p-4 text-center" hover>
