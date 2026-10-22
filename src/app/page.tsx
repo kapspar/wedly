@@ -29,7 +29,7 @@ export default async function HomePage() {
             <div>
               <div className="flex items-center gap-3 mb-8 text-[#9B6A62]">
                 <span className="h-px w-10 bg-[#BA9188]" />
-                <span className="text-xs sm:text-sm uppercase tracking-[0.2em] font-medium">Made for Tamil love stories</span>
+                <span className="font-[family-name:var(--font-logo)] text-xl sm:text-2xl italic tracking-wide">Love. Plan. Celebrate.</span>
               </div>
               <h1 className="font-[family-name:var(--font-heading)] text-[clamp(3rem,6vw,5.8rem)] leading-[1.12] tracking-tight text-[#3C3030]">
                 A beautiful beginning, <em className="font-normal text-rose-gold">thoughtfully planned.</em>
