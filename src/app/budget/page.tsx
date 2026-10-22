@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { DollarSign, Save, Plus, Trash2 } from 'lucide-react'
+import { DollarSign, Save, Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
@@ -89,14 +89,6 @@ export default function BudgetPage() {
       setMessage('Custom budget category added.')
     }
     setAdding(false)
-  }
-
-  const deleteCategory = async (id: string) => {
-    if (!window.confirm('Delete this custom budget category?')) return
-    const supabase = createClient()
-    const { error } = await supabase.from('budget_categories').delete().eq('id', id)
-    if (error) setMessage(error.message)
-    else { setItems(prev => prev.filter(item => item.id !== id)); setMessage('Category deleted.') }
   }
 
   const totalBudget = items.filter(i => i.is_enabled).reduce((sum, i) => sum + i.budgeted, 0)
@@ -194,9 +186,6 @@ export default function BudgetPage() {
                       </div>
                     </div>
                   </div>
-                  {!['venue','photography','videography','decor','dj','priest','makeup','florist','jewelry','travel','catering','attire','invitations','transportation','miscellaneous'].includes(item.category.toLowerCase()) && (
-                    <button type="button" aria-label={`Delete ${item.category}`} title="Delete custom category" onClick={() => deleteCategory(item.id)} className="text-charcoal/60 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
-                  )}
                 </div>
               ))}
             </Card>
