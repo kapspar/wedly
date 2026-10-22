@@ -129,12 +129,12 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-ivory flex flex-col">
-      <div className="flex items-center justify-center py-6">
+      <div className="flex items-center justify-center pt-5 pb-4 sm:py-6">
         <span className="font-[family-name:var(--font-logo)] text-3xl italic font-light tracking-wide text-charcoal">Wedly</span>
       </div>
 
       {/* Progress */}
-      <div className="max-w-lg mx-auto w-full px-4 mb-8">
+      <div className="max-w-lg mx-auto w-full px-4 mb-5 sm:mb-8">
         <div className="flex items-center justify-between">
           {STEPS.map((s, i) => (
             <div key={s} className="flex items-center">
@@ -145,7 +145,7 @@ export default function OnboardingPage() {
                     ? 'bg-sage text-white'
                     : i === step
                       ? 'bg-rose-gold text-white'
-                      : 'bg-peach-light text-charcoal/40'
+                      : 'bg-peach-light text-charcoal/70'
                 )}
               >
                 {i < step ? <Check className="h-4 w-4" /> : i + 1}
@@ -163,15 +163,15 @@ export default function OnboardingPage() {
         </div>
         <div className="flex justify-between mt-2">
           {STEPS.map((s) => (
-            <span key={s} className="text-[10px] text-charcoal/40 hidden sm:block">
+            <span key={s} className="text-[10px] text-charcoal/65 hidden sm:block">
               {s}
             </span>
           ))}
         </div>
       </div>
 
-      <div className="flex-1 flex items-start justify-center px-4 pb-8">
-        <Card className="w-full max-w-lg p-6 sm:p-8">
+      <div className="flex-1 flex items-start justify-center px-4 pb-6 sm:pb-8">
+        <Card className="w-full max-w-lg p-5 sm:p-8">
           {/* Step 0: Names */}
           {step === 0 && (
             <div className="space-y-6">
@@ -179,7 +179,7 @@ export default function OnboardingPage() {
                 <h2 className="font-[family-name:var(--font-heading)] text-xl text-charcoal">
                   Tell us about you
                 </h2>
-                <p className="text-sm text-charcoal/60 mt-1">
+                <p className="text-sm text-charcoal/75 mt-1">
                   What are the names of the happy couple?
                 </p>
               </div>
@@ -207,7 +207,7 @@ export default function OnboardingPage() {
                 <h2 className="font-[family-name:var(--font-heading)] text-xl text-charcoal">
                   Wedding Type
                 </h2>
-                <p className="text-sm text-charcoal/60 mt-1">
+                <p className="text-sm text-charcoal/75 mt-1">
                   This helps us personalize your planning experience
                 </p>
               </div>
@@ -237,7 +237,7 @@ export default function OnboardingPage() {
                 <h2 className="font-[family-name:var(--font-heading)] text-xl text-charcoal">
                   Wedding Date
                 </h2>
-                <p className="text-sm text-charcoal/60 mt-1">Do you have a date in mind?</p>
+                <p className="text-sm text-charcoal/75 mt-1">Do you have a date in mind?</p>
               </div>
               <div className="space-y-3">
                 {[
@@ -269,7 +269,7 @@ export default function OnboardingPage() {
                 />
               )}
               {hasDate === 'auspicious' && (
-                <p className="text-sm text-charcoal/50 bg-peach-light/30 rounded-xl p-3">
+                <p className="text-sm text-charcoal/70 bg-peach-light/30 rounded-xl p-3">
                   We&apos;re working on an auspicious date service — we&apos;ll notify you when it&apos;s ready!
                 </p>
               )}
@@ -283,7 +283,7 @@ export default function OnboardingPage() {
                 <h2 className="font-[family-name:var(--font-heading)] text-xl text-charcoal">
                   Wedding Events
                 </h2>
-                <p className="text-sm text-charcoal/60 mt-1">
+                <p className="text-sm text-charcoal/75 mt-1">
                   Select the events you&apos;re planning
                 </p>
               </div>
@@ -296,7 +296,7 @@ export default function OnboardingPage() {
                       'px-3 py-2.5 rounded-xl border-2 text-sm font-medium transition-all',
                       selectedEvents.includes(ev.value)
                         ? 'border-rose-gold bg-rose-gold/5 text-charcoal'
-                        : 'border-peach-light text-charcoal/50 hover:border-peach'
+                        : 'border-peach-light text-charcoal/70 hover:border-peach'
                     )}
                   >
                     {ev.label}
@@ -313,7 +313,7 @@ export default function OnboardingPage() {
                 <h2 className="font-[family-name:var(--font-heading)] text-xl text-charcoal">
                   Budget Setup
                 </h2>
-                <p className="text-sm text-charcoal/60 mt-1">
+                <p className="text-sm text-charcoal/75 mt-1">
                   Set your budget for each category (you can adjust later)
                 </p>
               </div>
@@ -336,7 +336,7 @@ export default function OnboardingPage() {
                     />
                     <span className="text-sm text-charcoal flex-1">{cat.label}</span>
                     <div className="flex items-center gap-1">
-                      <span className="text-xs text-charcoal/40">$</span>
+                      <span className="text-xs text-charcoal/65">$</span>
                       <input
                         type="number"
                         value={budgets[cat.key].amount}
@@ -354,7 +354,7 @@ export default function OnboardingPage() {
                 ))}
               </div>
               <div className="text-center pt-2 border-t border-peach-light">
-                <p className="text-sm text-charcoal/60">
+                <p className="text-sm text-charcoal/75">
                   Total Budget:{' '}
                   <span className="font-semibold text-charcoal">
                     $
@@ -375,7 +375,7 @@ export default function OnboardingPage() {
           )}
 
           {/* Navigation */}
-          <div className="flex justify-between mt-8">
+          <div className="flex justify-between gap-3 mt-6 sm:mt-8">
             <Button
               variant="ghost"
               onClick={() => setStep((s) => s - 1)}
