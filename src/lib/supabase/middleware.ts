@@ -55,13 +55,14 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && adminPaths.some((path) => pathname.startsWith(path))) {
-    const { data: profile } = await supabase
-      .from('profiles')
+    const { data: staff } = await supabase
+      .from('admin_access' as never)
       .select('role')
-      .eq('id', user.id)
-      .single()
+      .eq('user_id', user.id)
+      .maybeSingle()
 
-    if (profile?.role !== 'admin') {
+    const role = (staff as { role: string } | null)?.role
+    if (role !== 'owner' && role !== 'business_admin') {
       const url = request.nextUrl.clone()
       url.pathname = '/dashboard'
       return NextResponse.redirect(url)
