@@ -238,3 +238,10 @@ Design work must not be mistaken for completion of roadmap product features.
 - [x] Preserve authentication, redirects, wedding-type defaults and onboarding database writes.
 - [ ] Verify email signup/login, Google OAuth, error messages, onboarding steps and final submission in a Vercel preview.
 - [ ] Check mobile layout, keyboard navigation, and colour contrast before merge.
+
+## Existing account routing fix (November 2026)
+
+- [x] Google signup callback checks whether a wedding already exists before choosing dashboard or onboarding.
+- [x] Signed-in existing couples opening signup are redirected to dashboard.
+- [x] Onboarding checks existing weddings on entry and before insertion.
+- [ ] Verify returning Google users, returning email users, first-time signup, and direct onboarding URLs in Vercel preview.
