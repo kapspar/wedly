@@ -267,3 +267,13 @@ Mobile First
 
 Accessibility:
 WCAG AA
+
+
+## Visual experience requirements — November 2026
+
+- Follow `docs/BRAND_GUIDE.md` for the current approved design system.
+- Use shared semantic colours from `src/app/globals.css` and reusable UI components.
+- Keep mobile-first responsive layouts, readable contrast and visible keyboard focus.
+- Use the original approved transparent wedding illustrations from `public/illustrations/`; never silently regenerate replacements.
+- Preserve existing functionality and RLS/auth behaviour during visual-only work.
+- Test both public and signed-in experiences on mobile and desktop before deployment.
