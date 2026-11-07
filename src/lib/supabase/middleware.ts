@@ -45,6 +45,7 @@ export async function updateSession(request: NextRequest) {
   if (!user && adminPaths.some((path) => pathname.startsWith(path))) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
+    url.searchParams.set('redirect', pathname)
     return NextResponse.redirect(url)
   }
 
