@@ -1,27 +1,36 @@
 @import "tailwindcss";
 
 @theme {
-  --color-peach: #F6B8A8;
-  --color-peach-light: #FBD5CC;
-  --color-peach-dark: #E8957F;
-  --color-ivory: #FFF8F3;
-  --color-rose-gold: #A76559;
-  --color-rose-gold-dark: #875045;
-  --color-charcoal: #2F2F2F;
-  --color-sage: #A8C3A0;
-  --color-sage-dark: #8BAF82;
-
+  /* Wedly 2026: ivory, lilac and plum. Legacy token names remain as
+     compatibility aliases so existing pages inherit the refreshed palette. */
+  --color-primary: #893D87;
+  --color-primary-dark: #62245D;
+  --color-primary-soft: #F3E9F2;
+  --color-ivory: #FBF7FA;
+  --color-lilac: #F5EBF4;
+  --color-plum: #62245D;
+  --color-ink: #322634;
+  --color-muted: #615561;
+  --color-border-soft: #EADCE9;
+  --color-peach: #E8D2E6;
+  --color-peach-light: #F3E9F2;
+  --color-peach-dark: #B88AB6;
+  --color-rose-gold: #893D87;
+  --color-rose-gold-dark: #62245D;
+  --color-charcoal: #322634;
+  --color-sage: #9273A3;
+  --color-sage-dark: #76578A;
   --font-heading: 'Playfair Display', Georgia, serif;
   --font-body: 'Inter', system-ui, sans-serif;
   --font-logo: 'Cormorant Garamond', Georgia, serif;
 }
 
+:root { color-scheme: light; }
 body {
   font-family: var(--font-body);
-  color: var(--color-charcoal);
+  color: var(--color-ink);
   background-color: var(--color-ivory);
 }
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
-}
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
+::selection { background: #E8D2E6; color: #322634; }
+:focus-visible { outline: 2px solid #893D87; outline-offset: 3px; }
