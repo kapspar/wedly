@@ -27,9 +27,9 @@ export default async function SavedPage() {
     <>
       <Navbar />
       <main className="flex-1">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="font-[family-name:var(--font-heading)] text-2xl text-charcoal flex items-center gap-2 mb-6">
-            <Bookmark className="h-6 w-6 text-rose-gold" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-plum flex items-center gap-2 mb-6">
+            <Bookmark className="h-6 w-6 text-primary" />
             Saved Vendors
           </h1>
 
@@ -44,13 +44,13 @@ export default async function SavedPage() {
             </div>
           ) : (
             <Card className="p-8 text-center">
-              <Bookmark className="h-8 w-8 text-peach mx-auto mb-3" />
-              <p className="text-sm text-charcoal/50 mb-4">
+              <Bookmark className="h-8 w-8 text-primary mx-auto mb-3" />
+              <p className="text-sm text-muted mb-4">
                 No saved vendors yet. Browse vendors to find the perfect match!
               </p>
               <Link
                 href="/vendors"
-                className="inline-flex items-center gap-2 text-sm text-rose-gold hover:text-rose-gold-dark font-medium"
+                className="inline-flex items-center gap-2 text-sm text-primary hover:text-plum font-medium"
               >
                 Browse Vendors
               </Link>

@@ -60,13 +60,13 @@ export default async function DashboardPage() {
     <>
       <Navbar />
       <main className="flex-1">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="font-[family-name:var(--font-heading)] text-2xl sm:text-3xl text-charcoal">
+            <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-plum">
               {wedding.partner1_name} & {wedding.partner2_name}
             </h1>
-            <p className="text-charcoal/60 text-sm mt-1">
+            <p className="text-muted text-sm mt-1">
               {wedding.wedding_date
                 ? `Wedding on ${new Date(wedding.wedding_date).toLocaleDateString('en-CA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`
                 : wedding.seeking_auspicious_date
@@ -79,27 +79,27 @@ export default async function DashboardPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {countdown !== null && countdown > 0 && (
               <Card className="p-5 text-center">
-                <Calendar className="h-6 w-6 text-rose-gold mx-auto mb-2" />
-                <p className="text-2xl font-bold text-charcoal">{countdown}</p>
-                <p className="text-xs text-charcoal/50">days to go</p>
+                <Calendar className="h-6 w-6 text-primary mx-auto mb-2" />
+                <p className="text-2xl font-bold text-ink">{countdown}</p>
+                <p className="text-xs text-muted">days to go</p>
               </Card>
             )}
             <Card className="p-5 text-center">
-              <DollarSign className="h-6 w-6 text-sage mx-auto mb-2" />
-              <p className="text-lg font-bold text-charcoal">{formatCurrency(totalSpent)}</p>
-              <p className="text-xs text-charcoal/50">of {formatCurrency(totalBudget)} budget</p>
+              <DollarSign className="h-6 w-6 text-primary mx-auto mb-2" />
+              <p className="text-lg font-bold text-ink">{formatCurrency(totalSpent)}</p>
+              <p className="text-xs text-muted">of {formatCurrency(totalBudget)} budget</p>
             </Card>
             <Card className="p-5 text-center">
-              <Bookmark className="h-6 w-6 text-peach-dark mx-auto mb-2" />
-              <p className="text-2xl font-bold text-charcoal">{savedVendors?.length ?? 0}</p>
-              <p className="text-xs text-charcoal/50">saved vendors</p>
+              <Bookmark className="h-6 w-6 text-primary mx-auto mb-2" />
+              <p className="text-2xl font-bold text-ink">{savedVendors?.length ?? 0}</p>
+              <p className="text-xs text-muted">saved vendors</p>
             </Card>
             <Card className="p-5 text-center">
-              <CheckSquare className="h-6 w-6 text-sage mx-auto mb-2" />
-              <p className="text-2xl font-bold text-charcoal">
+              <CheckSquare className="h-6 w-6 text-primary mx-auto mb-2" />
+              <p className="text-2xl font-bold text-ink">
                 {completedTasks}/{totalTasks}
               </p>
-              <p className="text-xs text-charcoal/50">tasks done</p>
+              <p className="text-xs text-muted">tasks done</p>
             </Card>
           </div>
 
@@ -107,43 +107,43 @@ export default async function DashboardPage() {
             {/* Events */}
             <Card className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-[family-name:var(--font-heading)] text-lg text-charcoal flex items-center gap-2">
-                  <CalendarDays className="h-5 w-5 text-rose-gold" />
+                <h2 className="font-[family-name:var(--font-heading)] text-lg text-ink flex items-center gap-2">
+                  <CalendarDays className="h-5 w-5 text-primary" />
                   Wedding Events
                 </h2>
-                <Link href="/events" className="text-xs text-rose-gold hover:text-rose-gold-dark flex items-center gap-1">
+                <Link href="/events" className="text-xs text-primary hover:text-plum flex items-center gap-1">
                   Manage <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>
               {events && events.length > 0 ? (
                 <div className="space-y-3">
                   {events.map((event) => (
-                    <div key={event.id} className="flex items-center justify-between py-2 border-b border-peach-light/50 last:border-0">
+                    <div key={event.id} className="flex items-center justify-between py-2 border-b border-border-soft last:border-0">
                       <div>
-                        <p className="text-sm font-medium text-charcoal">
+                        <p className="text-sm font-medium text-ink">
                           {event.custom_label || event.event_type.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
                         </p>
-                        {event.venue_name && <p className="text-xs text-charcoal/50">{event.venue_name}</p>}
+                        {event.venue_name && <p className="text-xs text-muted">{event.venue_name}</p>}
                       </div>
-                      <span className="text-xs text-charcoal/40">
+                      <span className="text-xs text-muted">
                         {event.event_date ? new Date(event.event_date).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) : 'No date'}
                       </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-charcoal/40">No events planned yet</p>
+                <p className="text-sm text-muted">No events planned yet</p>
               )}
             </Card>
 
             {/* Budget Summary */}
             <Card className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-[family-name:var(--font-heading)] text-lg text-charcoal flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-sage" />
+                <h2 className="font-[family-name:var(--font-heading)] text-lg text-ink flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-primary" />
                   Budget
                 </h2>
-                <Link href="/budget" className="text-xs text-rose-gold hover:text-rose-gold-dark flex items-center gap-1">
+                <Link href="/budget" className="text-xs text-primary hover:text-plum flex items-center gap-1">
                   Details <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>
@@ -152,14 +152,14 @@ export default async function DashboardPage() {
                   {budgetData.filter((b) => b.is_enabled).slice(0, 5).map((b) => (
                     <div key={b.id}>
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="text-charcoal capitalize">{b.category.replace(/_/g, ' ')}</span>
-                        <span className="text-charcoal/60">
+                        <span className="text-ink capitalize">{b.category.replace(/_/g, ' ')}</span>
+                        <span className="text-muted">
                           {formatCurrency(Number(b.spent))} / {formatCurrency(Number(b.budgeted))}
                         </span>
                       </div>
-                      <div className="h-1.5 bg-peach-light rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-primary-soft rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-sage rounded-full transition-all"
+                          className="h-full bg-primary rounded-full transition-all"
                           style={{
                             width: `${Math.min((Number(b.spent) / Number(b.budgeted)) * 100, 100)}%`,
                           }}
@@ -169,18 +169,18 @@ export default async function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-charcoal/40">No budget set up yet</p>
+                <p className="text-sm text-muted">No budget set up yet</p>
               )}
             </Card>
 
             {/* Tasks */}
             <Card className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-[family-name:var(--font-heading)] text-lg text-charcoal flex items-center gap-2">
-                  <ListChecks className="h-5 w-5 text-peach-dark" />
+                <h2 className="font-[family-name:var(--font-heading)] text-lg text-ink flex items-center gap-2">
+                  <ListChecks className="h-5 w-5 text-primary" />
                   Tasks
                 </h2>
-                <Link href="/tasks" className="text-xs text-rose-gold hover:text-rose-gold-dark flex items-center gap-1">
+                <Link href="/tasks" className="text-xs text-primary hover:text-plum flex items-center gap-1">
                   View all <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>
@@ -188,47 +188,47 @@ export default async function DashboardPage() {
                 <div className="space-y-2">
                   {tasks.slice(0, 5).map((task) => (
                     <div key={task.id} className="flex items-center gap-3 py-1.5">
-                      <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${task.is_completed ? 'border-sage bg-sage' : 'border-peach-light'}`}>
+                      <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${task.is_completed ? 'border-primary bg-primary' : 'border-border-soft'}`}>
                         {task.is_completed && <Heart className="h-2.5 w-2.5 text-white" fill="currentColor" />}
                       </div>
-                      <span className={`text-sm ${task.is_completed ? 'text-charcoal/40 line-through' : 'text-charcoal'}`}>
+                      <span className={`text-sm ${task.is_completed ? 'text-muted line-through' : 'text-ink'}`}>
                         {task.title}
                       </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-charcoal/40">No tasks yet. Add some to stay organized!</p>
+                <p className="text-sm text-muted">No tasks yet. Add some to stay organized!</p>
               )}
             </Card>
 
             {/* Recent Inquiries */}
             <Card className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-[family-name:var(--font-heading)] text-lg text-charcoal flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-rose-gold" />
+                <h2 className="font-[family-name:var(--font-heading)] text-lg text-ink flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5 text-primary" />
                   Recent Inquiries
                 </h2>
-                <Link href="/inquiries" className="text-xs text-rose-gold hover:text-rose-gold-dark flex items-center gap-1">
+                <Link href="/inquiries" className="text-xs text-primary hover:text-plum flex items-center gap-1">
                   View all <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>
               {inquiries && inquiries.length > 0 ? (
                 <div className="space-y-3">
                   {inquiries.map((inq) => (
-                    <div key={inq.id} className="flex items-center justify-between py-2 border-b border-peach-light/50 last:border-0">
+                    <div key={inq.id} className="flex items-center justify-between py-2 border-b border-border-soft last:border-0">
                       <div>
-                        <p className="text-sm font-medium text-charcoal">
+                        <p className="text-sm font-medium text-ink">
                           {(inq.vendor as { name: string; slug: string })?.name}
                         </p>
-                        <p className="text-xs text-charcoal/50 truncate max-w-[200px]">{inq.message}</p>
+                        <p className="text-xs text-muted truncate max-w-[200px]">{inq.message}</p>
                       </div>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${
                         inq.status === 'pending'
-                          ? 'bg-peach-light text-peach-dark'
+                          ? 'bg-primary-soft text-primary'
                           : inq.status === 'replied'
-                            ? 'bg-sage/20 text-sage-dark'
-                            : 'bg-peach-light/50 text-charcoal/50'
+                            ? 'bg-primary-soft text-plum'
+                            : 'bg-primary-soft/60 text-muted'
                       }`}>
                         {inq.status}
                       </span>
@@ -236,9 +236,9 @@ export default async function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-charcoal/40">
+                <p className="text-sm text-muted">
                   No inquiries yet.{' '}
-                  <Link href="/vendors" className="text-rose-gold">
+                  <Link href="/vendors" className="text-primary">
                     Browse vendors
                   </Link>
                 </p>
@@ -257,8 +257,8 @@ export default async function DashboardPage() {
             ].map((link) => (
               <Link key={link.href} href={link.href}>
                 <Card className="p-4 text-center" hover>
-                  <link.icon className="h-5 w-5 text-rose-gold mx-auto mb-2" />
-                  <p className="text-xs font-medium text-charcoal">{link.label}</p>
+                  <link.icon className="h-5 w-5 text-primary mx-auto mb-2" />
+                  <p className="text-xs font-medium text-ink">{link.label}</p>
                 </Card>
               </Link>
             ))}

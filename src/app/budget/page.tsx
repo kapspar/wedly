@@ -99,10 +99,10 @@ export default function BudgetPage() {
     <>
       <Navbar />
       <main className="flex-1">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="font-[family-name:var(--font-heading)] text-2xl text-charcoal flex items-center gap-2">
-              <DollarSign className="h-6 w-6 text-sage" />
+            <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-plum flex items-center gap-2">
+              <DollarSign className="h-6 w-6 text-primary" />
               Budget Planner
             </h1>
             <Button onClick={handleSave} loading={saving} size="sm">
@@ -111,28 +111,28 @@ export default function BudgetPage() {
             </Button>
           </div>
 
-          {message && <p role="status" className="mb-4 rounded-xl bg-peach-light/40 px-4 py-3 text-sm text-charcoal">{message}</p>}
+          {message && <p role="status" className="mb-4 rounded-xl bg-primary-soft/50 px-4 py-3 text-sm text-ink">{message}</p>}
 
           {/* Summary */}
           <div className="grid grid-cols-3 gap-4 mb-8">
             <Card className="p-4 text-center">
-              <p className="text-xs text-charcoal/50 mb-1">Total Budget</p>
-              <p className="text-lg font-bold text-charcoal">{formatCurrency(totalBudget)}</p>
+              <p className="text-xs text-muted mb-1">Total Budget</p>
+              <p className="text-lg font-bold text-ink">{formatCurrency(totalBudget)}</p>
             </Card>
             <Card className="p-4 text-center">
-              <p className="text-xs text-charcoal/50 mb-1">Spent</p>
-              <p className="text-lg font-bold text-rose-gold">{formatCurrency(totalSpent)}</p>
+              <p className="text-xs text-muted mb-1">Spent</p>
+              <p className="text-lg font-bold text-primary">{formatCurrency(totalSpent)}</p>
             </Card>
             <Card className="p-4 text-center">
-              <p className="text-xs text-charcoal/50 mb-1">Remaining</p>
-              <p className={`text-lg font-bold ${remaining >= 0 ? 'text-sage-dark' : 'text-red-500'}`}>
+              <p className="text-xs text-muted mb-1">Remaining</p>
+              <p className={`text-lg font-bold ${remaining >= 0 ? 'text-plum' : 'text-red-500'}`}>
                 {formatCurrency(remaining)}
               </p>
             </Card>
           </div>
 
           {loading ? (
-            <div className="text-center py-12 text-charcoal/40">Loading...</div>
+            <div className="text-center py-12 text-muted">Loading...</div>
           ) : (
             <Card className="divide-y divide-peach-light/50">
               {items.map((item, idx) => (
@@ -147,14 +147,14 @@ export default function BudgetPage() {
                     }}
                     className="accent-rose-gold w-4 h-4"
                   />
-                  <span className="text-sm text-charcoal flex-1 capitalize">
+                  <span className="text-sm text-ink flex-1 capitalize">
                     {item.category.replace(/_/g, ' ')}
                   </span>
                   <div className="flex items-center gap-2">
                     <div className="text-right">
-                      <label className="text-[10px] text-charcoal/40">Budget</label>
+                      <label className="text-[10px] text-muted">Budget</label>
                       <div className="flex items-center gap-1">
-                        <span className="text-xs text-charcoal/40">$</span>
+                        <span className="text-xs text-muted">$</span>
                         <input
                           type="number"
                           value={item.budgeted}
@@ -164,14 +164,14 @@ export default function BudgetPage() {
                             setItems(next)
                           }}
                           disabled={!item.is_enabled}
-                          className="w-20 text-right text-sm bg-transparent border-b border-peach-light focus:outline-none focus:border-rose-gold disabled:text-charcoal/30"
+                          className="w-20 text-right text-sm bg-transparent border-b border-border-soft focus:outline-none focus:border-primary disabled:text-muted/70"
                         />
                       </div>
                     </div>
                     <div className="text-right">
-                      <label className="text-[10px] text-charcoal/40">Spent</label>
+                      <label className="text-[10px] text-muted">Spent</label>
                       <div className="flex items-center gap-1">
-                        <span className="text-xs text-charcoal/40">$</span>
+                        <span className="text-xs text-muted">$</span>
                         <input
                           type="number"
                           value={item.spent}
@@ -181,7 +181,7 @@ export default function BudgetPage() {
                             setItems(next)
                           }}
                           disabled={!item.is_enabled}
-                          className="w-20 text-right text-sm bg-transparent border-b border-peach-light focus:outline-none focus:border-rose-gold disabled:text-charcoal/30"
+                          className="w-20 text-right text-sm bg-transparent border-b border-border-soft focus:outline-none focus:border-primary disabled:text-muted/70"
                         />
                       </div>
                     </div>
@@ -194,11 +194,11 @@ export default function BudgetPage() {
             <Card className="mt-5 p-5 space-y-3">
               <h2 className="font-[family-name:var(--font-heading)] text-lg">Add custom budget category</h2>
               <div className="grid grid-cols-1 sm:grid-cols-[1fr_130px_auto] gap-3 items-end">
-                <label className="text-sm font-medium">Name<input value={newCategory} maxLength={80} onChange={e => setNewCategory(e.target.value)} placeholder="e.g. Saree draping" className="mt-1 block w-full rounded-xl border border-peach-light px-3 py-2.5" /></label>
-                <label className="text-sm font-medium">Budget ($)<input type="number" min="0" step="0.01" value={newBudget} onChange={e => setNewBudget(e.target.value)} placeholder="0" className="mt-1 block w-full rounded-xl border border-peach-light px-3 py-2.5" /></label>
+                <label className="text-sm font-medium">Name<input value={newCategory} maxLength={80} onChange={e => setNewCategory(e.target.value)} placeholder="e.g. Saree draping" className="mt-1 block w-full rounded-xl border border-border-soft px-3 py-2.5" /></label>
+                <label className="text-sm font-medium">Budget ($)<input type="number" min="0" step="0.01" value={newBudget} onChange={e => setNewBudget(e.target.value)} placeholder="0" className="mt-1 block w-full rounded-xl border border-border-soft px-3 py-2.5" /></label>
                 <Button type="button" onClick={addCategory} disabled={adding || !newCategory.trim()}><Plus className="h-4 w-4" /> Add</Button>
               </div>
-              <p className="text-xs text-charcoal/70">Custom categories save immediately. Use Save above to keep changes to existing amounts.</p>
+              <p className="text-xs text-muted">Custom categories save immediately. Use Save above to keep changes to existing amounts.</p>
             </Card>
           )}
         </div>

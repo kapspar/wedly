@@ -46,3 +46,8 @@ Use shared `Button`, `Card`, `Input`, `Navbar` and `Footer` components. Primary 
 ## Scope
 
 The refresh is visual only: no changes to auth, permissions, vendor data, budget calculations or business workflows. Test mobile and desktop layouts before merging.
+
+
+## Couple experience pages
+
+Dashboard, budget, tasks, events, inquiries and saved vendors should use the shared `text-plum`, `text-ink`, `text-muted`, `text-primary`, `bg-primary-soft` and `border-border-soft` utilities. Preserve existing task, budget and event persistence behaviour when changing visual styles. Status indicators must remain legible and convey meaning through text, not colour alone.

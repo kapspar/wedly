@@ -24,9 +24,9 @@ export default async function InquiriesPage() {
     <>
       <Navbar />
       <main className="flex-1">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="font-[family-name:var(--font-heading)] text-2xl text-charcoal flex items-center gap-2 mb-6">
-            <MessageSquare className="h-6 w-6 text-rose-gold" />
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-plum flex items-center gap-2 mb-6">
+            <MessageSquare className="h-6 w-6 text-primary" />
             My Inquiries
           </h1>
 
@@ -41,12 +41,12 @@ export default async function InquiriesPage() {
                         {vendor && (
                           <Link
                             href={`/vendor/${vendor.slug}`}
-                            className="font-[family-name:var(--font-heading)] text-base text-charcoal hover:text-rose-gold transition-colors"
+                            className="font-[family-name:var(--font-heading)] text-base text-ink hover:text-primary transition-colors"
                           >
                             {vendor.name}
                           </Link>
                         )}
-                        <p className="text-xs text-charcoal/40 mt-0.5">
+                        <p className="text-xs text-muted mt-0.5">
                           {vendor?.city} &middot;{' '}
                           {new Date(inq.created_at).toLocaleDateString('en-CA', {
                             month: 'short',
@@ -58,19 +58,19 @@ export default async function InquiriesPage() {
                       <span
                         className={`text-xs px-2.5 py-1 rounded-full font-medium ${
                           inq.status === 'pending'
-                            ? 'bg-peach-light text-peach-dark'
+                            ? 'bg-primary-soft text-primary'
                             : inq.status === 'replied'
-                              ? 'bg-sage/20 text-sage-dark'
+                              ? 'bg-primary-soft text-plum'
                               : inq.status === 'read'
                                 ? 'bg-blue-50 text-blue-600'
-                                : 'bg-gray-100 text-gray-500'
+                                : 'bg-slate-100 text-slate-600'
                         }`}
                       >
                         {inq.status}
                       </span>
                     </div>
-                    <p className="text-sm text-charcoal/70">{inq.message}</p>
-                    <div className="flex gap-4 mt-3 text-xs text-charcoal/40">
+                    <p className="text-sm text-muted">{inq.message}</p>
+                    <div className="flex gap-4 mt-3 text-xs text-muted">
                       {inq.event_date && (
                         <span>
                           Event:{' '}
@@ -88,13 +88,13 @@ export default async function InquiriesPage() {
             </div>
           ) : (
             <Card className="p-8 text-center">
-              <MessageSquare className="h-8 w-8 text-peach mx-auto mb-3" />
-              <p className="text-sm text-charcoal/50 mb-4">
+              <MessageSquare className="h-8 w-8 text-primary mx-auto mb-3" />
+              <p className="text-sm text-muted mb-4">
                 No inquiries yet. Find a vendor and send them a message!
               </p>
               <Link
                 href="/vendors"
-                className="text-sm text-rose-gold hover:text-rose-gold-dark font-medium"
+                className="text-sm text-primary hover:text-plum font-medium"
               >
                 Browse Vendors
               </Link>
