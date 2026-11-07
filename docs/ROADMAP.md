@@ -208,3 +208,15 @@ Registries.
 Travel.
 
 All in one place.
+
+
+## Design system refresh — November 2026
+
+- [x] Homepage refresh with approved original line-art illustrations (PR #6).
+- [x] Shared palette and common component styling prepared in the site-wide theme branch.
+- [x] Brand guide and README updated to reflect ivory, plum and lilac styling.
+- [ ] Verify Vercel preview and mobile/desktop contrast, navigation, cards, forms and page layouts.
+- [ ] Audit remaining page-specific hard-coded colours and migrate them to semantic tokens.
+- [ ] Review authenticated pages (onboarding, dashboard, budget, events, tasks, saved, inquiries) and vendor/admin experiences for visual consistency.
+
+Design work must not be mistaken for completion of roadmap product features.

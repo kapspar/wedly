@@ -1,132 +1,48 @@
-# Wedly Brand Guide
+# Wedly Brand Guide — November 2026
 
-## Brand Name
+## Identity
 
-Wedly
+**Wedly — Love. Plan. Celebrate.**
 
-## Tagline
+A warm, elegant and accessible wedding-planning platform, initially focused on GTA Tamil couples and designed to welcome other communities over time. The brand should feel personal, joyful, trustworthy and organized, never childish, generic or visually noisy.
 
-Love. Plan. Celebrate.
+## Approved palette
 
-## Brand Mission
+| Token | Hex | Use |
+| --- | --- | --- |
+| Primary purple | `#893D87` | Primary actions and links |
+| Deep plum | `#62245D` | Headings, logo and strong accents |
+| Warm ivory | `#FBF7FA` | Site backgrounds |
+| Soft lilac | `#F3E9F2` | Subtle backgrounds and icon containers |
+| Lilac section | `#F5EBF4` | Alternating sections |
+| Ink | `#322634` | Body text |
+| Muted ink | `#615561` | Secondary text |
+| Soft border | `#EADCE9` | Cards and fields |
 
-Wedly helps couples plan meaningful weddings with confidence by connecting them with trusted vendors, personalized planning tools, and cultural traditions that matter.
-
-Our initial focus is serving the Tamil wedding community in the Greater Toronto Area while building a platform that can eventually support all wedding traditions and cultures.
-
----
-
-## Brand Personality
-
-Wedly should feel:
-
-* Warm
-* Trustworthy
-* Elegant
-* Helpful
-* Modern
-* Romantic
-* Organized
-
-Wedly should NOT feel:
-
-* Corporate
-* Overly traditional
-* Generic
-* Cheap
-* Flashy
-
----
-
-## Colour Palette
-
-### Primary
-
-Soft Peach
-#F6B8A8
-
-### Secondary
-
-Warm Ivory
-#FFF8F3
-
-### Accent
-
-Rose Gold
-#D89A8A
-
-### Text
-
-Charcoal
-#2F2F2F
-
-### Success
-
-Sage Green
-#A8C3A0
-
----
+Avoid reintroducing peach and rose-gold as dominant UI colours. Legacy CSS tokens are mapped to the approved palette in `src/app/globals.css` until existing pages can be migrated safely.
 
 ## Typography
 
-### Logo Font
+- Headlines: Playfair Display
+- Body and functional UI: Inter
+- Wordmark: Cormorant Garamond
 
-Elegant Script Style
+Keep headlines editorial and controls highly legible. Maintain accessible contrast, clear focus indicators, generous whitespace and responsive mobile-first layouts.
 
-Suggested Fonts:
+## Illustration system
 
-* Allura
-* Parisienne
-* Great Vibes
+Use the **exact approved black-line illustrations**, not AI-generated substitutes or code recreations:
 
-### Heading Font
+- `public/illustrations/wedly-reception.png` — homepage hero
+- `public/illustrations/wedly-hindu.png` — Hindu ceremony section
+- `public/illustrations/wedly-catholic.png` — Catholic/Christian ceremony section
 
-Playfair Display
+Preserve their proportions and transparent backgrounds. Avoid stretching, colourizing, adding backgrounds or placing all three in the hero. Additional illustrations must match the same restrained line-art language.
 
-### Body Font
+## Components and voice
 
-Inter
+Use shared `Button`, `Card`, `Input`, `Navbar` and `Footer` components. Primary buttons use purple with white text; cards are white with subtle lilac borders; input focus is purple. Write in a welcoming, confident and practical voice. Keep the slogan **Love. Plan. Celebrate.**
 
----
+## Scope
 
-## Logo Concept
-
-Wordmark Logo
-
-Wedly
-
-The "W" should be elegant and flowing.
-
-A small heart or ring motif may be subtly integrated into the logo but should remain minimal.
-
-The logo should work equally well in:
-
-* Peach
-* White
-* Black
-
----
-
-## Brand Voice
-
-Wedly speaks like a trusted wedding planner.
-
-Friendly.
-Calm.
-Encouraging.
-
-Never pushy.
-
-Never sales-focused.
-
-Always helping couples feel excited and confident.
-
----
-
-## Key Message
-
-Planning your wedding should feel joyful, not overwhelming.
-
-Wedly helps couples discover vendors, manage budgets, organize events, and celebrate their story all in one place.
-
-Love. Plan. Celebrate.
+The refresh is visual only: no changes to auth, permissions, vendor data, budget calculations or business workflows. Test mobile and desktop layouts before merging.

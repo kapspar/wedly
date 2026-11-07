@@ -171,3 +171,16 @@ The schema supports future features including:
 ## License
 
 Private — All rights reserved.
+
+
+## Visual design system (November 2026)
+
+The site uses a unified ivory-and-plum design system defined in `src/app/globals.css` and documented in [docs/BRAND_GUIDE.md](docs/BRAND_GUIDE.md).
+
+- Primary: `#893D87`; deep plum: `#62245D`; ivory: `#FBF7FA`; soft lilac: `#F3E9F2`.
+- Playfair Display headings, Inter body text, Cormorant Garamond wordmark.
+- Reuse shared `Button`, `Card`, `Input`, `Navbar` and `Footer` components rather than inventing new colours.
+- Approved transparent line-art PNGs are stored at `public/illustrations/wedly-reception.png`, `wedly-hindu.png` and `wedly-catholic.png`. Do not redraw or replace these without approval.
+- Historical `rose-gold`, `peach` and `sage` CSS utilities are mapped to the new palette for backward compatibility; migrate to semantic tokens when touching pages.
+
+For visual QA, check the homepage, signup/login, onboarding, dashboard, budget, events, tasks, saved vendors, vendor directory/detail and admin screens at mobile and desktop widths. Do not infer feature completion from this design refresh.
