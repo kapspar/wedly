@@ -66,25 +66,25 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     <>
       <Navbar />
       <main className="flex-1">
-        <div className="bg-gradient-to-b from-peach-light/30 to-ivory py-10 sm:py-16">
+        <div className="bg-gradient-to-b from-primary-soft/60 to-ivory py-10 sm:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Link
               href="/vendors"
-              className="inline-flex items-center gap-1 text-sm text-charcoal/50 hover:text-charcoal mb-4"
+              className="inline-flex items-center gap-1 text-sm text-muted hover:text-ink mb-4"
             >
               <ChevronLeft className="h-4 w-4" />
               All Vendors
             </Link>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center">
-                <VendorCategoryIcon icon={cat.icon} className="h-5 w-5 text-rose-gold" />
+                <VendorCategoryIcon icon={cat.icon} className="h-5 w-5 text-primary" />
               </div>
-              <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-charcoal">
+              <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-ink">
                 {cat.name}
               </h1>
             </div>
             {cat.description && (
-              <p className="text-charcoal/60 mb-6 max-w-lg">{cat.description}</p>
+              <p className="text-muted mb-6 max-w-lg">{cat.description}</p>
             )}
             <div className="max-w-xl">
               <VendorSearch basePath={`/vendors/${category}`} initialQuery={sp.q} />
@@ -101,8 +101,8 @@ export default async function CategoryPage({ params, searchParams }: Props) {
                 className={cn(
                   'px-3 py-1 rounded-full text-xs transition-colors',
                   !sp.city
-                    ? 'bg-rose-gold text-white'
-                    : 'bg-peach-light/50 text-charcoal/60 hover:bg-peach-light'
+                    ? 'bg-primary text-white'
+                    : 'bg-primary-soft/60 text-muted hover:bg-primary-soft'
                 )}
               >
                 All Cities
@@ -114,8 +114,8 @@ export default async function CategoryPage({ params, searchParams }: Props) {
                   className={cn(
                     'px-3 py-1 rounded-full text-xs transition-colors',
                     sp.city === city
-                      ? 'bg-rose-gold text-white'
-                      : 'bg-peach-light/50 text-charcoal/60 hover:bg-peach-light'
+                      ? 'bg-primary text-white'
+                      : 'bg-primary-soft/60 text-muted hover:bg-primary-soft'
                   )}
                 >
                   {city}
@@ -124,7 +124,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             </div>
           )}
 
-          <p className="text-sm text-charcoal/50 mb-6">
+          <p className="text-sm text-muted mb-6">
             {vendors?.length ?? 0} vendor{(vendors?.length ?? 0) !== 1 ? 's' : ''} found
           </p>
 
@@ -136,7 +136,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             </div>
           ) : (
             <div className="text-center py-16">
-              <p className="text-charcoal/50">
+              <p className="text-muted">
                 {sp.q || sp.city
                   ? 'No vendors match your search. Try adjusting your filters.'
                   : 'No vendors found in this category.'}
@@ -144,7 +144,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
               {(sp.q || sp.city) && (
                 <Link
                   href={`/vendors/${category}`}
-                  className="mt-4 inline-block text-sm text-rose-gold hover:underline"
+                  className="mt-4 inline-block text-sm text-primary hover:underline"
                 >
                   Clear filters
                 </Link>
