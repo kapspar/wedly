@@ -220,3 +220,12 @@ All in one place.
 - [ ] Review authenticated pages (onboarding, dashboard, budget, events, tasks, saved, inquiries) and vendor/admin experiences for visual consistency.
 
 Design work must not be mistaken for completion of roadmap product features.
+
+
+## PR #8 — Couple experience visual refresh (November 2026)
+
+- [x] Apply semantic purple, plum, ink, muted and lilac tokens across dashboard, budget, tasks, events, inquiries and saved vendors.
+- [x] Standardize main content vertical spacing and prominent headings.
+- [x] Keep existing Supabase queries, mutations, navigation and form behaviour unchanged.
+- [ ] Confirm preview build, responsive layouts, contrast, and authenticated CRUD flows before merging.
+- [ ] Follow up on any issues identified during visual QA.
