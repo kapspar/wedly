@@ -45,11 +45,11 @@ export default function Navbar() {
     pathname === href || pathname.startsWith(href + '/')
 
   return (
-    <nav className="bg-white/80 backdrop-blur-md border-b border-peach-light/50 sticky top-0 z-50">
+    <nav className="bg-[#FBF7FA]/95 backdrop-blur-md border-b border-[#EADCE9] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center">
-            <span className="font-[family-name:var(--font-logo)] text-[1.65rem] italic font-light tracking-wide text-charcoal leading-none">
+            <span className="font-[family-name:var(--font-logo)] text-[1.8rem] italic font-light tracking-wide text-plum leading-none">
               Wedly
             </span>
           </Link>
