@@ -5,6 +5,7 @@ import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import Card from '@/components/ui/Card'
 import VendorCategoryIcon from '@/components/vendors/VendorCategoryIcon'
+import Image from 'next/image'
 
 const journey = [
   { number: '01', title: 'Make room for the dream', subtitle: 'Your budget, beautifully organized', icon: Wallet, detail: 'Set a budget that feels right for you, and keep track of every meaningful detail.', tone: 'bg-[#F8E8E2]' },
@@ -23,54 +24,49 @@ export default async function HomePage() {
     <>
       <Navbar />
       <main className="flex-1">
-        <section className="relative isolate overflow-hidden bg-[#FCF8F4]">
-          <div className="absolute inset-0 opacity-60 pointer-events-none" aria-hidden="true" style={{ backgroundImage: 'radial-gradient(ellipse at 85% 10%, #F4E4DD 0%, transparent 43%), radial-gradient(ellipse at 5% 90%, #F8E7E4 0%, transparent 45%)' }} />
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32 grid lg:grid-cols-[1.15fr_0.85fr] items-center gap-12 lg:gap-16">
-            <div>
-              <div className="flex items-center gap-3 mb-8 text-[#9B6A62]">
-                <span className="h-px w-10 bg-[#BA9188]" />
-                <span className="font-[family-name:var(--font-logo)] text-xl sm:text-2xl italic tracking-wide">Love. Plan. Celebrate.</span>
+        <section className="relative isolate overflow-hidden bg-[#FBF7FA]">
+          <div className="absolute inset-0 pointer-events-none" aria-hidden="true" style={{ background: 'radial-gradient(ellipse at 80% 20%, #F5EAF4 0%, transparent 55%)' }} />
+          <div className="relative max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 pt-12 pb-16 sm:pt-20 sm:pb-24">
+            <div className="grid lg:grid-cols-2 items-center gap-4 lg:gap-12">
+              <div className="text-center lg:text-left">
+                <p className="text-xs sm:text-sm uppercase tracking-[0.26em] text-[#74346E] mb-6">Love. Plan. Celebrate.</p>
+                <h1 className="font-[family-name:var(--font-heading)] text-[clamp(2.7rem,5.5vw,5rem)] leading-[1.1] text-[#62245D] tracking-tight">Your All-in-One Wedding Planning Assistant</h1>
+                <p className="mt-6 max-w-lg mx-auto lg:mx-0 text-base sm:text-lg leading-7 text-[#332B33]">Plan, organize, and bring your dream celebration to life — all in one place.</p>
+                <div className="mt-8 hidden lg:flex flex-wrap gap-3">
+                  <Link href="/auth/signup" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#893D87] px-8 py-4 text-white font-medium hover:bg-[#6B2C69] transition-colors">Create New Wedding Project <ArrowRight className="h-4 w-4" /></Link>
+                  <Link href="/vendors" className="inline-flex items-center justify-center rounded-xl border border-[#B78DB5] px-6 py-4 text-[#62245D] font-medium">Explore vendors</Link>
+                </div>
               </div>
-              <h1 className="font-[family-name:var(--font-heading)] text-[clamp(3rem,6vw,5.8rem)] leading-[1.12] tracking-tight text-[#3C3030]">
-                A beautiful beginning, <em className="font-normal text-rose-gold">thoughtfully planned.</em>
-              </h1>
-              <p className="mt-8 max-w-xl text-base sm:text-lg leading-8 text-[#74625D]">
-                Your love story deserves a celebration that feels like you. Discover wedding vendors, stay on top of your plans, and honour the traditions that matter.
-              </p>
-              <div className="mt-10 flex flex-col sm:flex-row gap-3">
-                <Link href="/auth/signup" className="inline-flex items-center justify-center gap-2 rounded-full bg-rose-gold px-8 py-4 text-white font-medium hover:bg-rose-gold-dark transition-colors">
-                  Start planning for free <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link href="/vendors" className="inline-flex items-center justify-center gap-2 rounded-full border border-[#CBB8AE] px-8 py-4 text-[#5B4642] font-medium hover:border-rose-gold hover:text-rose-gold transition-colors">
-                  Explore vendors
-                </Link>
+              <div className="w-full max-w-[540px] mx-auto -my-4 lg:my-0">
+                <Image src="/illustrations/wedly-reception.png" alt="Couple dancing at their wedding reception" width={936} height={936} priority className="w-full h-auto object-contain" />
               </div>
-              <p className="mt-7 text-xs tracking-wide text-[#8E7A73]">For Tamil Hindu and Christian weddings in the Greater Toronto Area</p>
             </div>
-
-            <div className="relative min-h-[350px] sm:min-h-[460px] lg:min-h-[520px] flex items-center justify-center" aria-label="Decorative wedding stationery illustration">
-              <div className="absolute w-[83%] aspect-square rounded-full border border-[#D9BEB1]/60" />
-              <div className="absolute w-[67%] aspect-square rounded-full border border-[#E8D4CB]" />
-              <div className="absolute left-[4%] top-[9%] text-[#B7827D] rotate-[-20deg]" aria-hidden="true"><Flower2 className="w-16 h-16 sm:w-24 sm:h-24" strokeWidth={0.8} /></div>
-              <div className="absolute right-[4%] bottom-[9%] text-[#B7827D] rotate-[20deg]" aria-hidden="true"><Flower2 className="w-16 h-16 sm:w-24 sm:h-24" strokeWidth={0.8} /></div>
-              <div className="relative w-[74%] max-w-[390px] rotate-[-4deg] bg-[#FFFDFB] border border-[#E5D6CD] shadow-[0_30px_75px_-30px_rgba(91,57,47,0.28)] px-8 py-12 sm:px-12 sm:py-16 text-center">
-                <div className="mx-auto w-12 h-12 rounded-full border border-[#C99B8B] flex items-center justify-center text-rose-gold"><Heart className="h-5 w-5" strokeWidth={1.3} /></div>
-                <p className="mt-8 text-[10px] uppercase tracking-[0.32em] text-[#A57A70]">The next chapter</p>
-                <p className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-[#57413C] mt-4 leading-tight">Your story,<br /><em>your celebration.</em></p>
-                <div className="flex items-center justify-center gap-3 mt-7 text-[#BA8D80]"><span className="h-px w-12 bg-[#D5B8A9]" /><Sparkles className="h-4 w-4" /><span className="h-px w-12 bg-[#D5B8A9]" /></div>
-                <p className="text-xs tracking-[0.17em] uppercase mt-7 text-[#9D8075]">With love, Wedly</p>
-              </div>
-              <div className="absolute right-[0%] top-[12%] w-20 h-24 sm:w-28 sm:h-32 bg-[#D6AA9C]/45 rotate-[14deg] rounded-t-full -z-10" />
-              <div className="absolute left-[5%] bottom-[12%] w-24 h-24 sm:w-32 sm:h-32 bg-[#E9D3C8]/65 rounded-full -z-10" />
+            <div className="lg:hidden max-w-md mx-auto mt-3">
+              <Link href="/auth/signup" className="flex items-center justify-center gap-2 rounded-xl bg-[#893D87] px-5 py-4 text-white text-center font-medium hover:bg-[#6B2C69] transition-colors">Create New Wedding Project <ArrowRight className="h-4 w-4" /></Link>
+            </div>
+            <div className="mt-6 text-center text-sm text-[#453746]">Are you a professional planner, vendor, or venue? <Link href="/auth/signup" className="inline-block ml-1 font-semibold text-[#74346E] underline underline-offset-4">Business Portal</Link></div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-7 mt-16 max-w-4xl mx-auto text-center">
+              {[
+                { icon: ClipboardCheck, label: 'Plan & Organize' },
+                { icon: Wallet, label: 'Manage Your Budget' },
+                { icon: Search, label: 'Find Vendors' },
+                { icon: Heart, label: 'Prepare & Celebrate' },
+              ].map((item) => (
+                <div key={item.label} className="flex flex-col items-center gap-3">
+                  <span className="rounded-full bg-[#F3E9F2] p-4 text-[#62245D]"><item.icon className="h-8 w-8" strokeWidth={1.4} /></span>
+                  <span className="text-sm sm:text-base text-[#322634]">{item.label}</span>
+                </div>
+              ))}
             </div>
           </div>
+          <div className="h-10 bg-[#FFFDFD]" style={{ clipPath: 'ellipse(80% 100% at 50% 100%)' }} />
         </section>
 
         <section className="bg-white py-20 sm:py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-14">
-              <p className="text-xs uppercase tracking-[0.2em] text-rose-gold font-medium mb-4">A little less stress, a lot more joy</p>
-              <h2 className="font-[family-name:var(--font-heading)] text-3xl sm:text-5xl text-[#433431] leading-tight">From the first idea to the <em>big day.</em></h2>
+              <p className="text-xs uppercase tracking-[0.2em] text-[#843E80] font-medium mb-4">A little less stress, a lot more joy</p>
+              <h2 className="font-[family-name:var(--font-heading)] text-3xl sm:text-5xl text-[#62245D] leading-tight">From the first idea to the <em>big day.</em></h2>
               <p className="mt-5 text-[#786761] leading-relaxed">Thoughtful tools to help you enjoy the journey, not just the destination.</p>
             </div>
             <div className="grid md:grid-cols-3 gap-5">
@@ -91,20 +87,23 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="bg-[#FAF3EE] py-20 sm:py-24">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="bg-[#FBF7FA] py-20 sm:py-24">
+          <div className="max-w-6xl mx-auto px-5 sm:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <p className="text-xs uppercase tracking-[0.24em] text-[#843E80] mb-3">Every love story belongs</p>
+              <h2 className="font-[family-name:var(--font-heading)] text-3xl sm:text-5xl text-[#62245D]">Your traditions. Your celebration.</h2>
+              <p className="mt-4 text-[#615561]">Built with the GTA Tamil community in mind, with room for every couple to celebrate their way.</p>
+            </div>
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="rounded-[2rem] border border-[#EAD8CE] bg-[#FFFDFB] p-8 sm:p-12">
-                <Flower2 className="h-9 w-9 text-rose-gold mb-7" strokeWidth={1.1} />
-                <p className="text-xs tracking-[0.17em] uppercase text-[#9E7168] mb-3">Honouring your traditions</p>
-                <h2 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-[#433431] mb-4">Tamil Hindu weddings</h2>
-                <p className="text-[#77645F] leading-7">From meaningful ceremonies to joyful receptions, make room for every tradition that matters to your family.</p>
+              <div className="rounded-[2rem] bg-white/80 p-6 sm:p-9 text-center border border-[#EEDFEA]">
+                <Image src="/illustrations/wedly-hindu.png" alt="Couple in Tamil Hindu wedding attire" width={936} height={936} className="w-full max-w-[390px] h-auto mx-auto object-contain" />
+                <h3 className="font-[family-name:var(--font-heading)] text-2xl text-[#62245D] mt-3">Tamil Hindu weddings</h3>
+                <p className="mt-2 text-sm leading-6 text-[#615561]">Plan your ceremony and honour the traditions that matter to your family.</p>
               </div>
-              <div className="rounded-[2rem] border border-[#EAD8CE] bg-[#FFFDFB] p-8 sm:p-12">
-                <Heart className="h-9 w-9 text-rose-gold mb-7" strokeWidth={1.1} />
-                <p className="text-xs tracking-[0.17em] uppercase text-[#9E7168] mb-3">Celebrating your story</p>
-                <h2 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-[#433431] mb-4">Tamil Christian weddings</h2>
-                <p className="text-[#77645F] leading-7">Plan your ceremony, reception, and the moments in between, with the people and traditions you love.</p>
+              <div className="rounded-[2rem] bg-white/80 p-6 sm:p-9 text-center border border-[#EEDFEA]">
+                <Image src="/illustrations/wedly-catholic.png" alt="Couple in Catholic wedding attire" width={936} height={936} className="w-full max-w-[390px] h-auto mx-auto object-contain" />
+                <h3 className="font-[family-name:var(--font-heading)] text-2xl text-[#62245D] mt-3">Tamil Christian weddings</h3>
+                <p className="mt-2 text-sm leading-6 text-[#615561]">Bring your ceremony, reception and meaningful moments together.</p>
               </div>
             </div>
           </div>
@@ -115,18 +114,18 @@ export default async function HomePage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-5 mb-12">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-rose-gold font-medium mb-4">Your people, your day</p>
-                  <h2 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-[#433431]">Find the right wedding vendors</h2>
+                  <p className="text-xs uppercase tracking-[0.2em] text-[#843E80] font-medium mb-4">Your people, your day</p>
+                  <h2 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-[#62245D]">Find the right wedding vendors</h2>
                   <p className="text-[#786761] mt-3">Explore businesses serving the GTA Tamil wedding community.</p>
                 </div>
-                <Link href="/vendors" className="inline-flex items-center gap-2 text-rose-gold font-medium hover:text-rose-gold-dark">Browse all vendors <ArrowRight className="h-4 w-4" /></Link>
+                <Link href="/vendors" className="inline-flex items-center gap-2 text-[#843E80] font-medium hover:text-[#62245D]">Browse all vendors <ArrowRight className="h-4 w-4" /></Link>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {categories.map((cat) => (
                   <Link key={cat.id} href={`/vendors/${cat.slug}`} className="group">
                     <Card className="p-5 text-center" hover>
                       <div className="w-12 h-12 rounded-xl bg-peach-light/50 flex items-center justify-center mx-auto mb-3 group-hover:bg-peach-light transition-colors">
-                        <VendorCategoryIcon icon={cat.icon} className="h-5 w-5 text-rose-gold" />
+                        <VendorCategoryIcon icon={cat.icon} className="h-5 w-5 text-[#843E80]" />
                       </div>
                       <h3 className="font-medium text-sm text-charcoal">{cat.name}</h3>
                       <p className="text-xs text-charcoal/40 mt-1">{(cat.vendors as { count: number }[])?.[0]?.count ?? 0} listings</p>
@@ -138,12 +137,12 @@ export default async function HomePage() {
           </section>
         )}
 
-        <section className="bg-[#F4E7E0] py-20 sm:py-24">
+        <section className="bg-[#F5EBF4] py-20 sm:py-24">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-            <Sparkles className="h-8 w-8 text-rose-gold mx-auto mb-6" strokeWidth={1.2} />
-            <h2 className="font-[family-name:var(--font-heading)] text-3xl sm:text-5xl text-[#433431] leading-tight">The best celebrations start with <em>a little planning.</em></h2>
+            <Sparkles className="h-8 w-8 text-[#843E80] mx-auto mb-6" strokeWidth={1.2} />
+            <h2 className="font-[family-name:var(--font-heading)] text-3xl sm:text-5xl text-[#62245D] leading-tight">The best celebrations start with <em>a little planning.</em></h2>
             <p className="text-[#786761] mt-6 mb-9">Your wedding planning space is free to get started. Bring your ideas; we&apos;ll help you organize the rest.</p>
-            <Link href="/auth/signup" className="inline-flex items-center justify-center gap-2 bg-rose-gold text-white px-8 py-4 rounded-full font-medium hover:bg-rose-gold-dark transition-colors">Create your free account <ArrowRight className="h-4 w-4" /></Link>
+            <Link href="/auth/signup" className="inline-flex items-center justify-center gap-2 bg-[#893D87] text-white px-8 py-4 rounded-full font-medium hover:bg-[#62245D] transition-colors">Create your free account <ArrowRight className="h-4 w-4" /></Link>
             <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-3 text-xs text-[#826D65]">
               <span className="flex items-center gap-1"><Check className="h-4 w-4" /> Budget tracker</span>
               <span className="flex items-center gap-1"><CalendarDays className="h-4 w-4" /> Event planning</span>
