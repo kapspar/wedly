@@ -52,12 +52,12 @@ export default async function VendorsPage({
     <>
       <Navbar />
       <main className="flex-1">
-        <div className="bg-gradient-to-b from-peach-light/30 to-ivory py-10 sm:py-16">
+        <div className="bg-gradient-to-b from-primary-soft/60 to-ivory py-10 sm:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-charcoal text-center mb-3">
+            <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-ink text-center mb-3">
               Wedding Vendors
             </h1>
-            <p className="text-center text-charcoal/60 mb-8 max-w-lg mx-auto">
+            <p className="text-center text-muted mb-8 max-w-lg mx-auto">
               Discover trusted vendors for your Tamil wedding in the Greater Toronto Area
             </p>
             <div className="max-w-xl mx-auto">
@@ -74,7 +74,7 @@ export default async function VendorsPage({
                 <Link
                   key={cat.id}
                   href={`/vendors/${cat.slug}`}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-peach-light bg-white text-sm text-charcoal/70 hover:border-rose-gold hover:text-rose-gold transition-colors"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-border-soft bg-white text-sm text-muted hover:border-primary hover:text-plum transition-colors"
                 >
                   <VendorCategoryIcon icon={cat.icon} className="h-3.5 w-3.5" />
                   {cat.name}
@@ -91,8 +91,8 @@ export default async function VendorsPage({
                 className={cn(
                   'px-3 py-1 rounded-full text-xs transition-colors',
                   !params.city
-                    ? 'bg-rose-gold text-white'
-                    : 'bg-peach-light/50 text-charcoal/60 hover:bg-peach-light'
+                    ? 'bg-primary text-white'
+                    : 'bg-primary-soft/60 text-muted hover:bg-primary-soft'
                 )}
               >
                 All Cities
@@ -104,8 +104,8 @@ export default async function VendorsPage({
                   className={cn(
                     'px-3 py-1 rounded-full text-xs transition-colors',
                     params.city === city
-                      ? 'bg-rose-gold text-white'
-                      : 'bg-peach-light/50 text-charcoal/60 hover:bg-peach-light'
+                      ? 'bg-primary text-white'
+                      : 'bg-primary-soft/60 text-muted hover:bg-primary-soft'
                   )}
                 >
                   {city}
@@ -115,7 +115,7 @@ export default async function VendorsPage({
           )}
 
           {/* Results */}
-          <p className="text-sm text-charcoal/50 mb-6">
+          <p className="text-sm text-muted mb-6">
             {vendors?.length ?? 0} vendor{(vendors?.length ?? 0) !== 1 ? 's' : ''} found
           </p>
 
@@ -127,13 +127,13 @@ export default async function VendorsPage({
             </div>
           ) : (
             <div className="text-center py-16">
-              <p className="text-charcoal/50">
+              <p className="text-muted">
                 No vendors found. Try adjusting your search or filters.
               </p>
               {(params.q || params.city) && (
                 <Link
                   href="/vendors"
-                  className="mt-4 inline-block text-sm text-rose-gold hover:underline"
+                  className="mt-4 inline-block text-sm text-primary hover:underline"
                 >
                   Clear filters
                 </Link>
