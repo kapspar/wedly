@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, ArrowLeft, Check } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -25,6 +25,25 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [checkingExisting, setCheckingExisting] = useState(true)
+
+  useEffect(() => {
+    let active = true
+    const checkExisting = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!active) return
+      if (!user) { router.replace('/auth/login?redirect=/dashboard'); return }
+      const { data: wedding, error: lookupError } = await supabase
+        .from('weddings').select('id').eq('couple_id', user.id).limit(1).maybeSingle()
+      if (!active) return
+      if (lookupError) { setError('Unable to load your wedding. Please refresh.'); setCheckingExisting(false); return }
+      if (wedding) { router.replace('/dashboard'); return }
+      setCheckingExisting(false)
+    }
+    void checkExisting()
+    return () => { active = false }
+  }, [router])
 
   const [partner1, setPartner1] = useState('')
   const [partner2, setPartner2] = useState('')
@@ -56,6 +75,7 @@ export default function OnboardingPage() {
   }
 
   const handleSubmit = async () => {
+    if (checkingExisting) return
     setLoading(true)
     setError('')
 
@@ -69,6 +89,11 @@ export default function OnboardingPage() {
       setLoading(false)
       return
     }
+
+    const { data: existingWedding, error: existingError } = await supabase
+      .from('weddings').select('id').eq('couple_id', user.id).limit(1).maybeSingle()
+    if (existingError) { setError(existingError.message); setLoading(false); return }
+    if (existingWedding) { router.replace('/dashboard'); return }
 
     const slug = slugify(`${partner1}-and-${partner2}`)
 
@@ -126,6 +151,10 @@ export default function OnboardingPage() {
           : step === 3
             ? selectedEvents.length > 0
             : true
+
+  if (checkingExisting) {
+    return <div className="min-h-screen bg-ivory flex items-center justify-center text-plum" role="status">Checking your wedding…</div>
+  }
 
   return (
     <div className="min-h-screen bg-ivory flex flex-col">

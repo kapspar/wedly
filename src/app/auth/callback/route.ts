@@ -18,7 +18,10 @@ export async function GET(request: Request) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(new URL(redirect, origin))
+      // Signup and login both land on the dashboard first. The dashboard
+      // already sends couples without a wedding to onboarding.
+      const destination = redirect === '/onboarding' || redirect === '/' ? '/dashboard' : redirect
+      return NextResponse.redirect(new URL(destination, origin))
     }
   }
 
