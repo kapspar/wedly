@@ -95,11 +95,11 @@ export default function TasksPage() {
       <main className="flex-1">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="font-[family-name:var(--font-heading)] text-2xl text-charcoal flex items-center gap-2">
-              <ListChecks className="h-6 w-6 text-peach-dark" />
+            <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-plum flex items-center gap-2">
+              <ListChecks className="h-6 w-6 text-primary" />
               Planning Tasks
             </h1>
-            <span className="text-sm text-charcoal/50">
+            <span className="text-sm text-muted">
               {completed}/{tasks.length} done
             </span>
           </div>
@@ -118,7 +118,7 @@ export default function TasksPage() {
                 value={newTask}
                 onChange={(e) => setNewTask(e.target.value)}
                 placeholder="Add a new task..."
-                className="flex-1 text-sm bg-transparent border-b border-peach-light focus:outline-none focus:border-rose-gold text-charcoal placeholder:text-charcoal/40 py-1"
+                className="flex-1 text-sm bg-transparent border-b border-border-soft focus:outline-none focus:border-primary text-ink placeholder:text-muted py-1"
               />
               <Button type="submit" size="sm" disabled={!newTask.trim()}>
                 <Plus className="h-4 w-4" />
@@ -128,11 +128,11 @@ export default function TasksPage() {
           </Card>
 
           {loading ? (
-            <div className="text-center py-12 text-charcoal/40">Loading...</div>
+            <div className="text-center py-12 text-muted">Loading...</div>
           ) : tasks.length === 0 ? (
             <Card className="p-8 text-center">
-              <ListChecks className="h-8 w-8 text-peach mx-auto mb-3" />
-              <p className="text-sm text-charcoal/50">
+              <ListChecks className="h-8 w-8 text-primary mx-auto mb-3" />
+              <p className="text-sm text-muted">
                 No tasks yet. Add some to stay organized!
               </p>
             </Card>
@@ -144,8 +144,8 @@ export default function TasksPage() {
                     onClick={() => toggleTask(task.id)}
                     className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                       task.is_completed
-                        ? 'border-sage bg-sage'
-                        : 'border-peach-light hover:border-rose-gold'
+                        ? 'border-primary bg-primary'
+                        : 'border-border-soft hover:border-primary'
                     }`}
                   >
                     {task.is_completed && (
@@ -154,14 +154,14 @@ export default function TasksPage() {
                   </button>
                   <span
                     className={`flex-1 text-sm ${
-                      task.is_completed ? 'text-charcoal/40 line-through' : 'text-charcoal'
+                      task.is_completed ? 'text-muted line-through' : 'text-ink'
                     }`}
                   >
                     {task.title}
                   </span>
                   <button
                     onClick={() => deleteTask(task.id)}
-                    className="text-charcoal/20 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                    className="text-muted/60 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
