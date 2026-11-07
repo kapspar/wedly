@@ -51,3 +51,8 @@ The refresh is visual only: no changes to auth, permissions, vendor data, budget
 ## Couple experience pages
 
 Dashboard, budget, tasks, events, inquiries and saved vendors should use the shared `text-plum`, `text-ink`, `text-muted`, `text-primary`, `bg-primary-soft` and `border-border-soft` utilities. Preserve existing task, budget and event persistence behaviour when changing visual styles. Status indicators must remain legible and convey meaning through text, not colour alone.
+
+
+## Authentication and onboarding
+
+Use the same ivory background, plum editorial headings, soft lilac borders and purple primary controls on login, signup and wedding onboarding. Keep Google branding intact within its sign-in button. Do not change Supabase auth, wedding-type defaults or step validation as part of visual-only work. Review all five onboarding steps on mobile before release.
