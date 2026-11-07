@@ -97,6 +97,8 @@ revoke all on function public.review_vendor_claim(uuid,text,text) from public;
 grant execute on function public.review_vendor_claim(uuid,text,text) to authenticated;
 
 -- IMPORTANT: Bootstrap owner by verified auth.users UUID, never by an email guessed in code:
--- insert into public.admin_access(user_id,role) values ('<verified-owner-auth-user-uuid>','owner');
+insert into public.admin_access(user_id,role)
+select id, 'owner' from auth.users where id='112f82fe-622a-4e5f-8200-4b0b724b59df'::uuid and lower(email)='kapilan@outlook.com'
+on conflict (user_id) do nothing;
 -- Only after the partner has signed up and their UUID is verified:
 -- insert into public.admin_access(user_id,role) values ('<verified-partner-auth-user-uuid>','business_admin');
