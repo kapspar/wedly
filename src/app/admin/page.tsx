@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Shield, Store, Tag, MessageSquare } from 'lucide-react'
+import { Shield, Store, Tag, MessageSquare, BadgeCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import Navbar from '@/components/layout/Navbar'
 import Card from '@/components/ui/Card'
@@ -30,6 +30,13 @@ export default async function AdminPage() {
       count: vendorCount ?? 0,
     },
     {
+      href: '/admin/claims',
+      label: 'Verification',
+      description: 'Review vendor ownership requests',
+      icon: BadgeCheck,
+      count: 0,
+    },
+    {
       href: '/admin/categories',
       label: 'Categories',
       description: 'Manage vendor categories',
@@ -55,7 +62,7 @@ export default async function AdminPage() {
             Admin Dashboard
           </h1>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {adminLinks.map((link) => (
               <Link key={link.href} href={link.href}>
                 <Card className="p-6" hover>
