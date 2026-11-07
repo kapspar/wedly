@@ -65,8 +65,8 @@ export default async function HomePage() {
         <section className="bg-white py-20 sm:py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-14">
-              <p className="text-xs uppercase tracking-[0.2em] text-rose-gold font-medium mb-4">A little less stress, a lot more joy</p>
-              <h2 className="font-[family-name:var(--font-heading)] text-3xl sm:text-5xl text-[#433431] leading-tight">From the first idea to the <em>big day.</em></h2>
+              <p className="text-xs uppercase tracking-[0.2em] text-[#843E80] font-medium mb-4">A little less stress, a lot more joy</p>
+              <h2 className="font-[family-name:var(--font-heading)] text-3xl sm:text-5xl text-[#62245D] leading-tight">From the first idea to the <em>big day.</em></h2>
               <p className="mt-5 text-[#786761] leading-relaxed">Thoughtful tools to help you enjoy the journey, not just the destination.</p>
             </div>
             <div className="grid md:grid-cols-3 gap-5">
@@ -114,18 +114,18 @@ export default async function HomePage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-5 mb-12">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-rose-gold font-medium mb-4">Your people, your day</p>
-                  <h2 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-[#433431]">Find the right wedding vendors</h2>
+                  <p className="text-xs uppercase tracking-[0.2em] text-[#843E80] font-medium mb-4">Your people, your day</p>
+                  <h2 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-[#62245D]">Find the right wedding vendors</h2>
                   <p className="text-[#786761] mt-3">Explore businesses serving the GTA Tamil wedding community.</p>
                 </div>
-                <Link href="/vendors" className="inline-flex items-center gap-2 text-rose-gold font-medium hover:text-rose-gold-dark">Browse all vendors <ArrowRight className="h-4 w-4" /></Link>
+                <Link href="/vendors" className="inline-flex items-center gap-2 text-[#843E80] font-medium hover:text-[#62245D]">Browse all vendors <ArrowRight className="h-4 w-4" /></Link>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {categories.map((cat) => (
                   <Link key={cat.id} href={`/vendors/${cat.slug}`} className="group">
                     <Card className="p-5 text-center" hover>
                       <div className="w-12 h-12 rounded-xl bg-peach-light/50 flex items-center justify-center mx-auto mb-3 group-hover:bg-peach-light transition-colors">
-                        <VendorCategoryIcon icon={cat.icon} className="h-5 w-5 text-rose-gold" />
+                        <VendorCategoryIcon icon={cat.icon} className="h-5 w-5 text-[#843E80]" />
                       </div>
                       <h3 className="font-medium text-sm text-charcoal">{cat.name}</h3>
                       <p className="text-xs text-charcoal/40 mt-1">{(cat.vendors as { count: number }[])?.[0]?.count ?? 0} listings</p>
@@ -137,12 +137,12 @@ export default async function HomePage() {
           </section>
         )}
 
-        <section className="bg-[#F4E7E0] py-20 sm:py-24">
+        <section className="bg-[#F5EBF4] py-20 sm:py-24">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-            <Sparkles className="h-8 w-8 text-rose-gold mx-auto mb-6" strokeWidth={1.2} />
-            <h2 className="font-[family-name:var(--font-heading)] text-3xl sm:text-5xl text-[#433431] leading-tight">The best celebrations start with <em>a little planning.</em></h2>
+            <Sparkles className="h-8 w-8 text-[#843E80] mx-auto mb-6" strokeWidth={1.2} />
+            <h2 className="font-[family-name:var(--font-heading)] text-3xl sm:text-5xl text-[#62245D] leading-tight">The best celebrations start with <em>a little planning.</em></h2>
             <p className="text-[#786761] mt-6 mb-9">Your wedding planning space is free to get started. Bring your ideas; we&apos;ll help you organize the rest.</p>
-            <Link href="/auth/signup" className="inline-flex items-center justify-center gap-2 bg-rose-gold text-white px-8 py-4 rounded-full font-medium hover:bg-rose-gold-dark transition-colors">Create your free account <ArrowRight className="h-4 w-4" /></Link>
+            <Link href="/auth/signup" className="inline-flex items-center justify-center gap-2 bg-[#893D87] text-white px-8 py-4 rounded-full font-medium hover:bg-[#62245D] transition-colors">Create your free account <ArrowRight className="h-4 w-4" /></Link>
             <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-3 text-xs text-[#826D65]">
               <span className="flex items-center gap-1"><Check className="h-4 w-4" /> Budget tracker</span>
               <span className="flex items-center gap-1"><CalendarDays className="h-4 w-4" /> Event planning</span>
