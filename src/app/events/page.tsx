@@ -112,10 +112,10 @@ export default function EventsPage() {
     <>
       <Navbar />
       <main className="flex-1">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="font-[family-name:var(--font-heading)] text-2xl text-charcoal flex items-center gap-2">
-              <CalendarDays className="h-6 w-6 text-rose-gold" />
+            <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-plum flex items-center gap-2">
+              <CalendarDays className="h-6 w-6 text-primary" />
               Wedding Events
             </h1>
             <div className="flex gap-2">
@@ -131,11 +131,11 @@ export default function EventsPage() {
           </div>
 
           {loading ? (
-            <div className="text-center py-12 text-charcoal/40">Loading...</div>
+            <div className="text-center py-12 text-muted">Loading...</div>
           ) : events.length === 0 ? (
             <Card className="p-8 text-center">
-              <CalendarDays className="h-8 w-8 text-peach mx-auto mb-3" />
-              <p className="text-sm text-charcoal/50 mb-4">No events planned yet</p>
+              <CalendarDays className="h-8 w-8 text-primary mx-auto mb-3" />
+              <p className="text-sm text-muted mb-4">No events planned yet</p>
               <Button onClick={addEvent} variant="outline" size="sm">
                 <Plus className="h-4 w-4" />
                 Add your first event
@@ -149,7 +149,7 @@ export default function EventsPage() {
                     <select
                       value={event.event_type}
                       onChange={(e) => updateEvent(event.id, 'event_type', e.target.value)}
-                      className="text-sm font-medium text-charcoal bg-transparent border-b border-peach-light focus:outline-none focus:border-rose-gold"
+                      className="text-sm font-medium text-ink bg-transparent border-b border-border-soft focus:outline-none focus:border-primary"
                     >
                       {EVENT_TYPES.map((t) => (
                         <option key={t.value} value={t.value}>
@@ -159,7 +159,7 @@ export default function EventsPage() {
                     </select>
                     <button
                       onClick={() => removeEvent(event.id)}
-                      className="text-charcoal/30 hover:text-red-500 transition-colors"
+                      className="text-muted/70 hover:text-red-500 transition-colors"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
