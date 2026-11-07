@@ -229,3 +229,12 @@ Design work must not be mistaken for completion of roadmap product features.
 - [x] Keep existing Supabase queries, mutations, navigation and form behaviour unchanged.
 - [ ] Confirm preview build, responsive layouts, contrast, and authenticated CRUD flows before merging.
 - [ ] Follow up on any issues identified during visual QA.
+
+
+## PR #9 — Authentication and onboarding visual refresh (November 2026)
+
+- [x] Align login and signup cards, links, headings and Google sign-in buttons with the approved purple/ivory palette.
+- [x] Align the five-step onboarding progress, selection surfaces and forms with semantic design tokens.
+- [x] Preserve authentication, redirects, wedding-type defaults and onboarding database writes.
+- [ ] Verify email signup/login, Google OAuth, error messages, onboarding steps and final submission in a Vercel preview.
+- [ ] Check mobile layout, keyboard navigation, and colour contrast before merge.

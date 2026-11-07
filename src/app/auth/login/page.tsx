@@ -51,10 +51,10 @@ function LoginForm() {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-peach-light/50 shadow-sm p-6 space-y-5">
+    <div className="bg-white rounded-2xl border border-border-soft shadow-sm p-6 sm:p-8 space-y-5">
       <button
         onClick={handleGoogleLogin}
-        className="w-full flex items-center justify-center gap-3 border border-peach-light rounded-xl px-4 py-2.5 text-sm font-medium text-charcoal hover:bg-peach-light/20 transition-colors"
+        className="w-full flex items-center justify-center gap-3 border border-border-soft rounded-xl px-4 py-2.5 text-sm font-medium text-ink hover:bg-primary-soft/20 transition-colors"
       >
         <svg className="h-5 w-5" viewBox="0 0 24 24">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
@@ -67,10 +67,10 @@ function LoginForm() {
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-peach-light" />
+          <div className="w-full border-t border-border-soft" />
         </div>
         <div className="relative flex justify-center text-xs">
-          <span className="bg-white px-3 text-charcoal/40">or</span>
+          <span className="bg-white px-3 text-muted">or</span>
         </div>
       </div>
 
@@ -110,25 +110,25 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-ivory">
+    <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-ivory">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-4">
-            <span className="font-[family-name:var(--font-logo)] text-4xl italic font-light tracking-wide text-charcoal">
+            <span className="font-[family-name:var(--font-logo)] text-4xl italic font-light tracking-wide text-plum">
               Wedly
             </span>
           </Link>
-          <h1 className="font-[family-name:var(--font-heading)] text-2xl text-charcoal">
+          <h1 className="font-[family-name:var(--font-heading)] text-3xl text-plum">
             Welcome back
           </h1>
-          <p className="text-sm text-charcoal/60 mt-1">
+          <p className="text-sm text-muted mt-1">
             Sign in to continue planning your wedding
           </p>
         </div>
 
         <Suspense
           fallback={
-            <div className="bg-white rounded-2xl border border-peach-light/50 shadow-sm p-6 text-center text-charcoal/40">
+            <div className="bg-white rounded-2xl border border-border-soft shadow-sm p-6 sm:p-8 text-center text-muted">
               Loading...
             </div>
           }
@@ -136,11 +136,11 @@ export default function LoginPage() {
           <LoginForm />
         </Suspense>
 
-        <p className="text-center text-sm text-charcoal/60 mt-6">
+        <p className="text-center text-sm text-muted mt-6">
           Don&apos;t have an account?{' '}
           <Link
             href="/auth/signup"
-            className="text-rose-gold font-medium hover:text-rose-gold-dark"
+            className="text-primary font-medium hover:text-plum"
           >
             Start planning
           </Link>

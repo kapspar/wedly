@@ -130,7 +130,7 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen bg-ivory flex flex-col">
       <div className="flex items-center justify-center pt-5 pb-4 sm:py-6">
-        <span className="font-[family-name:var(--font-logo)] text-3xl italic font-light tracking-wide text-charcoal">Wedly</span>
+        <span className="font-[family-name:var(--font-logo)] text-3xl italic font-light tracking-wide text-plum">Wedly</span>
       </div>
 
       {/* Progress */}
@@ -142,10 +142,10 @@ export default function OnboardingPage() {
                 className={cn(
                   'w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors',
                   i < step
-                    ? 'bg-sage text-white'
+                    ? 'bg-primary text-white'
                     : i === step
-                      ? 'bg-rose-gold text-white'
-                      : 'bg-peach-light text-charcoal/70'
+                      ? 'bg-primary text-white'
+                      : 'bg-primary-soft text-muted'
                 )}
               >
                 {i < step ? <Check className="h-4 w-4" /> : i + 1}
@@ -154,7 +154,7 @@ export default function OnboardingPage() {
                 <div
                   className={cn(
                     'h-0.5 w-6 sm:w-12 mx-1',
-                    i < step ? 'bg-sage' : 'bg-peach-light'
+                    i < step ? 'bg-primary' : 'bg-primary-soft'
                   )}
                 />
               )}
@@ -163,7 +163,7 @@ export default function OnboardingPage() {
         </div>
         <div className="flex justify-between mt-2">
           {STEPS.map((s) => (
-            <span key={s} className="text-[10px] text-charcoal/65 hidden sm:block">
+            <span key={s} className="text-[10px] text-muted hidden sm:block">
               {s}
             </span>
           ))}
@@ -176,10 +176,10 @@ export default function OnboardingPage() {
           {step === 0 && (
             <div className="space-y-6">
               <div className="text-center">
-                <h2 className="font-[family-name:var(--font-heading)] text-xl text-charcoal">
+                <h2 className="font-[family-name:var(--font-heading)] text-xl text-ink">
                   Tell us about you
                 </h2>
-                <p className="text-sm text-charcoal/75 mt-1">
+                <p className="text-sm text-muted mt-1">
                   What are the names of the happy couple?
                 </p>
               </div>
@@ -204,10 +204,10 @@ export default function OnboardingPage() {
           {step === 1 && (
             <div className="space-y-6">
               <div className="text-center">
-                <h2 className="font-[family-name:var(--font-heading)] text-xl text-charcoal">
+                <h2 className="font-[family-name:var(--font-heading)] text-xl text-ink">
                   Wedding Type
                 </h2>
-                <p className="text-sm text-charcoal/75 mt-1">
+                <p className="text-sm text-muted mt-1">
                   This helps us personalize your planning experience
                 </p>
               </div>
@@ -219,11 +219,11 @@ export default function OnboardingPage() {
                     className={cn(
                       'w-full text-left px-4 py-3 rounded-xl border-2 transition-all',
                       weddingType === t.value
-                        ? 'border-rose-gold bg-rose-gold/5'
-                        : 'border-peach-light hover:border-peach'
+                        ? 'border-primary bg-primary-soft/40'
+                        : 'border-border-soft hover:border-border-soft'
                     )}
                   >
-                    <span className="font-medium text-sm text-charcoal">{t.label}</span>
+                    <span className="font-medium text-sm text-ink">{t.label}</span>
                   </button>
                 ))}
               </div>
@@ -234,10 +234,10 @@ export default function OnboardingPage() {
           {step === 2 && (
             <div className="space-y-6">
               <div className="text-center">
-                <h2 className="font-[family-name:var(--font-heading)] text-xl text-charcoal">
+                <h2 className="font-[family-name:var(--font-heading)] text-xl text-ink">
                   Wedding Date
                 </h2>
-                <p className="text-sm text-charcoal/75 mt-1">Do you have a date in mind?</p>
+                <p className="text-sm text-muted mt-1">Do you have a date in mind?</p>
               </div>
               <div className="space-y-3">
                 {[
@@ -251,11 +251,11 @@ export default function OnboardingPage() {
                     className={cn(
                       'w-full text-left px-4 py-3 rounded-xl border-2 transition-all',
                       hasDate === opt.value
-                        ? 'border-rose-gold bg-rose-gold/5'
-                        : 'border-peach-light hover:border-peach'
+                        ? 'border-primary bg-primary-soft/40'
+                        : 'border-border-soft hover:border-border-soft'
                     )}
                   >
-                    <span className="font-medium text-sm text-charcoal">{opt.label}</span>
+                    <span className="font-medium text-sm text-ink">{opt.label}</span>
                   </button>
                 ))}
               </div>
@@ -269,7 +269,7 @@ export default function OnboardingPage() {
                 />
               )}
               {hasDate === 'auspicious' && (
-                <p className="text-sm text-charcoal/70 bg-peach-light/30 rounded-xl p-3">
+                <p className="text-sm text-muted bg-primary-soft/50 rounded-xl p-3">
                   We&apos;re working on an auspicious date service — we&apos;ll notify you when it&apos;s ready!
                 </p>
               )}
@@ -280,10 +280,10 @@ export default function OnboardingPage() {
           {step === 3 && (
             <div className="space-y-6">
               <div className="text-center">
-                <h2 className="font-[family-name:var(--font-heading)] text-xl text-charcoal">
+                <h2 className="font-[family-name:var(--font-heading)] text-xl text-ink">
                   Wedding Events
                 </h2>
-                <p className="text-sm text-charcoal/75 mt-1">
+                <p className="text-sm text-muted mt-1">
                   Select the events you&apos;re planning
                 </p>
               </div>
@@ -295,8 +295,8 @@ export default function OnboardingPage() {
                     className={cn(
                       'px-3 py-2.5 rounded-xl border-2 text-sm font-medium transition-all',
                       selectedEvents.includes(ev.value)
-                        ? 'border-rose-gold bg-rose-gold/5 text-charcoal'
-                        : 'border-peach-light text-charcoal/70 hover:border-peach'
+                        ? 'border-primary bg-primary-soft/40 text-ink'
+                        : 'border-border-soft text-muted hover:border-border-soft'
                     )}
                   >
                     {ev.label}
@@ -310,10 +310,10 @@ export default function OnboardingPage() {
           {step === 4 && (
             <div className="space-y-6">
               <div className="text-center">
-                <h2 className="font-[family-name:var(--font-heading)] text-xl text-charcoal">
+                <h2 className="font-[family-name:var(--font-heading)] text-xl text-ink">
                   Budget Setup
                 </h2>
-                <p className="text-sm text-charcoal/75 mt-1">
+                <p className="text-sm text-muted mt-1">
                   Set your budget for each category (you can adjust later)
                 </p>
               </div>
@@ -321,7 +321,7 @@ export default function OnboardingPage() {
                 {BUDGET_CATEGORIES.map((cat) => (
                   <div
                     key={cat.key}
-                    className="flex items-center gap-3 px-3 py-2 rounded-xl border border-peach-light"
+                    className="flex items-center gap-3 px-3 py-2 rounded-xl border border-border-soft"
                   >
                     <input
                       type="checkbox"
@@ -334,9 +334,9 @@ export default function OnboardingPage() {
                       }
                       className="accent-rose-gold w-4 h-4"
                     />
-                    <span className="text-sm text-charcoal flex-1">{cat.label}</span>
+                    <span className="text-sm text-ink flex-1">{cat.label}</span>
                     <div className="flex items-center gap-1">
-                      <span className="text-xs text-charcoal/65">$</span>
+                      <span className="text-xs text-muted">$</span>
                       <input
                         type="number"
                         value={budgets[cat.key].amount}
@@ -347,16 +347,16 @@ export default function OnboardingPage() {
                           }))
                         }
                         disabled={!budgets[cat.key].enabled}
-                        className="w-24 text-right text-sm bg-transparent border-none focus:outline-none disabled:text-charcoal/30"
+                        className="w-24 text-right text-sm bg-transparent border-none focus:outline-none disabled:text-muted"
                       />
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="text-center pt-2 border-t border-peach-light">
-                <p className="text-sm text-charcoal/75">
+              <div className="text-center pt-2 border-t border-border-soft">
+                <p className="text-sm text-muted">
                   Total Budget:{' '}
-                  <span className="font-semibold text-charcoal">
+                  <span className="font-semibold text-ink">
                     $
                     {Object.values(budgets)
                       .filter((b) => b.enabled)
