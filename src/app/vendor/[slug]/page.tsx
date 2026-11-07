@@ -8,6 +8,7 @@ import Card from '@/components/ui/Card'
 import VendorCategoryIcon from '@/components/vendors/VendorCategoryIcon'
 import InquiryForm from '@/components/vendors/InquiryForm'
 import SaveVendorButton from '@/components/vendors/SaveVendorButton'
+import ClaimListingForm from '@/components/vendors/ClaimListingForm'
 import type { Metadata } from 'next'
 
 interface Props {
@@ -265,6 +266,13 @@ export default async function VendorPage({ params }: Props) {
                   )}
                 </div>
               </Card>
+
+              {!vendor.is_claimed && (
+                <Card className="p-6">
+                  <h3 className="font-[family-name:var(--font-heading)] text-lg text-ink mb-3">Claim this listing</h3>
+                  <ClaimListingForm vendorId={vendor.id} userId={user?.id} />
+                </Card>
+              )}
 
               {/* Location */}
               <Card className="p-6">
