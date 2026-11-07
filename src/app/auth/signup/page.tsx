@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -15,6 +15,20 @@ export default function SignupPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  useEffect(() => {
+    let active = true
+    const checkExisting = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user || !active) return
+      const { data: wedding, error } = await supabase.from('weddings')
+        .select('id').eq('couple_id', user.id).limit(1).maybeSingle()
+      if (active && !error && wedding) router.replace('/dashboard')
+    }
+    void checkExisting()
+    return () => { active = false }
+  }, [router])
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -27,7 +41,7 @@ export default function SignupPage() {
     }
 
     const supabase = createClient()
-    const { error: authError } = await supabase.auth.signUp({
+    const { data: signupData, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -41,7 +55,13 @@ export default function SignupPage() {
       return
     }
 
-    router.push('/onboarding')
+    if (signupData.user && signupData.session) {
+      const { data: wedding } = await supabase.from('weddings')
+        .select('id').eq('couple_id', signupData.user.id).limit(1).maybeSingle()
+      router.replace(wedding ? '/dashboard' : '/onboarding')
+    } else {
+      router.replace('/auth/login')
+    }
     router.refresh()
   }
 
@@ -50,7 +70,7 @@ export default function SignupPage() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?redirect=/onboarding`,
+        redirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`,
       },
     })
   }
