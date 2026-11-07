@@ -245,3 +245,12 @@ Design work must not be mistaken for completion of roadmap product features.
 - [x] Signed-in existing couples opening signup are redirected to dashboard.
 - [x] Onboarding checks existing weddings on entry and before insertion.
 - [ ] Verify returning Google users, returning email users, first-time signup, and direct onboarding URLs in Vercel preview.
+
+## Vendor marketplace visual refresh — PR #12 (November 2026)
+
+- [x] Align vendor directory, category listings, profile pages, vendor cards and search form with ivory/plum/lilac semantic tokens.
+- [x] Preserve existing database queries, contact links, gallery, saved vendor and inquiry behaviour.
+- [ ] Run build, lint, mobile/desktop visual QA and authenticated inquiry testing in Vercel preview.
+- [ ] Audit vendor photo coverage and data accuracy; do not imply unverified vendors are endorsed.
+- [ ] Follow-up: fix city-filter options on category pages when active filters hide other cities.
+- [ ] Follow-up: vendor claim flow, editing, photo upload and inquiry delivery.
