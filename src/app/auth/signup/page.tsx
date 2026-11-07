@@ -41,7 +41,7 @@ export default function SignupPage() {
       return
     }
 
-    router.push('/onboarding')
+    router.push('/dashboard')
     router.refresh()
   }
 
@@ -50,7 +50,7 @@ export default function SignupPage() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?redirect=/onboarding`,
+        redirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`,
       },
     })
   }
