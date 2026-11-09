@@ -1,7 +1,7 @@
-export const SITE_NAME = 'Wedly'
+export const SITE_NAME = 'PlanWedly'
 export const SITE_TAGLINE = 'Love. Plan. Celebrate.'
 export const SITE_DESCRIPTION =
-  'Wedly helps couples plan meaningful weddings with confidence by connecting them with trusted vendors, personalized planning tools, and cultural traditions that matter.'
+  'PlanWedly helps couples plan meaningful weddings with confidence by connecting them with trusted vendors, personalized planning tools, and cultural traditions that matter.'
 export const SITE_URL = 'https://planwedly.com'
 
 export const WEDDING_TYPES = [
