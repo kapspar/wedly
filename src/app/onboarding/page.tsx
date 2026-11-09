@@ -159,7 +159,7 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen bg-ivory flex flex-col">
       <div className="flex items-center justify-center pt-5 pb-4 sm:py-6">
-        <span className="font-[family-name:var(--font-logo)] text-3xl italic font-light tracking-wide text-plum">Wedly</span>
+        <span className="font-[family-name:var(--font-logo)] text-3xl italic font-light tracking-wide text-plum">PlanWedly</span>
       </div>
 
       {/* Progress */}
