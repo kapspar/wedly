@@ -1,4 +1,4 @@
-Wedly is the trusted platform for planning Tamil weddings.
+PlanWedly is the trusted platform for planning Tamil weddings.
 
 Launch:
 - GTA Tamil community
