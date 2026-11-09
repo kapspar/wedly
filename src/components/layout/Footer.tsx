@@ -8,7 +8,7 @@ export default function Footer() {
           <div className="md:col-span-2">
             <div className="mb-3">
               <span className="font-[family-name:var(--font-logo)] text-2xl italic font-light tracking-wide text-white">
-                Wedly
+                PlanWedly
               </span>
             </div>
             <p className="text-sm text-white/60 max-w-sm">
@@ -62,7 +62,7 @@ export default function Footer() {
 
         <div className="border-t border-white/10 mt-8 pt-8 text-center">
           <p className="text-xs text-white/40">
-            &copy; {new Date().getFullYear()} Wedly. Love. Plan. Celebrate.
+            &copy; {new Date().getFullYear()} PlanWedly. Love. Plan. Celebrate.
           </p>
         </div>
       </div>
