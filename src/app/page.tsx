@@ -124,8 +124,8 @@ export default async function HomePage() {
                 {categories.map((cat) => (
                   <Link key={cat.id} href={`/vendors/${cat.slug}`} className="group">
                     <Card className="p-5 text-center" hover>
-                      <div className="w-12 h-12 rounded-xl bg-peach-light/50 flex items-center justify-center mx-auto mb-3 group-hover:bg-peach-light transition-colors">
-                        <VendorCategoryIcon icon={cat.icon} className="h-5 w-5 text-[#843E80]" />
+                      <div className="w-16 h-16 rounded-xl bg-peach-light/50 flex items-center justify-center mx-auto mb-3 group-hover:bg-peach-light transition-colors">
+                        <VendorCategoryIcon icon={cat.icon} className="h-14 w-14 text-[#843E80]" />
                       </div>
                       <h3 className="font-medium text-sm text-charcoal">{cat.name}</h3>
                       <p className="text-xs text-charcoal/40 mt-1">{(cat.vendors as { count: number }[])?.[0]?.count ?? 0} listings</p>

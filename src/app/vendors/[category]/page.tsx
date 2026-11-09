@@ -76,8 +76,8 @@ export default async function CategoryPage({ params, searchParams }: Props) {
               All Vendors
             </Link>
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center">
-                <VendorCategoryIcon icon={cat.icon} className="h-5 w-5 text-primary" />
+              <div className="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center">
+                <VendorCategoryIcon icon={cat.icon} className="h-12 w-12 text-primary" />
               </div>
               <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-ink">
                 {cat.name}
