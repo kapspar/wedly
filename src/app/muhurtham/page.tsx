@@ -43,7 +43,7 @@ export default function MuhurthamPage() {
             <Card className="p-6 border-rose-gold/30">
               <p className="text-xs uppercase tracking-wide text-rose-gold font-semibold">Optional paid service</p>
               <h2 className="font-[family-name:var(--font-heading)] text-2xl mt-2">Priest-verified consultation</h2>
-              <p className="text-sm text-charcoal/75 mt-2">Choose a simple date confirmation or detailed consultation. The priest reviews and signs the recommendation. Wedly collects payment and pays the priest or temple under their agreement.</p>
+              <p className="text-sm text-charcoal/75 mt-2">Choose a simple date confirmation or detailed consultation. The priest reviews and signs the recommendation. PlanWedly collects payment and pays the priest or temple under their agreement.</p>
               <p className="mt-5 text-xs font-medium text-charcoal/70">Coming soon · No payment collected</p>
             </Card>
           </div>
@@ -78,9 +78,9 @@ export default function MuhurthamPage() {
 
           <Card className="p-6 mt-10">
             <h2 className="font-[family-name:var(--font-heading)] text-2xl">Confirmation certificate preview</h2>
-            <p className="text-sm text-charcoal/75 mt-2">A proposed document signed by the reviewing priest. The priest may sign on behalf of a temple only when authorized by that temple. Wedly facilitates the service, not the religious decision.</p>
+            <p className="text-sm text-charcoal/75 mt-2">A proposed document signed by the reviewing priest. The priest may sign on behalf of a temple only when authorized by that temple. PlanWedly facilitates the service, not the religious decision.</p>
             <div className="mt-5 border-2 border-[#C7A67B] bg-[#FAF5EC] text-[#49382D] p-6 sm:p-10 text-center rounded-lg">
-              <p className="uppercase tracking-[0.25em] text-xs">Wedly · Sample only</p>
+              <p className="uppercase tracking-[0.25em] text-xs">PlanWedly · Sample only</p>
               <h3 className="font-[family-name:var(--font-heading)] text-2xl sm:text-3xl mt-3">Muhurtham Confirmation</h3>
               <p className="mt-4 text-sm">For: Couple's names to be confirmed</p>
               <p className="text-sm mt-1">Recommended date & time: Pending priest review</p>
@@ -93,7 +93,7 @@ export default function MuhurthamPage() {
 
           <Card className="p-6 mt-8">
             <h2 className="font-[family-name:var(--font-heading)] text-xl">Proposed priest-first pricing</h2>
-            <p className="text-sm text-charcoal/75 mt-2">The couple pays Wedly. Wedly retains its agreed fee and pays the priest or temple under their partnership agreement. This illustration does not process a payment.</p>
+            <p className="text-sm text-charcoal/75 mt-2">The couple pays PlanWedly. PlanWedly retains its agreed fee and pays the priest or temple under their partnership agreement. This illustration does not process a payment.</p>
             <div className="grid sm:grid-cols-2 gap-4 mt-5">
               <label className="text-sm font-medium">Sample consultation fee (CAD)
                 <input type="number" min="0" max="10000" step="5" value={price} onChange={e => setPrice(Math.max(0, Math.min(10000, Number(e.target.value) || 0)))} className="mt-1 block w-full rounded-xl border border-peach-light px-3 py-2.5" />
@@ -111,7 +111,7 @@ export default function MuhurthamPage() {
 
           <div className="mt-8 flex items-start gap-2 text-sm text-charcoal/75">
             <CheckCircle2 className="h-5 w-5 text-sage-dark shrink-0" />
-            <p>We will not collect birth details or offer calculated auspicious dates until the privacy, priest review, and calculation processes are ready. The priest makes the religious recommendation; Wedly operates the service and payment flow.</p>
+            <p>We will not collect birth details or offer calculated auspicious dates until the privacy, priest review, and calculation processes are ready. The priest makes the religious recommendation; PlanWedly operates the service and payment flow.</p>
           </div>
           <div className="mt-8"><Link href="/dashboard"><Button variant="outline">Back to dashboard</Button></Link></div>
         </div>
