@@ -81,7 +81,7 @@ export default function SignupPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-4">
             <span className="font-[family-name:var(--font-logo)] text-4xl italic font-light tracking-wide text-plum">
-              Wedly
+              PlanWedly
             </span>
           </Link>
           <h1 className="font-[family-name:var(--font-heading)] text-3xl text-plum">
