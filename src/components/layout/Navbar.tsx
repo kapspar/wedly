@@ -50,7 +50,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center">
             <span className="font-[family-name:var(--font-logo)] text-[1.8rem] italic font-light tracking-wide text-plum leading-none">
-              Wedly
+              PlanWedly
             </span>
           </Link>
 

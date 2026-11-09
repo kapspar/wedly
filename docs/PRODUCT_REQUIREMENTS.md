@@ -1,8 +1,8 @@
-# Wedly Product Requirements Document (PRD)
+# PlanWedly Product Requirements Document (PRD)
 
 ## Product Overview
 
-Wedly is a wedding planning and vendor marketplace platform.
+PlanWedly is a wedding planning and vendor marketplace platform.
 
 Initial launch focuses on Tamil weddings in the Greater Toronto Area.
 

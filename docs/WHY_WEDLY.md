@@ -9,7 +9,7 @@ Pricing is inconsistent.
 There is no centralized platform specifically designed around
 Tamil wedding traditions and multi-day wedding events.
 
-Wedly aims to become the trusted platform where couples can:
+PlanWedly aims to become the trusted platform where couples can:
 
 - Discover vendors
 - Manage budgets
@@ -20,5 +20,5 @@ Wedly aims to become the trusted platform where couples can:
 
 All in one place.
 
-Wedly launches focused on the GTA Tamil community but is designed
+PlanWedly launches focused on the GTA Tamil community but is designed
 to eventually support all cultures and wedding traditions.

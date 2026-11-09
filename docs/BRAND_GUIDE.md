@@ -1,8 +1,8 @@
-# Wedly Brand Guide — November 2026
+# PlanWedly Brand Guide — November 2026
 
 ## Identity
 
-**Wedly — Love. Plan. Celebrate.**
+**PlanWedly — Love. Plan. Celebrate.**
 
 A warm, elegant and accessible wedding-planning platform, initially focused on GTA Tamil couples and designed to welcome other communities over time. The brand should feel personal, joyful, trustworthy and organized, never childish, generic or visually noisy.
 

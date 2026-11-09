@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* Wedly 2026: ivory, lilac and plum. Legacy token names remain as
+  /* PlanWedly 2026: ivory, lilac and plum. Legacy token names remain as
      compatibility aliases so existing pages inherit the refreshed palette. */
   --color-primary: #893D87;
   --color-primary-dark: #62245D;

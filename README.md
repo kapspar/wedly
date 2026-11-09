@@ -1,8 +1,8 @@
-# Wedly
+# PlanWedly
 
 **Love. Plan. Celebrate.**
 
-Wedly is a wedding planning and vendor marketplace platform built for Tamil weddings in the Greater Toronto Area (GTA). It helps couples discover trusted vendors, manage budgets, plan multi-day events, and organize their wedding — all in one place.
+PlanWedly is a wedding planning and vendor marketplace platform built for Tamil weddings in the Greater Toronto Area (GTA). It helps couples discover trusted vendors, manage budgets, plan multi-day events, and organize their wedding — all in one place.
 
 ## Tech Stack
 
@@ -82,7 +82,7 @@ WHERE email = 'your-email@example.com';
 
 ```bash
 git add .
-git commit -m "Initial Wedly MVP"
+git commit -m "Initial PlanWedly MVP"
 git push origin main
 ```
 
