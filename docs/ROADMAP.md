@@ -1,12 +1,12 @@
-# Wedly Product Roadmap
+# PlanWedly Product Roadmap
 
 ## Vision
 
-Wedly exists to become the most trusted wedding planning platform for couples.
+PlanWedly exists to become the most trusted wedding planning platform for couples.
 
 The initial launch focuses on Tamil weddings in the Greater Toronto Area while building a platform that can eventually support all wedding traditions, cultures, and destinations.
 
-Wedly should guide couples from engagement to honeymoon.
+PlanWedly should guide couples from engagement to honeymoon.
 
 Our mission is simple:
 
@@ -193,7 +193,7 @@ Vacation packages
 
 # Long-Term Vision
 
-Wedly becomes the platform couples use from the day they get engaged until after their honeymoon.
+PlanWedly becomes the platform couples use from the day they get engaged until after their honeymoon.
 
 Wedding planning.
 
