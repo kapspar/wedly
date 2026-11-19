@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { CalendarDays, Plus, Trash2, Save } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import posthog from 'posthog-js'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import Card from '@/components/ui/Card'
@@ -88,7 +89,7 @@ export default function EventsPage() {
     setSaving(true)
     const supabase = createClient()
 
-    await supabase.from('wedding_events').delete().eq('wedding_id', weddingId)
+    const { error: deleteError } = await supabase.from('wedding_events').delete().eq('wedding_id', weddingId)
 
     const inserts = events.map((e, i) => ({
       wedding_id: weddingId,
@@ -101,8 +102,12 @@ export default function EventsPage() {
       sort_order: i,
     }))
 
-    if (inserts.length > 0) {
-      await supabase.from('wedding_events').insert(inserts)
+    const { error: insertError } = inserts.length > 0
+      ? await supabase.from('wedding_events').insert(inserts)
+      : { error: null }
+
+    if (!deleteError && !insertError) {
+      posthog.capture('wedding_events_saved', { event_count: events.length })
     }
 
     setSaving(false)

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ListChecks, Plus, Trash2, Heart } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import posthog from 'posthog-js'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import Card from '@/components/ui/Card'
@@ -65,6 +66,7 @@ export default function TasksPage() {
     if (data) {
       setTasks(prev => [...prev, data])
       setNewTask('')
+      posthog.capture('task_created')
     }
   }
 
@@ -73,18 +75,24 @@ export default function TasksPage() {
     if (!task) return
 
     const supabase = createClient()
-    await supabase
+    const { error } = await supabase
       .from('tasks')
       .update({ is_completed: !task.is_completed })
       .eq('id', id)
 
-    setTasks(prev => prev.map(t => (t.id === id ? { ...t, is_completed: !t.is_completed } : t)))
+    if (!error) {
+      setTasks(prev => prev.map(t => (t.id === id ? { ...t, is_completed: !t.is_completed } : t)))
+      posthog.capture('task_completion_toggled', { is_completed: !task.is_completed })
+    }
   }
 
   const deleteTask = async (id: string) => {
     const supabase = createClient()
-    await supabase.from('tasks').delete().eq('id', id)
-    setTasks(prev => prev.filter(t => t.id !== id))
+    const { error } = await supabase.from('tasks').delete().eq('id', id)
+    if (!error) {
+      setTasks(prev => prev.filter(t => t.id !== id))
+      posthog.capture('task_deleted')
+    }
   }
 
   const completed = tasks.filter(t => t.is_completed).length

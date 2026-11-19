@@ -8,6 +8,7 @@ import Card from '@/components/ui/Card'
 import VendorCategoryIcon from '@/components/vendors/VendorCategoryIcon'
 import InquiryForm from '@/components/vendors/InquiryForm'
 import SaveVendorButton from '@/components/vendors/SaveVendorButton'
+import VendorAnalytics from '@/components/analytics/VendorAnalytics'
 import type { Metadata } from 'next'
 
 interface Props {
@@ -81,6 +82,7 @@ export default async function VendorPage({ params }: Props) {
   return (
     <>
       <Navbar />
+      <VendorAnalytics vendorId={vendor.id} />
       <main className="flex-1">
         {/* Hero banner */}
         <div className="relative">
@@ -219,6 +221,7 @@ export default async function VendorPage({ params }: Props) {
                   {vendor.website_url && (
                     <a
                       href={vendor.website_url}
+                      data-analytics-outbound="website"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2.5 text-sm text-muted hover:text-plum transition-colors group"
@@ -249,6 +252,7 @@ export default async function VendorPage({ params }: Props) {
                   {vendor.instagram_url && (
                     <a
                       href={vendor.instagram_url}
+                      data-analytics-outbound="instagram"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2.5 text-sm text-muted hover:text-plum transition-colors group"

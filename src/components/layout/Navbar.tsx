@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { Menu, X, LogOut, LayoutDashboard, User } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import posthog from 'posthog-js'
 import { cn } from '@/lib/utils'
 import type { UserRole } from '@/lib/types/database'
 
@@ -20,6 +21,8 @@ export default function Navbar() {
     supabase.auth.getUser().then(({ data: { user: u } }) => {
       setUser(u ? { id: u.id, email: u.email ?? undefined } : null)
       if (u) {
+        posthog.identify(u.id)
+
         supabase
           .from('profiles')
           .select('role')
@@ -32,7 +35,8 @@ export default function Navbar() {
 
   const handleSignOut = async () => {
     const supabase = createClient()
-    await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut()
+    if (!error) posthog.reset()
     router.push('/')
     router.refresh()
   }

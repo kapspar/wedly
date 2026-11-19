@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { DollarSign, Save, Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import posthog from 'posthog-js'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import Card from '@/components/ui/Card'
@@ -66,8 +67,10 @@ export default function BudgetPage() {
           .eq('id', item.id)
       )
     )
+    const hasError = results.some(result => result.error)
     setSaving(false)
-    setMessage(results.some(result => result.error) ? 'Some changes could not be saved. Please retry.' : 'Budget saved successfully.')
+    setMessage(hasError ? 'Some changes could not be saved. Please retry.' : 'Budget saved successfully.')
+    if (!hasError) posthog.capture('budget_saved', { category_count: items.length })
   }
 
   const addCategory = async () => {
@@ -87,6 +90,7 @@ export default function BudgetPage() {
       setNewCategory('')
       setNewBudget('')
       setMessage('Custom budget category added.')
+      posthog.capture('budget_category_added')
     }
     setAdding(false)
   }

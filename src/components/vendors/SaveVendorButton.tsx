@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Bookmark } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import posthog from 'posthog-js'
 import { cn } from '@/lib/utils'
 
 interface Props {
@@ -27,17 +28,23 @@ export default function SaveVendorButton({ vendorId, initialSaved, userId }: Pro
     const supabase = createClient()
 
     if (saved) {
-      await supabase
+      const { error } = await supabase
         .from('saved_vendors')
         .delete()
         .eq('couple_id', userId)
         .eq('vendor_id', vendorId)
-      setSaved(false)
+      if (!error) {
+        setSaved(false)
+        posthog.capture('vendor_unsaved')
+      }
     } else {
-      await supabase
+      const { error } = await supabase
         .from('saved_vendors')
         .insert({ couple_id: userId, vendor_id: vendorId })
-      setSaved(true)
+      if (!error) {
+        setSaved(true)
+        posthog.capture('vendor_saved')
+      }
     }
 
     setLoading(false)

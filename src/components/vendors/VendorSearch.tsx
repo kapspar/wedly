@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Search } from 'lucide-react'
+import posthog from 'posthog-js'
 
 export default function VendorSearch({
   basePath,
@@ -21,6 +22,7 @@ export default function VendorSearch({
       params.set('q', query.trim())
     }
     const qs = params.toString()
+    posthog.capture('vendor_search_submitted', { has_query: Boolean(query.trim()) })
     router.push(qs ? `${basePath}?${qs}` : basePath)
   }
 

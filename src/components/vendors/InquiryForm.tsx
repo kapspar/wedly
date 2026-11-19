@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Send } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import posthog from 'posthog-js'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 
@@ -62,6 +63,10 @@ export default function InquiryForm({ vendorId, vendorName, vendorSlug, userId }
       return
     }
 
+    posthog.capture('vendor_inquiry_sent', {
+      has_event_date: Boolean(eventDate),
+      has_guest_count: Boolean(guestCount),
+    })
     setSuccess(true)
     setLoading(false)
     setMessage('')

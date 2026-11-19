@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import posthog from 'posthog-js'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 
@@ -56,6 +57,9 @@ export default function SignupPage() {
     }
 
     if (signupData.user && signupData.session) {
+      posthog.identify(signupData.user.id)
+      posthog.capture('user_signed_up', { auth_method: 'password' })
+
       const { data: wedding } = await supabase.from('weddings')
         .select('id').eq('couple_id', signupData.user.id).limit(1).maybeSingle()
       router.replace(wedding ? '/dashboard' : '/onboarding')
