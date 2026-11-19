@@ -38,7 +38,7 @@ export default async function HomePage() {
                 </div>
               </div>
               <div className="w-full max-w-[540px] mx-auto -my-4 lg:my-0">
-                <Image src="/illustrations/wedly-reception.png" alt="Couple dancing at their wedding reception" width={936} height={936} priority className="w-full h-auto object-contain" />
+                <Image src="/illustrations/wedly-reception.png" alt="Couple dancing at their wedding reception" width={1024} height={936} priority unoptimized sizes="(max-width: 1023px) 100vw, 540px" className="w-full h-auto object-contain" />
               </div>
             </div>
             <div className="lg:hidden max-w-md mx-auto mt-3">
@@ -96,12 +96,12 @@ export default async function HomePage() {
             </div>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="rounded-[2rem] bg-white/80 p-6 sm:p-9 text-center border border-[#EEDFEA]">
-                <Image src="/illustrations/wedly-hindu.png" alt="Couple in Tamil Hindu wedding attire" width={936} height={936} className="w-full max-w-[390px] h-auto mx-auto object-contain" />
+                <Image src="/illustrations/wedly-hindu.png" alt="Couple in Tamil Hindu wedding attire" width={936} height={1024} unoptimized sizes="(max-width: 639px) 100vw, 390px" className="w-full max-w-[390px] h-auto mx-auto object-contain" />
                 <h3 className="font-[family-name:var(--font-heading)] text-2xl text-[#62245D] mt-3">Tamil Hindu weddings</h3>
                 <p className="mt-2 text-sm leading-6 text-[#615561]">Plan your ceremony and honour the traditions that matter to your family.</p>
               </div>
               <div className="rounded-[2rem] bg-white/80 p-6 sm:p-9 text-center border border-[#EEDFEA]">
-                <Image src="/illustrations/wedly-catholic.png" alt="Couple in Catholic wedding attire" width={936} height={936} className="w-full max-w-[390px] h-auto mx-auto object-contain" />
+                <Image src="/illustrations/wedly-catholic.png" alt="Couple in Catholic wedding attire" width={936} height={1024} unoptimized sizes="(max-width: 639px) 100vw, 390px" className="w-full max-w-[390px] h-auto mx-auto object-contain" />
                 <h3 className="font-[family-name:var(--font-heading)] text-2xl text-[#62245D] mt-3">Tamil Christian weddings</h3>
                 <p className="mt-2 text-sm leading-6 text-[#615561]">Bring your ceremony, reception and meaningful moments together.</p>
               </div>
