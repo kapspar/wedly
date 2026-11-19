@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, ArrowLeft, Check } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import posthog from 'posthog-js'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Card from '@/components/ui/Card'
@@ -132,10 +133,19 @@ export default function OnboardingPage() {
         is_enabled: true,
       }))
 
-    await Promise.all([
+    const setupResults = await Promise.all([
       supabase.from('wedding_events').insert(eventInserts),
       supabase.from('budget_categories').insert(budgetInserts),
     ])
+
+    if (!setupResults.some((result) => result.error)) {
+      posthog.capture('onboarding_completed', {
+        wedding_type: weddingType,
+        date_preference: hasDate,
+        event_count: selectedEvents.length,
+        budget_category_count: budgetInserts.length,
+      })
+    }
 
     router.push('/dashboard')
     router.refresh()

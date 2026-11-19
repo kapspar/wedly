@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import posthog from 'posthog-js'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 
@@ -25,7 +26,7 @@ function LoginForm() {
     setError('')
 
     const supabase = createClient()
-    const { error: authError } = await supabase.auth.signInWithPassword({
+    const { data: loginData, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
@@ -34,6 +35,14 @@ function LoginForm() {
       setError(authError.message)
       setLoading(false)
       return
+    }
+
+    if (loginData.user) {
+      posthog.identify(loginData.user.id, {
+        email: loginData.user.email,
+        name: loginData.user.user_metadata.full_name,
+      })
+      posthog.capture('user_logged_in', { auth_method: 'password' })
     }
 
     router.push(redirect)
