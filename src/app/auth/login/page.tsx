@@ -38,10 +38,7 @@ function LoginForm() {
     }
 
     if (loginData.user) {
-      posthog.identify(loginData.user.id, {
-        email: loginData.user.email,
-        name: loginData.user.user_metadata.full_name,
-      })
+      posthog.identify(loginData.user.id)
       posthog.capture('user_logged_in', { auth_method: 'password' })
     }
 
