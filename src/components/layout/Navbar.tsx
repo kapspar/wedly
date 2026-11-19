@@ -21,10 +21,7 @@ export default function Navbar() {
     supabase.auth.getUser().then(({ data: { user: u } }) => {
       setUser(u ? { id: u.id, email: u.email ?? undefined } : null)
       if (u) {
-        posthog.identify(u.id, {
-          email: u.email,
-          name: u.user_metadata.full_name,
-        })
+        posthog.identify(u.id)
 
         supabase
           .from('profiles')
