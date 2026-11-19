@@ -57,10 +57,7 @@ export default function SignupPage() {
     }
 
     if (signupData.user && signupData.session) {
-      posthog.identify(signupData.user.id, {
-        email: signupData.user.email,
-        name: signupData.user.user_metadata.full_name,
-      })
+      posthog.identify(signupData.user.id)
       posthog.capture('user_signed_up', { auth_method: 'password' })
 
       const { data: wedding } = await supabase.from('weddings')
