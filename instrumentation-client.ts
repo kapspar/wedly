@@ -8,6 +8,11 @@ if (token && host) {
     api_host: host,
     defaults: '2026-08-30',
     capture_exceptions: true,
+    opt_out_capturing_by_default: true,
+    autocapture: false,
+    disable_session_recording: true,
+    mask_all_text: true,
+    mask_all_element_attributes: true,
     debug: process.env.NODE_ENV === 'development',
   })
 } else if (process.env.NODE_ENV === 'development') {
