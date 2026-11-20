@@ -15,6 +15,13 @@ type Fields = {
   phone: string
   website_url: string
   instagram_url: string
+  tiktok_url: string
+  facebook_url: string
+  youtube_url: string
+  pinterest_url: string
+  snapchat_url: string
+  linkedin_url: string
+  whatsapp_url: string
   description: string
   pricing_range: string
 }
@@ -24,6 +31,13 @@ export default function NewVendorForm({ requesterId, categories }: { requesterId
   const [fields, setFields] = useState<Fields>({
     category_id: '', name: '', city: '', area: '', business_email: '',
     phone: '', website_url: '', instagram_url: '', description: '', pricing_range: '',
+    tiktok_url: '',
+    facebook_url: '',
+    youtube_url: '',
+    pinterest_url: '',
+    snapchat_url: '',
+    linkedin_url: '',
+    whatsapp_url: '',
   })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -38,9 +52,9 @@ export default function NewVendorForm({ requesterId, categories }: { requesterId
       setError('Category, name, city and business email are required.')
       return
     }
-    for (const key of ['website_url', 'instagram_url'] as const) {
+    for (const key of ['website_url', 'instagram_url', 'tiktok_url', 'facebook_url', 'youtube_url', 'pinterest_url', 'snapchat_url', 'linkedin_url', 'whatsapp_url'] as const) {
       if (fields[key] && !/^https:\/\//i.test(fields[key].trim())) {
-        setError('Website and Instagram links must begin with https://')
+        setError('Website and social links must begin with https://')
         return
       }
     }
@@ -62,6 +76,13 @@ export default function NewVendorForm({ requesterId, categories }: { requesterId
       phone: fields.phone.trim() || null,
       website_url: fields.website_url.trim() || null,
       instagram_url: fields.instagram_url.trim() || null,
+      tiktok_url: fields.tiktok_url.trim() || null,
+      facebook_url: fields.facebook_url.trim() || null,
+      youtube_url: fields.youtube_url.trim() || null,
+      pinterest_url: fields.pinterest_url.trim() || null,
+      snapchat_url: fields.snapchat_url.trim() || null,
+      linkedin_url: fields.linkedin_url.trim() || null,
+      whatsapp_url: fields.whatsapp_url.trim() || null,
       description: fields.description.trim() || null,
       pricing_range: fields.pricing_range.trim() || null,
     })
@@ -96,6 +117,13 @@ export default function NewVendorForm({ requesterId, categories }: { requesterId
     ['phone', 'Business phone', false],
     ['website_url', 'Website (https://)', false],
     ['instagram_url', 'Instagram URL (https://)', false],
+    ['tiktok_url', 'TikTok URL (https://)', false],
+    ['facebook_url', 'Facebook URL (https://)', false],
+    ['youtube_url', 'YouTube URL (https://)', false],
+    ['pinterest_url', 'Pinterest URL (https://)', false],
+    ['snapchat_url', 'Snapchat URL (https://)', false],
+    ['linkedin_url', 'LinkedIn URL (https://)', false],
+    ['whatsapp_url', 'WhatsApp URL (https://)', false],
     ['pricing_range', 'Pricing guidance', false],
   ] as const
 

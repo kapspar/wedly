@@ -17,6 +17,13 @@ type Vendor = {
   phone: string | null
   email: string | null
   instagram_url: string | null
+  tiktok_url: string | null
+  facebook_url: string | null
+  youtube_url: string | null
+  pinterest_url: string | null
+  snapchat_url: string | null
+  linkedin_url: string | null
+  whatsapp_url: string | null
 }
 
 type Photo = { id: string; storage_path: string; alt_text: string | null }
@@ -30,6 +37,13 @@ const editable = [
   ['phone', 'Phone'],
   ['email', 'Business email'],
   ['instagram_url', 'Instagram URL'],
+  ['tiktok_url', 'TikTok URL'],
+  ['facebook_url', 'Facebook URL'],
+  ['youtube_url', 'YouTube URL'],
+  ['pinterest_url', 'Pinterest URL'],
+  ['snapchat_url', 'Snapchat URL'],
+  ['linkedin_url', 'LinkedIn URL'],
+  ['whatsapp_url', 'WhatsApp URL'],
 ] as const
 
 export default function VendorListingEditor({ vendor, initialPhoto }: { vendor: Vendor; initialPhoto: Photo | null }) {
@@ -44,6 +58,13 @@ export default function VendorListingEditor({ vendor, initialPhoto }: { vendor: 
     phone: vendor.phone ?? '',
     email: vendor.email ?? '',
     instagram_url: vendor.instagram_url ?? '',
+    tiktok_url: vendor.tiktok_url ?? '',
+    facebook_url: vendor.facebook_url ?? '',
+    youtube_url: vendor.youtube_url ?? '',
+    pinterest_url: vendor.pinterest_url ?? '',
+    snapchat_url: vendor.snapchat_url ?? '',
+    linkedin_url: vendor.linkedin_url ?? '',
+    whatsapp_url: vendor.whatsapp_url ?? '',
   })
   const [photo, setPhoto] = useState(initialPhoto)
   const [busy, setBusy] = useState(false)
@@ -61,10 +82,10 @@ export default function VendorListingEditor({ vendor, initialPhoto }: { vendor: 
       setError('Business name and city are required.')
       return
     }
-    for (const key of ['website_url', 'instagram_url'] as const) {
+    for (const key of ['website_url', 'instagram_url', 'tiktok_url', 'facebook_url', 'youtube_url', 'pinterest_url', 'snapchat_url', 'linkedin_url', 'whatsapp_url'] as const) {
       const value = fields[key].trim()
       if (value && !/^https:\/\//i.test(value)) {
-        setError('Website and Instagram links must start with https://')
+        setError('Website and social links must start with https://')
         return
       }
     }
@@ -87,6 +108,13 @@ export default function VendorListingEditor({ vendor, initialPhoto }: { vendor: 
         phone: fields.phone.trim() || null,
         email: fields.email.trim() || null,
         instagram_url: fields.instagram_url.trim() || null,
+        tiktok_url: fields.tiktok_url.trim() || null,
+        facebook_url: fields.facebook_url.trim() || null,
+        youtube_url: fields.youtube_url.trim() || null,
+        pinterest_url: fields.pinterest_url.trim() || null,
+        snapchat_url: fields.snapchat_url.trim() || null,
+        linkedin_url: fields.linkedin_url.trim() || null,
+        whatsapp_url: fields.whatsapp_url.trim() || null,
       })
       .eq('id', vendor.id).eq('claimed_by', user.id).eq('is_claimed', true)
       .select('id').single()
