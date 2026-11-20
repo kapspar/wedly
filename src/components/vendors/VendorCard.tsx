@@ -20,7 +20,7 @@ export default function VendorCard({ vendor, imagePath }: VendorCardProps) {
   return (
     <Link href={`/vendor/${vendor.slug}`}>
       <Card hover className="overflow-hidden h-full flex flex-col">
-        <div className="h-40 bg-gradient-to-br from-primary-soft to-lilac flex items-center justify-center relative">
+        <div className="aspect-[2/1] bg-gradient-to-br from-primary-soft to-lilac flex items-center justify-center relative">
           {imageUrl ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img src={imageUrl} alt={vendor.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
