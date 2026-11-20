@@ -22,8 +22,8 @@ export default async function VendorGetStartedPage() {
             Your business account is ready. The next step is finding your listing in the vendor directory.
           </p>
           <div className="mt-8 rounded-xl bg-primary-soft/40 p-5 text-sm text-ink">
-            <strong>Business claims are not open yet.</strong> We are building a secure review process so
-            only verified owners can manage listings. No listing has been transferred to your account.
+            Find your business in the directory and select <strong>Claim This Business</strong> to send us a verification request.
+            Your listing stays unclaimed until the PlanWedly team reviews and approves it.
           </div>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link href="/vendors" className="rounded-xl bg-primary px-5 py-3 text-sm font-medium text-white hover:bg-plum">
