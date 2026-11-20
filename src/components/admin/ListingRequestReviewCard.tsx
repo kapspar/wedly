@@ -15,6 +15,13 @@ type RequestItem = {
   phone: string | null
   websiteUrl: string | null
   instagramUrl: string | null
+  tiktokUrl: string | null
+  facebookUrl: string | null
+  youtubeUrl: string | null
+  pinterestUrl: string | null
+  snapchatUrl: string | null
+  linkedinUrl: string | null
+  whatsappUrl: string | null
   description: string | null
   status: string
   reviewNote: string | null
@@ -77,6 +84,19 @@ export default function ListingRequestReviewCard({ request }: { request: Request
           <a href={request.websiteUrl} rel="noopener noreferrer" target="_blank" className="break-all text-primary underline">Visit website</a>}
         {request.instagramUrl && /^https:\/\//.test(request.instagramUrl) &&
           <a href={request.instagramUrl} rel="noopener noreferrer" target="_blank" className="break-all text-primary underline">View Instagram</a>}
+        {([
+          ['TikTok', request.tiktokUrl],
+          ['Facebook', request.facebookUrl],
+          ['YouTube', request.youtubeUrl],
+          ['Pinterest', request.pinterestUrl],
+          ['Snapchat', request.snapchatUrl],
+          ['LinkedIn', request.linkedinUrl],
+          ['WhatsApp', request.whatsappUrl],
+        ] as const).map(([label, url]) => url && /^https:\/\//i.test(url) ? (
+          <a key={label} href={url} target="_blank" rel="noopener noreferrer" className="break-all text-primary underline">
+            View {label}
+          </a>
+        ) : null)}
       </div>
       {request.description && <p className="whitespace-pre-wrap break-words rounded-xl bg-ivory p-4 text-sm text-ink">{request.description}</p>}
       {request.reviewNote && <p className="text-sm text-muted">Review note: {request.reviewNote}</p>}
