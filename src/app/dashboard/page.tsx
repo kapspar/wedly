@@ -27,6 +27,8 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser()
 
   if (!user) redirect('/auth/login')
+  const { data: isStaff } = await supabase.rpc('is_admin')
+  if (isStaff) redirect('/admin')
 
   const { data: wedding } = await supabase
     .from('weddings')

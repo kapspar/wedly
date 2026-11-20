@@ -45,18 +45,27 @@ export async function updateSession(request: NextRequest) {
   if (!user && adminPaths.some((path) => pathname.startsWith(path))) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
+    url.searchParams.set('redirect', pathname)
     return NextResponse.redirect(url)
   }
 
   if (user && authPaths.some((path) => pathname.startsWith(path))) {
     const url = request.nextUrl.clone()
+    const { data: isStaff } = await supabase.rpc('is_admin')
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-    url.pathname = profile?.role === 'vendor' ? '/vendor/get-started' : '/dashboard'
+    url.pathname = isStaff ? '/admin' : profile?.role === 'vendor' ? '/vendor/get-started' : '/dashboard'
     return NextResponse.redirect(url)
   }
 
   if (user && (pathname === '/dashboard' || pathname === '/onboarding' || ['/budget', '/events', '/tasks', '/saved', '/inquiries'].some((path) => pathname.startsWith(path)))) {
+    const { data: isStaff } = await supabase.rpc('is_admin')
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+    if (isStaff) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/admin'
+      url.search = ''
+      return NextResponse.redirect(url)
+    }
     if (profile?.role === 'vendor') {
       const url = request.nextUrl.clone()
       url.pathname = '/vendor/get-started'
@@ -66,15 +75,12 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && adminPaths.some((path) => pathname.startsWith(path))) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
+    const { data: isStaff } = await supabase.rpc('is_admin')
 
-    if (profile?.role !== 'admin') {
+    if (!isStaff) {
       const url = request.nextUrl.clone()
-      url.pathname = '/dashboard'
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+      url.pathname = profile?.role === 'vendor' ? '/vendor/get-started' : '/dashboard'
       return NextResponse.redirect(url)
     }
   }

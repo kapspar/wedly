@@ -584,7 +584,14 @@ export interface Database {
       }
     }
     Views: Record<string, never>
-    Functions: Record<string, never>
+    Functions: {
+      is_admin: { Args: Record<string, never>; Returns: boolean }
+      review_vendor_claim: {
+        Args: { p_claim_id: string; p_decision: string; p_note?: string | null }
+        Returns: undefined
+      }
+      register_vendor_account: { Args: Record<string, never>; Returns: boolean }
+    }
     Enums: {
       wedding_type: WeddingType
       event_type: EventType

@@ -18,18 +18,19 @@ export async function GET(request: Request) {
     if (!error) {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
+        const { data: isStaff } = await supabase.rpc('is_admin')
         const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
         let role = profile?.role
-        if (requested === '/vendor/get-started' && role === 'couple') {
+        if (requested === '/vendor/get-started' && role === 'couple' && !isStaff) {
           const { data: converted, error: conversionError } = await supabase.rpc('register_vendor_account')
           if (conversionError || !converted) {
             return NextResponse.redirect(new URL('/?vendor_account_error=1', origin))
           }
           role = 'vendor'
         }
-        const home = role === 'vendor' ? '/vendor/get-started' : '/dashboard'
+        const home = isStaff ? '/admin' : role === 'vendor' ? '/vendor/get-started' : '/dashboard'
         if (requested === '/dashboard' || requested === '/onboarding') {
-          if (role === 'vendor') return NextResponse.redirect(new URL(home, origin))
+          if (isStaff || role === 'vendor') return NextResponse.redirect(new URL(home, origin))
           if (requested === '/onboarding') {
             const { data: wedding, error: lookupError } = await supabase.from('weddings')
               .select('id').eq('couple_id', user.id).limit(1).maybeSingle()
@@ -37,7 +38,10 @@ export async function GET(request: Request) {
             return NextResponse.redirect(new URL(wedding ? home : '/onboarding', origin))
           }
         }
-        if (requested === '/vendor/get-started' && role !== 'vendor') {
+        if (requested.startsWith('/admin') && !isStaff) {
+          return NextResponse.redirect(new URL(home, origin))
+        }
+        if (requested === '/vendor/get-started' && (role !== 'vendor' || isStaff)) {
           return NextResponse.redirect(new URL(home, origin))
         }
         return NextResponse.redirect(new URL(requested, origin))

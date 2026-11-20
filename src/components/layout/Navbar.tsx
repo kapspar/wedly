@@ -15,6 +15,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null)
   const [role, setRole] = useState<UserRole | null>(null)
+  const [isStaff, setIsStaff] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -23,6 +24,7 @@ export default function Navbar() {
       if (u) {
         posthog.identify(u.id)
 
+        supabase.rpc('is_admin').then(({ data }) => setIsStaff(data === true))
         supabase
           .from('profiles')
           .select('role')
@@ -75,7 +77,7 @@ export default function Navbar() {
             ))}
             {user ? (
               <div className="flex items-center gap-3">
-                {role === 'admin' && (
+                {isStaff && (
                   <Link
                     href="/admin"
                     className="text-sm font-medium text-charcoal/70 hover:text-charcoal transition-colors"
@@ -84,7 +86,7 @@ export default function Navbar() {
                   </Link>
                 )}
                 <Link
-                  href={role === 'vendor' ? '/vendor/get-started' : '/dashboard'}
+                  href={isStaff ? '/admin' : role === 'vendor' ? '/vendor/get-started' : '/dashboard'}
                   className="flex items-center gap-1.5 text-sm font-medium text-charcoal/70 hover:text-charcoal transition-colors"
                 >
                   <LayoutDashboard className="h-4 w-4" />
@@ -145,7 +147,7 @@ export default function Navbar() {
             ))}
             {user ? (
               <>
-                {role === 'admin' && (
+                {isStaff && (
                   <Link
                     href="/admin"
                     onClick={() => setMenuOpen(false)}
@@ -156,7 +158,7 @@ export default function Navbar() {
                   </Link>
                 )}
                 <Link
-                  href={role === 'vendor' ? '/vendor/get-started' : '/dashboard'}
+                  href={isStaff ? '/admin' : role === 'vendor' ? '/vendor/get-started' : '/dashboard'}
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-charcoal/70 hover:bg-peach-light/30"
                 >
