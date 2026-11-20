@@ -54,8 +54,10 @@ export async function POST(request: Request) {
   }
 
   let ledgerInserted = false
+  let processingStep = 'initializing'
   try {
     const admin = billingAdmin()
+    processingStep = 'recording event id'
     const { error: ledgerError } = await admin.from('stripe_webhook_events').insert({ event_id: event.id })
     if (ledgerError?.code === '23505') return NextResponse.json({ received: true, duplicate: true })
     if (ledgerError) throw ledgerError
@@ -68,6 +70,7 @@ export async function POST(request: Request) {
       // A different Stripe product or manually managed subscription.
       return NextResponse.json({ received: true, skipped: true })
     }
+    processingStep = 'looking up verified vendor'
     const { data: vendor, error: vendorError } = await admin.from('vendors')
       .select('id,claimed_by,is_claimed').eq('id', vendorId).maybeSingle()
     if (vendorError) throw vendorError
@@ -84,6 +87,7 @@ export async function POST(request: Request) {
       ? subscription.customer : subscription.customer?.id
     if (!customerId) throw new Error('Subscription is missing a Stripe customer.')
 
+    processingStep = 'looking up current subscription'
     const { data: current, error: lookupError } = await admin.from('vendor_subscriptions')
       .select('last_stripe_event_at,stripe_subscription_id').eq('vendor_id', vendorId).maybeSingle()
     if (lookupError) throw lookupError
@@ -97,6 +101,7 @@ export async function POST(request: Request) {
     }
 
     const periodEnd = subscription.items?.data?.[0]?.current_period_end
+    processingStep = 'upserting subscription'
     const { error: upsertError } = await admin.from('vendor_subscriptions').upsert({
       vendor_id: vendorId,
       owner_id: ownerId,
@@ -113,7 +118,12 @@ export async function POST(request: Request) {
     if (upsertError) throw upsertError
     return NextResponse.json({ received: true })
   } catch (error) {
-    console.error('Stripe test webhook processing failed:', error instanceof Error ? error.message : 'unknown')
+    const details = error && typeof error === 'object' ? error as { code?: unknown; message?: unknown } : null
+    console.error('Stripe test webhook processing failed:', {
+      step: processingStep,
+      code: typeof details?.code === 'string' ? details.code : undefined,
+      message: typeof details?.message === 'string' ? details.message : error instanceof Error ? error.message : 'unknown',
+    })
     if (ledgerInserted && event?.id) {
       // Allow Stripe retries after transient processing errors.
       try { await billingAdmin().from('stripe_webhook_events').delete().eq('event_id', event.id) } catch {}
