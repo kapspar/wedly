@@ -13,11 +13,13 @@ export default async function VendorDashboardPage() {
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle()
   if (profile?.role !== 'vendor') redirect('/dashboard')
 
-  const [{ data: listings, error: listingError }, { data: claims }] = await Promise.all([
+  const [{ data: listings, error: listingError }, { data: claims }, { data: submissions }] = await Promise.all([
     supabase.from('vendors').select('id,slug,name,city,description,is_published,is_claimed')
       .eq('claimed_by', user.id).eq('is_claimed', true).order('name'),
     supabase.from('vendor_claims')
       .select('id,vendor_id,status,created_at,review_note,vendor:vendors(name,slug)')
+      .eq('requester_id', user.id).order('created_at', { ascending: false }).limit(30),
+    supabase.from('vendor_listing_requests').select('id,name,city,status,created_at,review_note,resulting_vendor_id')
       .eq('requester_id', user.id).order('created_at', { ascending: false }).limit(30),
   ])
 
@@ -33,7 +35,10 @@ export default async function VendorDashboardPage() {
 
           <div className="mt-9 flex items-center justify-between gap-4">
             <h2 className="font-[family-name:var(--font-heading)] text-2xl text-plum">My listings</h2>
-            <Link href="/vendors" className="text-sm font-medium text-primary hover:underline">Browse vendors</Link>
+            <div className="flex flex-wrap items-center gap-4">
+              <Link href="/vendors" className="text-sm font-medium text-primary hover:underline">Browse vendors</Link>
+              <Link href="/vendor/new" className="rounded-xl bg-plum px-4 py-2.5 text-sm font-medium text-white hover:opacity-90">Add my business</Link>
+            </div>
           </div>
           {listingError ? (
             <p role="alert" className="mt-4 rounded-xl bg-white border border-border-soft p-5 text-red-700">Could not load your listings.</p>
@@ -41,7 +46,10 @@ export default async function VendorDashboardPage() {
             <div className="mt-4 rounded-2xl border border-border-soft bg-white p-7">
               <p className="font-medium text-ink">No approved listings yet</p>
               <p className="mt-2 text-sm text-muted">Find your business in the directory and select Claim This Business to request access.</p>
-              <Link href="/vendors" className="mt-4 inline-block rounded-xl bg-plum px-5 py-3 text-sm font-semibold text-white">Find my business</Link>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <Link href="/vendors" className="rounded-xl border border-border-soft px-5 py-3 text-sm font-semibold text-plum">Find my business</Link>
+                <Link href="/vendor/new" className="rounded-xl bg-plum px-5 py-3 text-sm font-semibold text-white">My business is not listed</Link>
+              </div>
             </div>
           ) : (
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -75,6 +83,21 @@ export default async function VendorDashboardPage() {
               })}
             </div>
           ) : <p className="mt-3 text-sm text-muted">No pending ownership requests.</p>}
+          <h2 className="mt-12 font-[family-name:var(--font-heading)] text-2xl text-plum">New business submissions</h2>
+          {(submissions ?? []).length ? (
+            <div className="mt-4 space-y-3">
+              {submissions!.map(item => (
+                <div key={item.id} className="rounded-xl border border-border-soft bg-white p-5">
+                  <p className="font-medium text-ink">{item.name} · {item.city}</p>
+                  <p className="mt-1 text-sm text-muted">Status: {item.status === 'pending' ? 'Awaiting admin review' : item.status === 'approved' ? 'Approved' : 'Rejected'}</p>
+                  {item.review_note && <p className="mt-2 text-sm text-muted">Admin note: {item.review_note}</p>}
+                  {item.status === 'approved' && item.resulting_vendor_id && (
+                    <Link href={`/vendor/dashboard/${item.resulting_vendor_id}`} className="mt-2 inline-block text-sm text-primary underline">Manage approved listing</Link>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : <p className="mt-3 text-sm text-muted">No new business submissions.</p>}
           <p className="mt-10 text-xs text-muted">The free plan currently includes one listing photo. Additional customization and featured placements will be offered separately.</p>
         </div>
       </main>
