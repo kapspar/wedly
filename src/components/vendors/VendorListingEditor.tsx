@@ -164,18 +164,28 @@ export default function VendorListingEditor({ vendor, initialPhoto }: { vendor: 
     setMessage('')
     setPhotoBusy(true)
     const supabase = createClient()
-    const { error: removeError } = await supabase.storage.from('vendor-photos').remove([photo.storage_path])
-    if (removeError) {
-      setError('Could not remove photo: ' + removeError.message)
+    // Remove the listing reference first: deleting storage first can leave a
+    // publicly visible broken image if the database delete fails.
+    const { data: deletedPhoto, error: deleteError } = await supabase.from('vendor_photos').delete()
+      .eq('id', photo.id).eq('vendor_id', vendor.id)
+      .select('id').maybeSingle()
+    if (deleteError || !deletedPhoto) {
+      setError('Could not remove the listing photo. Please try again.')
       setPhotoBusy(false)
       return
     }
-    const { error: deleteError } = await supabase.from('vendor_photos').delete()
-      .eq('id', photo.id).eq('vendor_id', vendor.id)
-    setPhotoBusy(false)
-    if (deleteError) { setError('Photo record could not be removed. Contact PlanWedly support.'); return }
+
     setPhoto(null)
-    setMessage('Photo removed. You can upload a new photo.')
+    const { error: removeError } = await supabase.storage.from('vendor-photos').remove([photo.storage_path])
+    setPhotoBusy(false)
+    if (removeError) {
+      // The listing is already consistent. An orphaned storage object can be
+      // cleaned up later; do not claim the displayed photo still exists.
+      setMessage('Photo removed from your listing. You can upload another photo.')
+      setError('The old image file could not be cleaned up. Please contact PlanWedly support.')
+    } else {
+      setMessage('Photo removed. You can upload a new photo.')
+    }
     router.refresh()
   }
 
