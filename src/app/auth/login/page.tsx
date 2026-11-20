@@ -43,6 +43,11 @@ function LoginForm() {
       posthog.capture('user_logged_in', { auth_method: 'password' })
     }
 
+    if (!loginData.user) {
+      setError('Could not verify your account. Please try again.')
+      setLoading(false)
+      return
+    }
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', loginData.user.id).single()
     if (redirect === '/vendor/get-started' && profile?.role === 'couple') {
       const { data: converted, error: conversionError } = await supabase.rpc('register_vendor_account')
@@ -52,8 +57,9 @@ function LoginForm() {
         return
       }
     }
-    const home = profile?.role === 'vendor' || redirect === '/vendor/get-started' ? '/vendor/get-started' : '/dashboard'
-    router.push(redirect === '/dashboard' || redirect === '/onboarding' ? home : redirect)
+    const vendor = profile?.role === 'vendor' || redirect === '/vendor/get-started'
+    const home = vendor ? '/vendor/get-started' : '/dashboard'
+    router.push(redirect === '/dashboard' || redirect === '/onboarding' || (redirect === '/vendor/get-started' && !vendor) ? home : redirect)
     router.refresh()
   }
 
