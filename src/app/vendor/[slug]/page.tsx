@@ -165,6 +165,12 @@ export default async function VendorPage({ params }: Props) {
                 </div>
                 <div className="flex flex-col items-start sm:items-end gap-3">
                   <SaveVendorButton vendorId={vendor.id} initialSaved={isSaved} userId={user?.id} />
+                  {user && vendor.claimed_by !== user.id && (
+                    <Link href={`/vendor/${vendor.slug}/review`}
+                      className="inline-flex items-center justify-center rounded-xl border border-primary px-4 py-2 text-sm font-medium text-primary hover:bg-primary-soft/30 transition-colors">
+                      Leave a Review
+                    </Link>
+                  )}
                   {!vendor.is_claimed && !vendor.claimed_by && (
                     <Link
                       href={`/vendor/claim/${vendor.slug}`}
