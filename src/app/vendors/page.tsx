@@ -30,7 +30,7 @@ export default async function VendorsPage({
 
   let vendorQuery = supabase
     .from('vendors')
-    .select('*, vendor_categories(name)')
+    .select('*, vendor_categories(name), vendor_photos(storage_path,sort_order)')
     .eq('is_published', true)
     .order('is_featured', { ascending: false })
     .order('priority')
@@ -122,7 +122,7 @@ export default async function VendorsPage({
           {vendors && vendors.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {vendors.map((vendor) => (
-                <VendorCard key={vendor.id} vendor={vendor} />
+                <VendorCard key={vendor.id} vendor={vendor} imagePath={vendor.vendor_photos?.find(photo => photo.sort_order === 0)?.storage_path} />
               ))}
             </div>
           ) : (
