@@ -11,7 +11,8 @@ import Input from '@/components/ui/Input'
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirect = searchParams.get('redirect') || '/dashboard'
+  const rawRedirect = searchParams.get('redirect') || '/dashboard'
+  const redirect = rawRedirect.startsWith('/') && !rawRedirect.startsWith('//') && !rawRedirect.includes('\\') ? rawRedirect : '/dashboard'
   const authError = searchParams.get('error')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -42,7 +43,23 @@ function LoginForm() {
       posthog.capture('user_logged_in', { auth_method: 'password' })
     }
 
-    router.push(redirect)
+    if (!loginData.user) {
+      setError('Could not verify your account. Please try again.')
+      setLoading(false)
+      return
+    }
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', loginData.user.id).single()
+    if (redirect === '/vendor/get-started' && profile?.role === 'couple') {
+      const { data: converted, error: conversionError } = await supabase.rpc('register_vendor_account')
+      if (conversionError || !converted) {
+        setError('This account already has a wedding or cannot be used as a vendor. Please use a different account.')
+        setLoading(false)
+        return
+      }
+    }
+    const vendor = profile?.role === 'vendor' || redirect === '/vendor/get-started'
+    const home = vendor ? '/vendor/get-started' : '/dashboard'
+    router.push(redirect === '/dashboard' || redirect === '/onboarding' || (redirect === '/vendor/get-started' && !vendor) ? home : redirect)
     router.refresh()
   }
 
@@ -51,7 +68,7 @@ function LoginForm() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?redirect=${redirect}`,
+        redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirect)}`,
       },
     })
   }
@@ -128,7 +145,7 @@ export default function LoginPage() {
             Welcome back
           </h1>
           <p className="text-sm text-muted mt-1">
-            Sign in to continue planning your wedding
+            Sign in to your PlanWedly account
           </p>
         </div>
 

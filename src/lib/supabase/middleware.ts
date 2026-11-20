@@ -50,8 +50,19 @@ export async function updateSession(request: NextRequest) {
 
   if (user && authPaths.some((path) => pathname.startsWith(path))) {
     const url = request.nextUrl.clone()
-    url.pathname = pathname.startsWith('/auth/signup/vendor') ? '/vendor/get-started' : '/dashboard'
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+    url.pathname = profile?.role === 'vendor' ? '/vendor/get-started' : '/dashboard'
     return NextResponse.redirect(url)
+  }
+
+  if (user && (pathname === '/dashboard' || pathname === '/onboarding' || ['/budget', '/events', '/tasks', '/saved', '/inquiries'].some((path) => pathname.startsWith(path)))) {
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+    if (profile?.role === 'vendor') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/vendor/get-started'
+      url.search = ''
+      return NextResponse.redirect(url)
+    }
   }
 
   if (user && adminPaths.some((path) => pathname.startsWith(path))) {
