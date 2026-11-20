@@ -26,7 +26,10 @@ export default function SignupPage() {
       if (!user || !active) return
       const { data: wedding, error } = await supabase.from('weddings')
         .select('id').eq('couple_id', user.id).limit(1).maybeSingle()
-      if (active && !error && wedding && !isVendor) router.replace('/dashboard')
+      if (!active) return
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+      if (profile?.role === 'vendor') router.replace('/vendor/get-started')
+      else if (!error && wedding && !isVendor) router.replace('/dashboard')
     }
     void checkExisting()
     return () => { active = false }
@@ -64,6 +67,12 @@ export default function SignupPage() {
       posthog.capture('user_signed_up', { auth_method: 'password', account_type: isVendor ? 'vendor' : 'couple' })
 
       if (isVendor) {
+        const { data: enabled, error: roleError } = await supabase.rpc('register_vendor_account')
+        if (roleError || !enabled) {
+          setError('Could not activate the vendor account. Please try signing in.')
+          setLoading(false)
+          return
+        }
         router.replace(destination)
       } else {
         const { data: wedding } = await supabase.from('weddings')
