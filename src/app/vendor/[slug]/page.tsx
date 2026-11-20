@@ -88,7 +88,11 @@ export default async function VendorPage({ params }: Props) {
     { key: 'whatsapp', label: 'WhatsApp', url: vendor.whatsapp_url },
   ].filter((link) => link.url && /^https:\/\//i.test(link.url))
 
-  const hasPhotos = photos && photos.length > 0
+  const directoryPhoto = photos?.find(photo => photo.sort_order === 0)
+  const logoPhoto = photos?.find(photo => photo.sort_order === 1)
+  const bannerPhoto = photos?.find(photo => photo.sort_order === 2) ?? directoryPhoto
+  const galleryPhotos = photos?.filter(photo => photo.sort_order > 2) ?? []
+  const hasPhotos = !!bannerPhoto
 
   return (
     <>
@@ -104,11 +108,11 @@ export default async function VendorPage({ params }: Props) {
                 : 'bg-gradient-to-br from-primary-soft via-lilac/70 to-ivory'
             } overflow-hidden`}
           >
-            {hasPhotos && photos[0] ? (
+            {bannerPhoto ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
-                src={getPhotoUrl(photos[0].storage_path)}
-                alt={photos[0].alt_text ?? vendor.name}
+                src={getPhotoUrl(bannerPhoto.storage_path)}
+                alt={bannerPhoto.alt_text ?? vendor.name}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -125,6 +129,11 @@ export default async function VendorPage({ params }: Props) {
             <Card className="p-6 sm:p-8 shadow-md">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div>
+                  {logoPhoto && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={getPhotoUrl(logoPhoto.storage_path)} alt={`${vendor.name} logo`}
+                      className="mb-4 h-20 w-20 rounded-2xl border border-border-soft bg-white object-contain p-1" />
+                  )}
                   <Link
                     href={`/vendors/${category.slug}`}
                     className="inline-flex items-center gap-1 text-xs text-muted hover:text-plum transition-colors mb-3"
@@ -188,13 +197,13 @@ export default async function VendorPage({ params }: Props) {
               )}
 
               {/* Gallery */}
-              {hasPhotos && (
+              {galleryPhotos.length > 0 && (
                 <Card className="p-6 sm:p-8">
                   <h2 className="font-[family-name:var(--font-heading)] text-xl text-ink mb-5">
                     Gallery
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {photos.map((photo, idx) => (
+                    {galleryPhotos.map((photo, idx) => (
                       <div
                         key={photo.id}
                         className={`bg-primary-soft/40 rounded-xl overflow-hidden ${
