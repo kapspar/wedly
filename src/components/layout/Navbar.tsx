@@ -86,7 +86,7 @@ export default function Navbar() {
                   </Link>
                 )}
                 <Link
-                  href={isStaff ? '/admin' : role === 'vendor' ? '/vendor/get-started' : '/dashboard'}
+                  href={isStaff ? '/admin' : role === 'vendor' ? '/vendor/dashboard' : '/dashboard'}
                   className="flex items-center gap-1.5 text-sm font-medium text-charcoal/70 hover:text-charcoal transition-colors"
                 >
                   <LayoutDashboard className="h-4 w-4" />
@@ -158,7 +158,7 @@ export default function Navbar() {
                   </Link>
                 )}
                 <Link
-                  href={isStaff ? '/admin' : role === 'vendor' ? '/vendor/get-started' : '/dashboard'}
+                  href={isStaff ? '/admin' : role === 'vendor' ? '/vendor/dashboard' : '/dashboard'}
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-charcoal/70 hover:bg-peach-light/30"
                 >
