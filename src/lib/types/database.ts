@@ -296,6 +296,71 @@ export interface Database {
           },
         ]
       }
+      vendor_listing_requests: {
+        Row: {
+          id: string
+          requester_id: string
+          category_id: string
+          name: string
+          city: string
+          area: string | null
+          description: string | null
+          business_email: string
+          phone: string | null
+          website_url: string | null
+          instagram_url: string | null
+          pricing_range: string | null
+          status: 'pending' | 'approved' | 'rejected'
+          review_note: string | null
+          reviewed_by: string | null
+          reviewed_at: string | null
+          resulting_vendor_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          requester_id: string
+          category_id: string
+          name: string
+          city: string
+          area?: string | null
+          description?: string | null
+          business_email: string
+          phone?: string | null
+          website_url?: string | null
+          instagram_url?: string | null
+          pricing_range?: string | null
+          status?: 'pending' | 'approved' | 'rejected'
+          review_note?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          resulting_vendor_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          status?: 'pending' | 'approved' | 'rejected'
+          review_note?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          resulting_vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'vendor_listing_requests_category_id_fkey'
+            columns: ['category_id']
+            isOneToOne: false
+            referencedRelation: 'vendor_categories'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'vendor_listing_requests_resulting_vendor_id_fkey'
+            columns: ['resulting_vendor_id']
+            isOneToOne: false
+            referencedRelation: 'vendors'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       vendor_claims: {
         Row: {
           id: string
@@ -591,6 +656,7 @@ export interface Database {
         Returns: undefined
       }
       register_vendor_account: { Args: Record<string, never>; Returns: boolean }
+      review_vendor_listing_request: { Args: { p_request_id: string; p_decision: string; p_note?: string | null }; Returns: undefined }
     }
     Enums: {
       wedding_type: WeddingType
