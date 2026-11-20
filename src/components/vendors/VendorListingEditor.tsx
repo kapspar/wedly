@@ -29,9 +29,9 @@ type Vendor = {
 type PhotoWithSlot = { id: string; storage_path: string; alt_text: string | null; sort_order: number }
 
 const imageSlots = [
-  { slot: 0, title: 'Directory cover', description: 'Shown on the Browse Vendors cards. Landscape photo, roughly 3:2.' },
-  { slot: 1, title: 'Business logo', description: 'Shown alongside your business name on your profile. Square logo recommended.' },
-  { slot: 2, title: 'Profile banner', description: 'Wide header at the top of your business page. Landscape 16:9 recommended.' },
+  { slot: 0, title: 'Directory cover', dimensions: '1200 × 600 px', ratio: '2:1', description: 'Shown on Browse Vendors and saved vendor cards. Choose a horizontal image, with the subject near the centre.' },
+  { slot: 1, title: 'Business logo', dimensions: '600 × 600 px', ratio: '1:1', description: 'Shown alongside your business name. Upload a square logo with some padding so lettering is not cut off.' },
+  { slot: 2, title: 'Profile banner', dimensions: '1600 × 640 px', ratio: '5:2', description: 'Wide image at the top of your profile. Keep important details away from the edges, which may be cropped on phones.' },
 ] as const
 
 const editable = [
@@ -220,14 +220,20 @@ export default function VendorListingEditor({ vendor, initialPhotos }: { vendor:
 
       <section className="rounded-2xl border border-border-soft bg-white p-6 sm:p-8">
         <h2 className="font-[family-name:var(--font-heading)] text-xl text-plum">Free listing images</h2>
-        <p className="mt-2 text-sm text-muted">Three free image placements. Each accepts JPG, PNG or WebP up to 5 MB. You can change them whenever you want.</p>
+        <p className="mt-2 text-sm text-muted">Your free listing includes a directory cover, logo and header image. Upload each separately; you can replace them at any time.</p>
+        <div className="mt-4 rounded-xl bg-primary-soft/40 p-4 text-sm text-ink">
+          <p className="font-semibold">Image upload guide</p>
+          <p className="mt-1">Crop your images to the recommended dimensions below before uploading for the best results. JPG, PNG and WebP files up to 5 MB each are accepted. Exact pixel sizes are recommended, not required.</p>
+          <p className="mt-2 text-muted">Images fill their designated spaces and may be cropped on different screen sizes. Keep faces, text and important details in the centre; avoid placing writing near the edges.</p>
+        </div>
         <div className="mt-6 grid gap-6 sm:grid-cols-2">
-          {imageSlots.map(({ slot, title, description }) => {
+          {imageSlots.map(({ slot, title, description, dimensions, ratio }) => {
             const photo = photos.find(p => p.sort_order === slot)
             const publicUrl = photo ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vendor-photos/${photo.storage_path}` : ''
             return (
               <div key={slot} className="rounded-xl border border-border-soft p-4">
                 <h3 className="font-semibold text-plum">{title}</h3>
+                <p className="mt-1 text-xs font-semibold text-primary">Recommended: {dimensions} · {ratio} aspect ratio</p>
                 <p className="mt-1 mb-4 text-xs text-muted">{description}</p>
                 {photo ? (
                   <div className="space-y-3">
