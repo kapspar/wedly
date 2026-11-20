@@ -10,6 +10,7 @@ export default async function VendorGetStartedPage() {
   if (!user) redirect('/auth/login?redirect=/vendor/get-started')
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
   if (profile?.role !== 'vendor') redirect('/dashboard')
+  redirect('/vendor/dashboard')
 
   return (
     <>
