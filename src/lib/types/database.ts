@@ -229,6 +229,13 @@ export interface Database {
           phone: string | null
           email: string | null
           instagram_url: string | null
+          tiktok_url: string | null
+          facebook_url: string | null
+          youtube_url: string | null
+          pinterest_url: string | null
+          snapchat_url: string | null
+          linkedin_url: string | null
+          whatsapp_url: string | null
           is_claimed: boolean
           is_featured: boolean
           is_published: boolean
@@ -251,6 +258,13 @@ export interface Database {
           phone?: string | null
           email?: string | null
           instagram_url?: string | null
+          tiktok_url?: string | null
+          facebook_url?: string | null
+          youtube_url?: string | null
+          pinterest_url?: string | null
+          snapchat_url?: string | null
+          linkedin_url?: string | null
+          whatsapp_url?: string | null
           is_claimed?: boolean
           is_featured?: boolean
           is_published?: boolean
@@ -272,6 +286,13 @@ export interface Database {
           phone?: string | null
           email?: string | null
           instagram_url?: string | null
+          tiktok_url?: string | null
+          facebook_url?: string | null
+          youtube_url?: string | null
+          pinterest_url?: string | null
+          snapchat_url?: string | null
+          linkedin_url?: string | null
+          whatsapp_url?: string | null
           is_claimed?: boolean
           is_featured?: boolean
           is_published?: boolean
@@ -309,6 +330,13 @@ export interface Database {
           phone: string | null
           website_url: string | null
           instagram_url: string | null
+          tiktok_url: string | null
+          facebook_url: string | null
+          youtube_url: string | null
+          pinterest_url: string | null
+          snapchat_url: string | null
+          linkedin_url: string | null
+          whatsapp_url: string | null
           pricing_range: string | null
           status: 'pending' | 'approved' | 'rejected'
           review_note: string | null
@@ -329,6 +357,13 @@ export interface Database {
           phone?: string | null
           website_url?: string | null
           instagram_url?: string | null
+          tiktok_url?: string | null
+          facebook_url?: string | null
+          youtube_url?: string | null
+          pinterest_url?: string | null
+          snapchat_url?: string | null
+          linkedin_url?: string | null
+          whatsapp_url?: string | null
           pricing_range?: string | null
           status?: 'pending' | 'approved' | 'rejected'
           review_note?: string | null
