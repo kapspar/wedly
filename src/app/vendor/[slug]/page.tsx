@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, MapPin, Globe, Phone, Mail, ExternalLink, AtSign } from 'lucide-react'
+import { ChevronLeft, MapPin, Globe, Phone, Mail, ExternalLink, Instagram, Facebook, Youtube, Music2, Pin, Ghost, Linkedin, MessageCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
@@ -78,14 +78,14 @@ export default async function VendorPage({ params }: Props) {
   }
 
   const socialLinks = [
-    { key: 'instagram', label: 'Instagram', url: vendor.instagram_url },
-    { key: 'tiktok', label: 'TikTok', url: vendor.tiktok_url },
-    { key: 'facebook', label: 'Facebook', url: vendor.facebook_url },
-    { key: 'youtube', label: 'YouTube', url: vendor.youtube_url },
-    { key: 'pinterest', label: 'Pinterest', url: vendor.pinterest_url },
-    { key: 'snapchat', label: 'Snapchat', url: vendor.snapchat_url },
-    { key: 'linkedin', label: 'LinkedIn', url: vendor.linkedin_url },
-    { key: 'whatsapp', label: 'WhatsApp', url: vendor.whatsapp_url },
+    { key: 'instagram', icon: Instagram, label: 'Instagram', url: vendor.instagram_url },
+    { key: 'tiktok', icon: Music2, label: 'TikTok', url: vendor.tiktok_url },
+    { key: 'facebook', icon: Facebook, label: 'Facebook', url: vendor.facebook_url },
+    { key: 'youtube', icon: Youtube, label: 'YouTube', url: vendor.youtube_url },
+    { key: 'pinterest', icon: Pin, label: 'Pinterest', url: vendor.pinterest_url },
+    { key: 'snapchat', icon: Ghost, label: 'Snapchat', url: vendor.snapchat_url },
+    { key: 'linkedin', icon: Linkedin, label: 'LinkedIn', url: vendor.linkedin_url },
+    { key: 'whatsapp', icon: MessageCircle, label: 'WhatsApp', url: vendor.whatsapp_url },
   ].filter((link) => link.url && /^https:\/\//i.test(link.url))
 
   const hasPhotos = photos && photos.length > 0
@@ -270,8 +270,9 @@ export default async function VendorPage({ params }: Props) {
                       <span className="truncate">{vendor.email}</span>
                     </a>
                   )}
-                  {socialLinks.map(link => (
-                    <a
+                  {socialLinks.map(link => {
+                    const Icon = link.icon
+                    return <a
                       key={link.key}
                       href={link.url!}
                       data-analytics-outbound={link.key}
@@ -279,11 +280,11 @@ export default async function VendorPage({ params }: Props) {
                       rel="noopener noreferrer"
                       className="flex items-center gap-2.5 text-sm text-muted hover:text-plum transition-colors group"
                     >
-                      <AtSign className="h-4 w-4 text-primary flex-shrink-0" />
+                      <Icon className="h-4 w-4 text-primary flex-shrink-0" />
                       <span className="flex-1">{link.label}</span>
                       <ExternalLink className="h-3 w-3 opacity-40 group-hover:opacity-100 flex-shrink-0" />
                     </a>
-                  ))}
+                  })}
                   {!vendor.website_url && !vendor.phone && !vendor.email && socialLinks.length === 0 && (
                     <p className="text-sm text-muted">
                       Use the inquiry form below to get in touch.
