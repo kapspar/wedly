@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import BillingActions from '@/components/vendors/BillingActions'
+import { billingAdmin } from '@/lib/billing/stripe'
 
 export const metadata = { title: 'Vendor Dashboard — PlanWedly' }
 
@@ -22,6 +24,20 @@ export default async function VendorDashboardPage() {
     supabase.from('vendor_listing_requests').select('id,name,city,status,created_at,review_note,resulting_vendor_id')
       .eq('requester_id', user.id).order('created_at', { ascending: false }).limit(30),
   ])
+
+  const billingEnabled = !!(process.env.STRIPE_SECRET_KEY?.startsWith('sk_test_') &&
+    process.env.STRIPE_PRICE_MONTHLY?.startsWith('price_') &&
+    process.env.STRIPE_PRICE_YEARLY?.startsWith('price_') &&
+    process.env.STRIPE_WEBHOOK_SECRET?.startsWith('whsec_') &&
+    process.env.SUPABASE_SERVICE_ROLE_KEY)
+  const subscriptions = new Map<string, string>()
+  if (billingEnabled && listings?.length) {
+    const { data, error } = await billingAdmin().from('vendor_subscriptions')
+      .select('vendor_id,status').eq('owner_id', user.id)
+      .in('vendor_id', listings.map(vendor => vendor.id))
+    if (error) console.error('Could not load billing status:', error.message)
+    else for (const subscription of data ?? []) subscriptions.set(subscription.vendor_id, subscription.status)
+  }
 
   const pendingClaims = (claims ?? []).filter(c => c.status === 'pending' || c.status === 'more_info')
   return (
@@ -59,6 +75,7 @@ export default async function VendorDashboardPage() {
                   <h3 className="mt-2 font-[family-name:var(--font-heading)] text-xl text-plum">{vendor.name}</h3>
                   <p className="mt-1 text-sm text-muted">{vendor.city} · {vendor.is_published ? 'Published' : 'Unpublished'}</p>
                   <p className="mt-3 text-sm text-muted line-clamp-2">{vendor.description || 'Add a description to introduce your business.'}</p>
+                  <BillingActions vendorId={vendor.id} status={subscriptions.get(vendor.id) ?? null} enabled={billingEnabled} />
                   <div className="mt-6 flex flex-wrap gap-3">
                     <Link href={`/vendor/dashboard/${vendor.id}`} className="rounded-xl bg-plum px-4 py-2.5 text-sm font-medium text-white">Manage listing</Link>
                     {vendor.is_published && <Link href={`/vendor/${vendor.slug}`} className="rounded-xl border border-border-soft px-4 py-2.5 text-sm font-medium text-plum">View public page</Link>}
@@ -98,7 +115,7 @@ export default async function VendorDashboardPage() {
               ))}
             </div>
           ) : <p className="mt-3 text-sm text-muted">No new business submissions.</p>}
-          <p className="mt-10 text-xs text-muted">The free plan currently includes one listing photo. Additional customization and featured placements will be offered separately.</p>
+          <p className="mt-10 text-xs text-muted">The free plan includes a directory cover, business logo, and profile banner. Premium billing is in test mode and does not grant live paid benefits yet.</p>
         </div>
       </main>
       <Footer />
