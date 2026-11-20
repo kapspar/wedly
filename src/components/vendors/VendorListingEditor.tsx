@@ -26,7 +26,13 @@ type Vendor = {
   whatsapp_url: string | null
 }
 
-type Photo = { id: string; storage_path: string; alt_text: string | null }
+type PhotoWithSlot = { id: string; storage_path: string; alt_text: string | null; sort_order: number }
+
+const imageSlots = [
+  { slot: 0, title: 'Directory cover', description: 'Shown on the Browse Vendors cards. Landscape photo, roughly 3:2.' },
+  { slot: 1, title: 'Business logo', description: 'Shown alongside your business name on your profile. Square logo recommended.' },
+  { slot: 2, title: 'Profile banner', description: 'Wide header at the top of your business page. Landscape 16:9 recommended.' },
+] as const
 
 const editable = [
   ['name', 'Business name'],
@@ -46,7 +52,7 @@ const editable = [
   ['whatsapp_url', 'WhatsApp URL'],
 ] as const
 
-export default function VendorListingEditor({ vendor, initialPhoto }: { vendor: Vendor; initialPhoto: Photo | null }) {
+export default function VendorListingEditor({ vendor, initialPhotos }: { vendor: Vendor; initialPhotos: PhotoWithSlot[] }) {
   const router = useRouter()
   const [fields, setFields] = useState({
     name: vendor.name,
@@ -66,7 +72,7 @@ export default function VendorListingEditor({ vendor, initialPhoto }: { vendor: 
     linkedin_url: vendor.linkedin_url ?? '',
     whatsapp_url: vendor.whatsapp_url ?? '',
   })
-  const [photo, setPhoto] = useState(initialPhoto)
+  const [photos, setPhotos] = useState(initialPhotos)
   const [busy, setBusy] = useState(false)
   const [photoBusy, setPhotoBusy] = useState(false)
   const [message, setMessage] = useState('')
@@ -124,11 +130,14 @@ export default function VendorListingEditor({ vendor, initialPhoto }: { vendor: 
     router.refresh()
   }
 
-  async function upload(file: File | undefined) {
+  async function upload(file: File | undefined, slot: number) {
     if (!file) return
     setError('')
     setMessage('')
-    if (photo) { setError('Your free listing already has one photo. Remove it before adding another.'); return }
+    if (photos.some(p => p.sort_order === slot)) {
+      setError('Remove the current image in this placement before uploading another.')
+      return
+    }
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
       setError('Choose a JPG, PNG or WebP image smaller than 5 MB.')
       return
@@ -144,52 +153,45 @@ export default function VendorListingEditor({ vendor, initialPhoto }: { vendor: 
       return
     }
     const { data, error: insertError } = await supabase.from('vendor_photos')
-      .insert({ vendor_id: vendor.id, storage_path: path, alt_text: vendor.name, sort_order: 0 })
-      .select('id,storage_path,alt_text').single()
+      .insert({ vendor_id: vendor.id, storage_path: path, alt_text: vendor.name, sort_order: slot })
+      .select('id,storage_path,alt_text,sort_order').single()
     if (insertError || !data) {
       await supabase.storage.from('vendor-photos').remove([path])
-      setError('Could not attach photo to listing. ' + (insertError?.message ?? 'Try again.'))
+      setError('Could not attach image: ' + (insertError?.message ?? 'Try again.'))
       setPhotoBusy(false)
       return
     }
-    setPhoto(data)
-    setMessage('Photo uploaded successfully.')
+    setPhotos(previous => [...previous, data])
+    setMessage('Image uploaded successfully.')
     setPhotoBusy(false)
     router.refresh()
   }
 
-  async function removePhoto() {
-    if (!photo) return
+  async function removePhoto(photo: PhotoWithSlot) {
     setError('')
     setMessage('')
     setPhotoBusy(true)
     const supabase = createClient()
-    // Remove the listing reference first: deleting storage first can leave a
-    // publicly visible broken image if the database delete fails.
     const { data: deletedPhoto, error: deleteError } = await supabase.from('vendor_photos').delete()
       .eq('id', photo.id).eq('vendor_id', vendor.id)
       .select('id').maybeSingle()
     if (deleteError || !deletedPhoto) {
-      setError('Could not remove the listing photo. Please try again.')
+      setError('Could not remove the image. Please try again.')
       setPhotoBusy(false)
       return
     }
-
-    setPhoto(null)
+    setPhotos(previous => previous.filter(p => p.id !== photo.id))
     const { error: removeError } = await supabase.storage.from('vendor-photos').remove([photo.storage_path])
     setPhotoBusy(false)
     if (removeError) {
-      // The listing is already consistent. An orphaned storage object can be
-      // cleaned up later; do not claim the displayed photo still exists.
-      setMessage('Photo removed from your listing. You can upload another photo.')
-      setError('The old image file could not be cleaned up. Please contact PlanWedly support.')
+      setMessage('Image removed from the listing. You may upload another.')
+      setError('The old file could not be cleaned up. Please contact PlanWedly support.')
     } else {
-      setMessage('Photo removed. You can upload a new photo.')
+      setMessage('Image removed. You may upload another.')
     }
     router.refresh()
   }
 
-  const publicUrl = photo ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vendor-photos/${photo.storage_path}` : ''
   return (
     <div className="mt-8 space-y-8">
       <form onSubmit={save} className="rounded-2xl border border-border-soft bg-white p-6 sm:p-8 space-y-5">
@@ -217,25 +219,39 @@ export default function VendorListingEditor({ vendor, initialPhoto }: { vendor: 
       </form>
 
       <section className="rounded-2xl border border-border-soft bg-white p-6 sm:p-8">
-        <h2 className="font-[family-name:var(--font-heading)] text-xl text-plum">Listing photo</h2>
-        <p className="mt-2 text-sm text-muted">One photo is included free. JPG, PNG or WebP, up to 5 MB.</p>
-        {photo ? (
-          <div className="mt-5 space-y-4">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={publicUrl} alt={photo.alt_text || vendor.name} className="h-56 w-full max-w-md rounded-xl object-cover" />
-            <button disabled={photoBusy} onClick={removePhoto} className="rounded-xl border border-border-soft px-4 py-2.5 text-sm font-medium text-plum disabled:opacity-50">
-              {photoBusy ? 'Removing…' : 'Remove photo'}
-            </button>
-          </div>
-        ) : (
-          <label className="mt-5 block max-w-md cursor-pointer rounded-xl border border-dashed border-primary px-5 py-6 text-center text-sm font-medium text-primary hover:bg-primary-soft/30">
-            {photoBusy ? 'Uploading…' : 'Choose a listing photo'}
-            <input type="file" accept="image/jpeg,image/png,image/webp" disabled={photoBusy} className="sr-only" onChange={e => {
-              void upload(e.target.files?.[0])
-              e.target.value = ''
-            }} />
-          </label>
-        )}
+        <h2 className="font-[family-name:var(--font-heading)] text-xl text-plum">Free listing images</h2>
+        <p className="mt-2 text-sm text-muted">Three free image placements. Each accepts JPG, PNG or WebP up to 5 MB. You can change them whenever you want.</p>
+        <div className="mt-6 grid gap-6 sm:grid-cols-2">
+          {imageSlots.map(({ slot, title, description }) => {
+            const photo = photos.find(p => p.sort_order === slot)
+            const publicUrl = photo ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vendor-photos/${photo.storage_path}` : ''
+            return (
+              <div key={slot} className="rounded-xl border border-border-soft p-4">
+                <h3 className="font-semibold text-plum">{title}</h3>
+                <p className="mt-1 mb-4 text-xs text-muted">{description}</p>
+                {photo ? (
+                  <div className="space-y-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={publicUrl} alt={photo.alt_text || title} className={`w-full rounded-lg object-cover bg-primary-soft/30 ${slot === 1 ? 'h-40 object-contain' : 'h-40'}`} />
+                    <button type="button" disabled={photoBusy} onClick={() => void removePhoto(photo)}
+                      className="rounded-xl border border-border-soft px-4 py-2 text-sm font-medium text-plum disabled:opacity-50">
+                      {photoBusy ? 'Working…' : 'Remove image'}
+                    </button>
+                  </div>
+                ) : (
+                  <label className="block cursor-pointer rounded-xl border border-dashed border-primary px-5 py-6 text-center text-sm font-medium text-primary hover:bg-primary-soft/30">
+                    {photoBusy ? 'Working…' : 'Choose image'}
+                    <input type="file" accept="image/jpeg,image/png,image/webp" disabled={photoBusy}
+                      className="sr-only" onChange={e => {
+                        void upload(e.target.files?.[0], slot)
+                        e.target.value = ''
+                      }} />
+                  </label>
+                )}
+              </div>
+            )
+          })}
+        </div>
       </section>
       {error && <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm text-red-700">{error}</p>}
       {message && <p role="status" className="rounded-xl bg-primary-soft p-4 text-sm text-plum">{message}</p>}
