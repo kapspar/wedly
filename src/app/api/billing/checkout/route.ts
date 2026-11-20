@@ -29,7 +29,46 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'A subscription already exists. Use Billing settings or contact support.' }, { status: 409 })
     }
 
+    // Check Stripe directly as well as Supabase. Subscription webhooks can be
+    // delayed, so the local record alone is not sufficient for paid checkout.
     const config = stripeTestConfig()
+    const search = new URL('https://api.stripe.com/v1/subscriptions/search')
+    search.searchParams.set('query', `metadata['vendor_id']:'${vendorId}'`)
+    search.searchParams.set('limit', '100')
+    const lookup = await fetch(search, {
+      headers: { Authorization: `Bearer ${config.secret}` },
+      cache: 'no-store',
+    })
+    if (!lookup.ok) throw new Error('Could not verify active Stripe subscriptions.')
+    const found = await lookup.json() as {
+      data?: Array<{ status: string; items?: { data?: Array<{ price?: { id: string } }> } }>
+      has_more?: boolean
+    }
+    // Fail closed rather than potentially creating a duplicate if the query
+    // is incomplete. In normal operation there are far fewer than 100.
+    if (found.has_more) throw new Error('Subscription lookup needs manual review.')
+    if (found.data?.some(subscription =>
+      subscription.items?.data?.some(item =>
+        item.price?.id === config.monthPrice || item.price?.id === config.yearPrice
+      ) && !['canceled', 'incomplete_expired'].includes(subscription.status)
+    )) {
+      return NextResponse.json({
+        error: 'An active or pending Stripe subscription already exists for this business. Use Manage test billing.',
+      }, { status: 409 })
+    }
+
+    // One atomic reservation per listing. This closes the window in which
+    // multiple checkouts could be opened before their webhooks were delivered.
+    const { data: reservationToken, error: reservationError } = await admin.rpc(
+      'reserve_vendor_checkout', { p_vendor_id: vendorId, p_owner_id: user.id }
+    )
+    if (reservationError) throw reservationError
+    if (!reservationToken) {
+      return NextResponse.json({
+        error: 'A test checkout is already open for this business. Complete it or retry after the 35-minute reservation expires.',
+      }, { status: 409 })
+    }
+
     const form = new URLSearchParams()
     form.set('mode', 'subscription')
     form.set('line_items[0][price]', interval === 'month' ? config.monthPrice : config.yearPrice)
@@ -44,11 +83,26 @@ export async function POST(request: Request) {
     const origin = new URL(request.url).origin
     form.set('success_url', origin + '/vendor/dashboard?billing=success')
     form.set('cancel_url', origin + '/vendor/dashboard?billing=cancelled')
-    const session = await stripePost('checkout/sessions', form,
-      'pw-test-checkout-' + vendorId + '-' + interval + '-' + Math.floor(Date.now() / 300000))
-    if (!session.url || !session.url.startsWith('https://checkout.stripe.com/')) {
-      throw new Error('Stripe did not provide a checkout URL.')
+    // Stripe sessions cannot outlive the reservation: 31-minute Checkout,
+    // 35-minute reservation to cover webhook delivery and clock skew.
+    form.set('expires_at', String(Math.floor(Date.now() / 1000) + 31 * 60))
+    let session: { id: string; url?: string }
+    try {
+      session = await stripePost('checkout/sessions', form,
+        'pw-test-checkout-' + vendorId + '-' + reservationToken)
+      if (!session.url || !session.url.startsWith('https://checkout.stripe.com/')) {
+        throw new Error('Stripe did not provide a checkout URL.')
+      }
+    } catch (error) {
+      // Failed Stripe requests should not block a new checkout for 35 minutes.
+      await admin.from('vendor_checkout_reservations').delete()
+        .eq('vendor_id', vendorId).eq('reservation_token', reservationToken)
+      throw error
     }
+    const { error: saveError } = await admin.from('vendor_checkout_reservations')
+      .update({ stripe_session_id: session.id })
+      .eq('vendor_id', vendorId).eq('reservation_token', reservationToken)
+    if (saveError) throw saveError
     return NextResponse.json({ url: session.url })
   } catch (error) {
     console.error('Stripe test checkout failed:', error instanceof Error ? error.message : 'unknown')
