@@ -48,8 +48,9 @@ function LoginForm() {
       setLoading(false)
       return
     }
+    const { data: isStaff } = await supabase.rpc('is_admin')
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', loginData.user.id).single()
-    if (redirect === '/vendor/get-started' && profile?.role === 'couple') {
+    if (redirect === '/vendor/get-started' && profile?.role === 'couple' && !isStaff) {
       const { data: converted, error: conversionError } = await supabase.rpc('register_vendor_account')
       if (conversionError || !converted) {
         setError('This account already has a wedding or cannot be used as a vendor. Please use a different account.')
@@ -57,9 +58,13 @@ function LoginForm() {
         return
       }
     }
-    const vendor = profile?.role === 'vendor' || redirect === '/vendor/get-started'
-    const home = vendor ? '/vendor/get-started' : '/dashboard'
-    router.push(redirect === '/dashboard' || redirect === '/onboarding' || (redirect === '/vendor/get-started' && !vendor) ? home : redirect)
+    const vendor = profile?.role === 'vendor'
+    const home = isStaff ? '/admin' : vendor ? '/vendor/get-started' : '/dashboard'
+    const destination = redirect === '/dashboard' || redirect === '/onboarding'
+      || (redirect.startsWith('/admin') && !isStaff)
+      || (redirect === '/vendor/get-started' && isStaff)
+      ? home : redirect
+    router.push(destination)
     router.refresh()
   }
 
