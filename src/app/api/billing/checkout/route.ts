@@ -83,9 +83,9 @@ export async function POST(request: Request) {
     const origin = new URL(request.url).origin
     form.set('success_url', origin + '/vendor/dashboard?billing=success')
     form.set('cancel_url', origin + '/vendor/dashboard?billing=cancelled')
-    // Stripe sessions cannot outlive the reservation: 30-minute Checkout,
+    // Stripe sessions cannot outlive the reservation: 31-minute Checkout,
     // 35-minute reservation to cover webhook delivery and clock skew.
-    form.set('expires_at', String(Math.floor(Date.now() / 1000) + 30 * 60))
+    form.set('expires_at', String(Math.floor(Date.now() / 1000) + 31 * 60))
     let session: { id: string; url?: string }
     try {
       session = await stripePost('checkout/sessions', form,
