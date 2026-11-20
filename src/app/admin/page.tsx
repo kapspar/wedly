@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Shield, Store, Tag, MessageSquare, ClipboardCheck } from 'lucide-react'
+import { Shield, Store, Tag, MessageSquare, ClipboardCheck, Building2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import Navbar from '@/components/layout/Navbar'
 import Card from '@/components/ui/Card'
@@ -15,15 +15,24 @@ export default async function AdminPage() {
     { count: inquiryCount },
     { count: pendingInquiryCount },
     { count: pendingClaims },
+    { count: pendingListingRequests },
   ] = await Promise.all([
     supabase.from('vendors').select('*', { count: 'exact', head: true }),
     supabase.from('vendor_categories').select('*', { count: 'exact', head: true }),
     supabase.from('inquiries').select('*', { count: 'exact', head: true }),
     supabase.from('inquiries').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
     supabase.from('vendor_claims').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('vendor_listing_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
   ])
 
   const adminLinks = [
+    {
+      href: '/admin/listing-requests',
+      label: 'New Business Reviews',
+      description: 'Review new vendor listing submissions',
+      icon: Building2,
+      count: pendingListingRequests ?? 0,
+    },
     {
       href: '/admin/claims',
       label: 'Vendor Claims',
@@ -64,7 +73,7 @@ export default async function AdminPage() {
             Admin Dashboard
           </h1>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {adminLinks.map((link) => (
               <Link key={link.href} href={link.href}>
                 <Card className="p-6" hover>
