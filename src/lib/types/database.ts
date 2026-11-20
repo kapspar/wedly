@@ -296,6 +296,52 @@ export interface Database {
           },
         ]
       }
+      vendor_claims: {
+        Row: {
+          id: string
+          vendor_id: string
+          requester_id: string
+          business_email: string
+          evidence_url: string | null
+          explanation: string
+          status: 'pending' | 'approved' | 'rejected' | 'more_info'
+          review_note: string | null
+          reviewed_by: string | null
+          reviewed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          vendor_id: string
+          requester_id: string
+          business_email: string
+          evidence_url?: string | null
+          explanation: string
+          status?: 'pending' | 'approved' | 'rejected' | 'more_info'
+          review_note?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          business_email?: string
+          evidence_url?: string | null
+          explanation?: string
+          status?: 'pending' | 'approved' | 'rejected' | 'more_info'
+          review_note?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_claims_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendor_photos: {
         Row: {
           id: string

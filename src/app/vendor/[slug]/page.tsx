@@ -143,7 +143,17 @@ export default async function VendorPage({ params }: Props) {
                     )}
                   </div>
                 </div>
-                <SaveVendorButton vendorId={vendor.id} initialSaved={isSaved} userId={user?.id} />
+                <div className="flex flex-col items-start sm:items-end gap-3">
+                  <SaveVendorButton vendorId={vendor.id} initialSaved={isSaved} userId={user?.id} />
+                  {!vendor.is_claimed && !vendor.claimed_by && (
+                    <Link
+                      href={`/vendor/claim/${vendor.slug}`}
+                      className="inline-flex items-center justify-center rounded-xl border border-primary px-4 py-2 text-sm font-medium text-primary hover:bg-primary-soft/30 transition-colors"
+                    >
+                      Claim This Business
+                    </Link>
+                  )}
+                </div>
               </div>
             </Card>
           </div>
