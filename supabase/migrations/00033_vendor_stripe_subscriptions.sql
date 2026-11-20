@@ -15,7 +15,7 @@ create table if not exists public.vendor_subscriptions (
   updated_at timestamptz not null default now()
 );
 
-create unique index if not exists vendor_subscriptions_customer_idx
+create index if not exists vendor_subscriptions_customer_idx
   on public.vendor_subscriptions(stripe_customer_id)
   where stripe_customer_id is not null;
 
