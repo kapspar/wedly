@@ -3,6 +3,7 @@ import { MapPin, ExternalLink } from 'lucide-react'
 import Card from '@/components/ui/Card'
 
 interface VendorCardProps {
+  imagePath?: string | null
   vendor: {
     slug: string
     name: string
@@ -14,14 +15,20 @@ interface VendorCardProps {
   }
 }
 
-export default function VendorCard({ vendor }: VendorCardProps) {
+export default function VendorCard({ vendor, imagePath }: VendorCardProps) {
+  const imageUrl = imagePath ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vendor-photos/${imagePath}` : null
   return (
     <Link href={`/vendor/${vendor.slug}`}>
       <Card hover className="overflow-hidden h-full flex flex-col">
-        <div className="h-40 bg-gradient-to-br from-primary-soft to-lilac flex items-center justify-center relative">
-          <span className="font-[family-name:var(--font-heading)] text-5xl text-plum/30">
-            {vendor.name.charAt(0)}
-          </span>
+        <div className="aspect-[2/1] bg-gradient-to-br from-primary-soft to-lilac flex items-center justify-center relative">
+          {imageUrl ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={imageUrl} alt={vendor.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+          ) : (
+            <span className="font-[family-name:var(--font-heading)] text-5xl text-plum/30">
+              {vendor.name.charAt(0)}
+            </span>
+          )}
           {vendor.is_featured && (
             <span className="absolute top-3 right-3 bg-primary text-white text-[10px] font-medium px-2 py-0.5 rounded-full">
               Featured

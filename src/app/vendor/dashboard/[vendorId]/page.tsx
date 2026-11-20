@@ -19,8 +19,8 @@ export default async function EditVendorPage({ params }: { params: Promise<{ ven
     .select('id,name,slug,description,city,area,pricing_range,website_url,phone,email,instagram_url,tiktok_url,facebook_url,youtube_url,pinterest_url,snapchat_url,linkedin_url,whatsapp_url,claimed_by,is_claimed')
     .eq('id', vendorId).eq('claimed_by', user.id).eq('is_claimed', true).maybeSingle()
   if (!vendor) notFound()
-  const { data: photos } = await supabase.from('vendor_photos').select('id,storage_path,alt_text')
-    .eq('vendor_id', vendor.id).order('sort_order').limit(2)
+  const { data: photos } = await supabase.from('vendor_photos').select('id,storage_path,alt_text,sort_order')
+    .eq('vendor_id', vendor.id).order('sort_order').limit(3)
   return (
     <>
       <Navbar />
@@ -29,7 +29,7 @@ export default async function EditVendorPage({ params }: { params: Promise<{ ven
           <Link href="/vendor/dashboard" className="text-sm font-medium text-primary hover:underline">Back to vendor dashboard</Link>
           <h1 className="mt-5 font-[family-name:var(--font-heading)] text-3xl text-plum">Manage {vendor.name}</h1>
           <p className="mt-2 text-muted">Update your free business listing. Changes to these fields appear publicly.</p>
-          <VendorListingEditor vendor={vendor} initialPhoto={photos?.[0] ?? null} />
+          <VendorListingEditor vendor={vendor} initialPhotos={photos ?? []} />
         </div>
       </main>
       <Footer />
