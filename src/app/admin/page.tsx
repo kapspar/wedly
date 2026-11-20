@@ -55,6 +55,13 @@ export default async function AdminPage() {
       count: categoryCount ?? 0,
     },
     {
+      href: '/admin/reviews',
+      label: 'Customer Reviews',
+      description: 'Moderate reviews and verify genuine customers',
+      icon: ClipboardCheck,
+      count: 0,
+    },
+    {
       href: '/admin/inquiries',
       label: 'Inquiries',
       description: `${pendingInquiryCount ?? 0} pending`,
