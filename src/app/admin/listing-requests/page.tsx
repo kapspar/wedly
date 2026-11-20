@@ -9,7 +9,7 @@ export const metadata = { title: 'New Business Reviews — PlanWedly Admin' }
 export default async function AdminNewListingRequestsPage() {
   const supabase = await createClient()
   const { data: requests, error } = await supabase.from('vendor_listing_requests')
-    .select('id,requester_id,name,city,business_email,phone,website_url,instagram_url,description,status,review_note,resulting_vendor_id,created_at,category:vendor_categories(name)')
+    .select('id,requester_id,name,city,business_email,phone,website_url,instagram_url,tiktok_url,facebook_url,youtube_url,pinterest_url,snapchat_url,linkedin_url,whatsapp_url,description,status,review_note,resulting_vendor_id,created_at,category:vendor_categories(name)')
     .order('created_at', { ascending: false }).limit(100)
   const ids = [...new Set((requests ?? []).map(r => r.requester_id))]
   const { data: requesters } = ids.length
@@ -29,6 +29,13 @@ export default async function AdminNewListingRequestsPage() {
       phone: r.phone,
       websiteUrl: r.website_url,
       instagramUrl: r.instagram_url,
+      tiktokUrl: r.tiktok_url,
+      facebookUrl: r.facebook_url,
+      youtubeUrl: r.youtube_url,
+      pinterestUrl: r.pinterest_url,
+      snapchatUrl: r.snapchat_url,
+      linkedinUrl: r.linkedin_url,
+      whatsappUrl: r.whatsapp_url,
       description: r.description,
       status: r.status,
       reviewNote: r.review_note,
