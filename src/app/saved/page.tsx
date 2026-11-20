@@ -17,7 +17,7 @@ export default async function SavedPage() {
 
   const { data: saved } = await supabase
     .from('saved_vendors')
-    .select('*, vendor:vendors(*)')
+    .select('*, vendor:vendors(*, vendor_photos(storage_path,sort_order))')
     .eq('couple_id', user.id)
     .order('created_at', { ascending: false })
 
@@ -39,6 +39,7 @@ export default async function SavedPage() {
                 <VendorCard
                   key={(vendor as { id: string }).id}
                   vendor={vendor as { slug: string; name: string; description: string | null; city: string; area: string | null; pricing_range: string | null; is_featured: boolean }}
+                  imagePath={(vendor as { vendor_photos?: { storage_path: string; sort_order: number }[] }).vendor_photos?.find(photo => photo.sort_order === 0)?.storage_path}
                 />
               ))}
             </div>
