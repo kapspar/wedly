@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import posthog from 'posthog-js'
@@ -10,6 +10,8 @@ import Input from '@/components/ui/Input'
 
 export default function SignupPage() {
   const router = useRouter()
+  const isVendor = usePathname() === '/auth/signup/vendor'
+  const destination = isVendor ? '/vendor/get-started' : '/onboarding'
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -24,11 +26,11 @@ export default function SignupPage() {
       if (!user || !active) return
       const { data: wedding, error } = await supabase.from('weddings')
         .select('id').eq('couple_id', user.id).limit(1).maybeSingle()
-      if (active && !error && wedding) router.replace('/dashboard')
+      if (active && !error && wedding && !isVendor) router.replace('/dashboard')
     }
     void checkExisting()
     return () => { active = false }
-  }, [router])
+  }, [router, isVendor])
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,7 +48,8 @@ export default function SignupPage() {
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: fullName, account_type: isVendor ? 'vendor' : 'couple' },
+        emailRedirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(destination)}`,
       },
     })
 
@@ -58,13 +61,17 @@ export default function SignupPage() {
 
     if (signupData.user && signupData.session) {
       posthog.identify(signupData.user.id)
-      posthog.capture('user_signed_up', { auth_method: 'password' })
+      posthog.capture('user_signed_up', { auth_method: 'password', account_type: isVendor ? 'vendor' : 'couple' })
 
-      const { data: wedding } = await supabase.from('weddings')
-        .select('id').eq('couple_id', signupData.user.id).limit(1).maybeSingle()
-      router.replace(wedding ? '/dashboard' : '/onboarding')
+      if (isVendor) {
+        router.replace(destination)
+      } else {
+        const { data: wedding } = await supabase.from('weddings')
+          .select('id').eq('couple_id', signupData.user.id).limit(1).maybeSingle()
+        router.replace(wedding ? '/dashboard' : '/onboarding')
+      }
     } else {
-      router.replace('/auth/login')
+      router.replace(`/auth/login?redirect=${encodeURIComponent(destination)}`)
     }
     router.refresh()
   }
@@ -74,7 +81,7 @@ export default function SignupPage() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`,
+        redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(destination)}`,
       },
     })
   }
@@ -89,10 +96,10 @@ export default function SignupPage() {
             </span>
           </Link>
           <h1 className="font-[family-name:var(--font-heading)] text-3xl text-plum">
-            Start planning your wedding
+            {isVendor ? 'Join PlanWedly as a vendor' : 'Start planning your wedding'}
           </h1>
           <p className="text-sm text-muted mt-1">
-            Create your free account and begin your journey
+            {isVendor ? 'Create an account for your wedding business' : 'Create your free account and begin your journey'}
           </p>
         </div>
 
@@ -164,10 +171,16 @@ export default function SignupPage() {
         <p className="text-center text-sm text-muted mt-6">
           Already have an account?{' '}
           <Link
-            href="/auth/login"
+            href={`/auth/login?redirect=${encodeURIComponent(destination)}`}
             className="text-primary font-medium hover:text-plum"
           >
             Sign in
+          </Link>
+        </p>
+        <p className="text-center text-sm text-muted mt-3">
+          {isVendor ? 'Planning a wedding instead?' : 'Own a wedding business?'}{' '}
+          <Link href={isVendor ? '/auth/signup' : '/auth/signup/vendor'} className="text-primary font-medium hover:text-plum">
+            {isVendor ? 'Create a couple account' : 'Join as a vendor'}
           </Link>
         </p>
       </div>

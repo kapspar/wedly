@@ -44,7 +44,7 @@ export default async function HomePage() {
             <div className="lg:hidden max-w-md mx-auto mt-3">
               <Link href="/auth/signup" className="flex items-center justify-center gap-2 rounded-xl bg-[#893D87] px-5 py-4 text-white text-center font-medium hover:bg-[#6B2C69] transition-colors">Create New Wedding Project <ArrowRight className="h-4 w-4" /></Link>
             </div>
-            <div className="mt-6 text-center text-sm text-[#453746]">Are you a professional planner, vendor, or venue? <Link href="/auth/signup" className="inline-block ml-1 font-semibold text-[#74346E] underline underline-offset-4">Business Portal</Link></div>
+            <div className="mt-6 text-center text-sm text-[#453746]">Are you a professional planner, vendor, or venue? <Link href="/auth/signup/vendor" className="inline-block ml-1 font-semibold text-[#74346E] underline underline-offset-4">Business Portal</Link></div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-7 mt-16 max-w-4xl mx-auto text-center">
               {[
                 { icon: ClipboardCheck, label: 'Plan & Organize' },
