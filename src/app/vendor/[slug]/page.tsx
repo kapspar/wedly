@@ -77,6 +77,17 @@ export default async function VendorPage({ params }: Props) {
     return `${supabaseUrl}/storage/v1/object/public/vendor-photos/${storagePath}`
   }
 
+  const socialLinks = [
+    { key: 'instagram', label: 'Instagram', url: vendor.instagram_url },
+    { key: 'tiktok', label: 'TikTok', url: vendor.tiktok_url },
+    { key: 'facebook', label: 'Facebook', url: vendor.facebook_url },
+    { key: 'youtube', label: 'YouTube', url: vendor.youtube_url },
+    { key: 'pinterest', label: 'Pinterest', url: vendor.pinterest_url },
+    { key: 'snapchat', label: 'Snapchat', url: vendor.snapchat_url },
+    { key: 'linkedin', label: 'LinkedIn', url: vendor.linkedin_url },
+    { key: 'whatsapp', label: 'WhatsApp', url: vendor.whatsapp_url },
+  ].filter((link) => link.url && /^https:\/\//i.test(link.url))
+
   const hasPhotos = photos && photos.length > 0
 
   return (
@@ -259,20 +270,21 @@ export default async function VendorPage({ params }: Props) {
                       <span className="truncate">{vendor.email}</span>
                     </a>
                   )}
-                  {vendor.instagram_url && (
+                  {socialLinks.map(link => (
                     <a
-                      href={vendor.instagram_url}
-                      data-analytics-outbound="instagram"
+                      key={link.key}
+                      href={link.url!}
+                      data-analytics-outbound={link.key}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2.5 text-sm text-muted hover:text-plum transition-colors group"
                     >
                       <AtSign className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span className="flex-1">Instagram</span>
+                      <span className="flex-1">{link.label}</span>
                       <ExternalLink className="h-3 w-3 opacity-40 group-hover:opacity-100 flex-shrink-0" />
                     </a>
-                  )}
-                  {!vendor.website_url && !vendor.phone && !vendor.email && !vendor.instagram_url && (
+                  ))}
+                  {!vendor.website_url && !vendor.phone && !vendor.email && socialLinks.length === 0 && (
                     <p className="text-sm text-muted">
                       Use the inquiry form below to get in touch.
                     </p>
