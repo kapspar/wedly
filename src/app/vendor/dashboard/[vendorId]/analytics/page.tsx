@@ -24,18 +24,20 @@ export default async function VendorAnalyticsDashboard({params}:{params:Promise<
   </div></main><Footer/></>
   const since=new Date(Date.now()-30*86400000).toISOString().slice(0,10)
   const createdSince=new Date(Date.now()-30*86400000).toISOString()
-  const [views,website,instagram,inquiries,booked,quoted]=await Promise.all([
+  const [views,website,instagram,inquiries,allInquiries,booked,quoted]=await Promise.all([
     admin.from('vendor_metric_events').select('vendor_id',{count:'exact',head:true}).eq('vendor_id',vendor.id).gte('event_date',since).eq('kind','view'),
     admin.from('vendor_metric_events').select('vendor_id',{count:'exact',head:true}).eq('vendor_id',vendor.id).gte('event_date',since).eq('kind','website'),
     admin.from('vendor_metric_events').select('vendor_id',{count:'exact',head:true}).eq('vendor_id',vendor.id).gte('event_date',since).eq('kind','instagram'),
     admin.from('inquiries').select('id',{count:'exact',head:true}).eq('vendor_id',vendor.id).gte('created_at',createdSince),
+    admin.from('inquiries').select('id',{count:'exact',head:true}).eq('vendor_id',vendor.id),
     admin.from('vendor_lead_pipeline').select('inquiry_id',{count:'exact',head:true}).eq('vendor_id',vendor.id).eq('stage','booked'),
     admin.from('vendor_lead_pipeline').select('inquiry_id',{count:'exact',head:true}).eq('vendor_id',vendor.id).eq('stage','quoted'),
   ])
   const totalInquiries=inquiries.count??0
   const completed=booked.count??0
-  const conversion=totalInquiries?Math.round(100*completed/totalInquiries):null
-  const anyError=[views,website,instagram,inquiries,booked,quoted].some(result=>!!result.error)
+  const allTimeInquiries=allInquiries.count??0
+  const conversion=allTimeInquiries?Math.round(100*completed/allTimeInquiries):null
+  const anyError=[views,website,instagram,inquiries,allInquiries,booked,quoted].some(result=>!!result.error)
   const metrics=[
     {title:'Estimated profile viewing sessions',value:views.count??0,detail:'Past 30 days · deduplicated per browser tab each day'},
     {title:'Website click sessions',value:website.count??0,detail:'Past 30 days'},
@@ -59,7 +61,7 @@ export default async function VendorAnalyticsDashboard({params}:{params:Promise<
     <div className="mt-6 rounded-2xl border border-border-soft bg-white p-6">
       <p className="text-sm font-semibold text-plum">Indicative booking conversion</p>
       <p className="mt-2 text-2xl font-semibold text-plum">{conversion===null?'Not enough data':conversion+'%'}</p>
-      <p className="mt-1 text-xs text-muted">Leads currently marked Booked divided by inquiries received in the past 30 days. This is an early operational indicator, not a cohort-based conversion rate; dates may differ. More rigorous conversion reporting comes later.</p>
+      <p className="mt-1 text-xs text-muted">Leads currently marked Booked divided by all inquiries received since launch. This is an early operational snapshot, not a cohort-based conversion rate. More rigorous conversion reporting comes later.</p>
       <Link href={`/vendor/dashboard/${vendor.id}/inquiries`} className="mt-4 inline-block text-sm text-primary underline">Manage inquiries and lead stages</Link>
     </div>
     <p className="mt-6 text-xs text-muted">Site interaction counts use randomly generated browser-tab session identifiers, counted once per listing, day and interaction. No visitor names, IP addresses, emails or full destination URLs are saved to these metrics. Automated traffic and visitors who block tracking can affect counts.</p>
