@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import VendorListingEditor from '@/components/vendors/VendorListingEditor'
+import { vendorEntitlements } from '@/lib/vendors/entitlements'
 
 export const metadata = { title: 'Manage Business Listing — PlanWedly' }
 
@@ -20,7 +21,8 @@ export default async function EditVendorPage({ params }: { params: Promise<{ ven
     .eq('id', vendorId).eq('claimed_by', user.id).eq('is_claimed', true).maybeSingle()
   if (!vendor) notFound()
   const { data: photos } = await supabase.from('vendor_photos').select('id,storage_path,alt_text,sort_order')
-    .eq('vendor_id', vendor.id).order('sort_order').limit(3)
+    .eq('vendor_id', vendor.id).order('sort_order').limit(18)
+  const badge = (await vendorEntitlements([{ id:vendor.id, claimed_by:vendor.claimed_by, is_claimed:vendor.is_claimed }])).get(vendor.id)
   return (
     <>
       <Navbar />
@@ -29,7 +31,7 @@ export default async function EditVendorPage({ params }: { params: Promise<{ ven
           <Link href="/vendor/dashboard" className="text-sm font-medium text-primary hover:underline">Back to vendor dashboard</Link>
           <h1 className="mt-5 font-[family-name:var(--font-heading)] text-3xl text-plum">Manage {vendor.name}</h1>
           <p className="mt-2 text-muted">Update your free business listing. Changes to these fields appear publicly.</p>
-          <VendorListingEditor vendor={vendor} initialPhotos={photos ?? []} />
+          <VendorListingEditor vendor={vendor} initialPhotos={photos ?? []} premiumPreview={badge?.premiumPreview??false} />
         </div>
       </main>
       <Footer />
