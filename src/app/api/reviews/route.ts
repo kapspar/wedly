@@ -21,8 +21,13 @@ export async function POST(request: Request) {
       body.length < 20 || body.length > 3000) {
     return NextResponse.json({ error: 'Add at least 20 characters describing your experience (up to 3,000).' }, { status: 400 })
   }
-  if (date && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date)) || date > new Date().toISOString().slice(0,10))) {
-    return NextResponse.json({ error: 'Choose a past service date.' }, { status: 400 })
+  // Service date anchors the review and any pricing commentary in time.
+  // Compare canonical YYYY-MM-DD to reject normalized impossible dates.
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) ||
+      Number.isNaN(Date.parse(date)) ||
+      new Date(date).toISOString().slice(0,10) !== date ||
+      date > new Date().toISOString().slice(0,10)) {
+    return NextResponse.json({ error: 'Enter the date you received the service (today or earlier).' }, { status: 400 })
   }
   const scores: Record<string,number|null> = {}
   for (const field of ratingFields) {
@@ -66,7 +71,7 @@ export async function POST(request: Request) {
       rating: scores.rating, communication_rating:scores.communication_rating,
       quality_rating:scores.quality_rating, value_rating:scores.value_rating,
       reliability_rating:scores.reliability_rating,
-      service_date: date || null, evidence_path: evidencePath,
+      service_date: date, evidence_path: evidencePath,
       moderation_status:'pending', is_approved:false, customer_verified:false,
     })
     if (insertError) {
