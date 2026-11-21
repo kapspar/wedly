@@ -80,7 +80,7 @@ export default function SignupPage() {
         router.replace(wedding ? '/dashboard' : '/onboarding')
       }
     } else {
-      router.replace(`/auth/login?redirect=${encodeURIComponent(destination)}`)
+      router.replace('/auth/check-email')
     }
     router.refresh()
   }
