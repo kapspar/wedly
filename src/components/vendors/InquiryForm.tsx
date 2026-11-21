@@ -20,6 +20,7 @@ export default function InquiryForm({ vendorId, vendorName, vendorSlug, userId }
   const [message, setMessage] = useState('')
   const [eventDate, setEventDate] = useState('')
   const [guestCount, setGuestCount] = useState('')
+  const [budget, setBudget] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
@@ -55,6 +56,7 @@ export default function InquiryForm({ vendorId, vendorName, vendorSlug, userId }
       message: message.trim(),
       event_date: eventDate || null,
       guest_count: guestCount ? parseInt(guestCount) : null,
+      budget_cad: budget ? Number(budget) : null,
     })
 
     if (insertError) {
@@ -66,12 +68,14 @@ export default function InquiryForm({ vendorId, vendorName, vendorSlug, userId }
     posthog.capture('vendor_inquiry_sent', {
       has_event_date: Boolean(eventDate),
       has_guest_count: Boolean(guestCount),
+      has_budget: Boolean(budget),
     })
     setSuccess(true)
     setLoading(false)
     setMessage('')
     setEventDate('')
     setGuestCount('')
+    setBudget('')
   }
 
   if (success) {
@@ -112,6 +116,12 @@ export default function InquiryForm({ vendorId, vendorName, vendorSlug, userId }
           onChange={(e) => setGuestCount(e.target.value)}
           placeholder="Approx. guests"
         />
+      </div>
+      <div className="space-y-1.5">
+        <label htmlFor="budget" className="block text-sm font-medium text-charcoal/80">Approximate budget for this service (CAD, optional)</label>
+        <input id="budget" type="number" min="1" max="1000000" step="1" value={budget}
+          onChange={e=>setBudget(e.target.value)} placeholder="For example, 3000" className="w-full rounded-xl border border-peach-light bg-white px-4 py-2.5 text-sm"/>
+        <p className="text-xs text-muted">You choose whether to share this estimate. It will be included in your inquiry to this vendor, whether they use Free or Premium.</p>
       </div>
       <div className="space-y-1.5">
         <label htmlFor="message" className="block text-sm font-medium text-charcoal/80">
