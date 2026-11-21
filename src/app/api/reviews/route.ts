@@ -66,7 +66,7 @@ export async function POST(request: Request) {
       rating: scores.rating, communication_rating:scores.communication_rating,
       quality_rating:scores.quality_rating, value_rating:scores.value_rating,
       reliability_rating:scores.reliability_rating,
-      service_date: date || null, evidence_path: evidencePath,
+      service_date: date, evidence_path: evidencePath,
       moderation_status:'pending', is_approved:false, customer_verified:false,
     })
     if (insertError) {
