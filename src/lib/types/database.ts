@@ -483,6 +483,7 @@ export interface Database {
           message: string
           event_date: string | null
           guest_count: number | null
+          budget_cad: number | null
           status: InquiryStatus
           created_at: string
         }
@@ -494,6 +495,7 @@ export interface Database {
           message: string
           event_date?: string | null
           guest_count?: number | null
+          budget_cad?: number | null
           status?: InquiryStatus
           created_at?: string
         }
