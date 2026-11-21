@@ -7,6 +7,7 @@ import VendorListingEditor from '@/components/vendors/VendorListingEditor'
 import { vendorEntitlements } from '@/lib/vendors/entitlements'
 import { billingAdmin } from '@/lib/billing/stripe'
 import VendorAvailabilityCalendar from '@/components/vendors/VendorAvailabilityCalendar'
+import PremiumProfileEditor, { type PremiumProfileData } from '@/components/vendors/PremiumProfileEditor'
 
 export const metadata = { title: 'Manage Business Listing — PlanWedly' }
 
@@ -29,6 +30,9 @@ export default async function EditVendorPage({ params }: { params: Promise<{ ven
   const {data:availability}=badge?.premiumPreview?await billingAdmin().from('vendor_availability')
     .select('available_date,status').eq('vendor_id',vendor.id)
     .gte('available_date',today).order('available_date').limit(366):{data:[] as {available_date:string;status:string}[]}
+  const {data:premiumProfile}=badge?.premiumPreview?await billingAdmin().from('vendor_premium_profiles')
+    .select('packages,faqs,highlights,video_urls').eq('vendor_id',vendor.id).maybeSingle():
+    {data:null}
   return (
     <>
       <Navbar />
@@ -39,6 +43,10 @@ export default async function EditVendorPage({ params }: { params: Promise<{ ven
           <p className="mt-2 text-muted">Update your free business listing. Changes to these fields appear publicly.</p>
           <VendorListingEditor vendor={vendor} initialPhotos={photos ?? []} premiumPreview={badge?.premiumPreview??false} />
           <div className="mt-8">{badge?.premiumPreview?<VendorAvailabilityCalendar vendorId={vendor.id} initialEntries={availability??[]} editable/>:<p className="rounded-xl bg-white p-6 text-sm text-muted">The availability calendar is a Premium Preview benefit. Subscribe to unlock date publishing.</p>}</div>
+          <div className="mt-8">{badge?.premiumPreview?
+            <PremiumProfileEditor vendorId={vendor.id} initial={premiumProfile as PremiumProfileData|null}/>:
+            <p className="rounded-xl bg-white p-6 text-sm text-muted">Enhanced packages, FAQs, highlights and videos are Premium Preview benefits.</p>
+          }</div>
         </div>
       </main>
       <Footer />
