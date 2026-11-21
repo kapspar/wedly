@@ -231,7 +231,7 @@ export default async function VendorPage({ params }: Props) {
               )}
 
               {/* Gallery */}
-              {galleryPhotos.length > 0 && (
+              {listingBadges?.premiumPreview && galleryPhotos.length > 0 && (
                 <Card className="p-6 sm:p-8">
                   <h2 className="font-[family-name:var(--font-heading)] text-xl text-ink mb-5">
                     Gallery
