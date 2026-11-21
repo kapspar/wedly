@@ -81,6 +81,7 @@ export default async function VendorDashboardPage() {
                     <Link href={`/vendor/dashboard/${vendor.id}`} className="rounded-xl bg-plum px-4 py-2.5 text-sm font-medium text-white">Manage listing</Link>
                     <Link href={`/vendor/dashboard/${vendor.id}/reviews`} className="rounded-xl border border-border-soft px-4 py-2.5 text-sm font-medium text-plum">Customer reviews</Link>
                     <Link href={`/vendor/dashboard/${vendor.id}/inquiries`} className="rounded-xl border border-border-soft px-4 py-2.5 text-sm font-medium text-plum">Wedding inquiries</Link>
+                    <Link href={`/vendor/dashboard/${vendor.id}/analytics`} className="rounded-xl border border-border-soft px-4 py-2.5 text-sm font-medium text-plum">Analytics</Link>
                     {vendor.is_published && <Link href={`/vendor/${vendor.slug}`} className="rounded-xl border border-border-soft px-4 py-2.5 text-sm font-medium text-plum">View public page</Link>}
                   </div>
                 </div>
