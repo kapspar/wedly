@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { MapPin, ExternalLink } from 'lucide-react'
 import Card from '@/components/ui/Card'
+import ListingBadges from '@/components/vendors/ListingBadges'
 
 interface VendorCardProps {
   imagePath?: string | null
@@ -12,6 +13,8 @@ interface VendorCardProps {
     area: string | null
     pricing_range: string | null
     is_featured: boolean
+    verified?: boolean
+    premiumPreview?: boolean
   }
 }
 
@@ -39,6 +42,7 @@ export default function VendorCard({ vendor, imagePath }: VendorCardProps) {
           <h3 className="font-[family-name:var(--font-heading)] text-base text-ink mb-1">
             {vendor.name}
           </h3>
+          <div className="mb-2"><ListingBadges verified={vendor.verified} premiumPreview={vendor.premiumPreview} compact /></div>
           <div className="flex items-center gap-1 text-xs text-muted mb-2">
             <MapPin className="h-3 w-3" />
             {vendor.city}
