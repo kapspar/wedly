@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { BadgeCheck, Star } from 'lucide-react'
 import Card from '@/components/ui/Card'
+import ReportReview from '@/components/vendors/ReportReview'
 
 export type PublicReview = {
   id: string
@@ -58,6 +59,7 @@ export default function PublicReviews({reviews,count,average,slug}:{
               {([['Communication',review.communication_rating],['Quality',review.quality_rating],['Value',review.value_rating],['Reliability',review.reliability_rating]] as const).filter(([,v])=>v!==null).map(([label,value])=>
                 <span key={label} className="rounded-full bg-primary-soft/40 px-2 py-1 text-xs text-muted">{label}: {value}/5</span>)}
             </div>}
+          <ReportReview reviewId={review.id}/>
           {review.response_status==='approved'&&review.vendor_response&&<div className="mt-4 rounded-lg border-l-2 border-primary bg-primary-soft/20 p-3">
             <p className="text-xs font-semibold text-plum">Response from the business</p>
             <p className="mt-2 whitespace-pre-line text-sm text-ink">{review.vendor_response}</p>

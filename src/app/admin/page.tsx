@@ -31,11 +31,15 @@ export default async function AdminPage() {
   // only after verifying staff authorization.
   const { data: isStaff, error: staffError } = await supabase.rpc('is_admin')
   let pendingReviewCount = 0
+  let pendingReportCount = 0
   if (!staffError && isStaff === true) {
     const { count, error } = await billingAdmin().from('reviews')
       .select('id', { count: 'exact', head: true }).eq('moderation_status', 'pending')
     if (error) console.error('Could not load pending review count:', error.message)
     else pendingReviewCount = count ?? 0
+    const {count: reports, error:reportError}=await billingAdmin().from('review_reports').select('id',{count:'exact',head:true}).eq('status','pending')
+    if(reportError)console.error('Could not load review report count:',reportError.code)
+    else pendingReportCount=reports??0
   }
 
   const adminLinks = [
@@ -73,6 +77,13 @@ export default async function AdminPage() {
       description: `${pendingReviewCount} awaiting moderation`,
       icon: ClipboardCheck,
       count: pendingReviewCount,
+    },
+    {
+      href: '/admin/review-reports',
+      label: 'Review Disputes',
+      description: 'Investigate reported customer reviews',
+      icon: ClipboardCheck,
+      count: pendingReportCount,
     },
     {
       href: '/admin/inquiries',

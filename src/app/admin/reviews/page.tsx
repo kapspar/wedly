@@ -45,6 +45,7 @@ export default async function AdminReviewsPage() {
   return <><Navbar/><main className="min-h-[70vh] bg-ivory px-4 py-10"><div className="mx-auto max-w-5xl">
     <Link href="/admin" className="text-sm text-primary hover:underline">← Admin dashboard</Link>
     <h1 className="mt-4 font-[family-name:var(--font-heading)] text-3xl text-plum">Customer Review Moderation</h1>
+    <Link href="/admin/review-reports" className="mt-3 inline-block text-sm text-primary underline">Review reports & disputes</Link>
     <p className="mt-2 text-sm text-muted">Read each review and inspect genuine-service evidence before awarding Verified Customer. Only approved reviews and separately approved business responses appear publicly.</p>
     {error?<p className="mt-8 text-red-700">Unable to load review queue.</p>:<>
       <h2 className="mb-4 mt-8 text-xl font-semibold">Pending ({items.filter(i=>i.moderation_status==='pending').length})</h2>
