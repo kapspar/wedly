@@ -9,6 +9,8 @@ import VendorCategoryIcon from '@/components/vendors/VendorCategoryIcon'
 import InquiryForm from '@/components/vendors/InquiryForm'
 import SaveVendorButton from '@/components/vendors/SaveVendorButton'
 import VendorAnalytics from '@/components/analytics/VendorAnalytics'
+import PublicReviews, { type PublicReview } from '@/components/vendors/PublicReviews'
+import { billingAdmin } from '@/lib/billing/stripe'
 import type { Metadata } from 'next'
 
 interface Props {
@@ -93,6 +95,28 @@ export default async function VendorPage({ params }: Props) {
   const bannerPhoto = photos?.find(photo => photo.sort_order === 2) ?? directoryPhoto
   const galleryPhotos = photos?.filter(photo => photo.sort_order > 2) ?? []
   const hasPhotos = !!bannerPhoto
+
+  // Public pages use server-only access: the reviews table (including proof
+  // of service, reviewer identity and moderation notes) has no browser grants.
+  // Select only explicitly approved display fields; never leak evidence.
+  let publicReviews: PublicReview[] = []
+  let approvedReviewCount = 0
+  let publicRatingAverage: number | null = null
+  const { data: approved, count, error: reviewError } = await billingAdmin().from('reviews')
+    .select('id,rating,body,service_date,created_at,customer_verified,communication_rating,quality_rating,value_rating,reliability_rating,vendor_response,response_status', { count: 'exact' })
+    .eq('vendor_id', vendor.id).eq('moderation_status', 'approved').eq('is_approved', true)
+    .order('created_at', { ascending: false }).limit(1000)
+  if (reviewError) {
+    console.error('Could not load public reviews:', reviewError.message)
+  } else {
+    approvedReviewCount = count ?? 0
+    publicReviews = (approved ?? []).slice(0,20) as PublicReview[]
+    // Never publish an aggregate star score from only 1–2 reviews.
+    // If more than 1000 exist, fail closed rather than computing a partial mean.
+    if (approvedReviewCount >= 3 && approvedReviewCount <= 1000 && approved?.length === approvedReviewCount) {
+      publicRatingAverage = approved.reduce((sum, review) => sum + review.rating, 0) / approvedReviewCount
+    }
+  }
 
   return (
     <>
@@ -228,6 +252,9 @@ export default async function VendorPage({ params }: Props) {
                   </div>
                 </Card>
               )}
+
+              {/* Only PlanWedly-moderated reviews; no public ratings for fewer than three. */}
+              <PublicReviews reviews={publicReviews} count={approvedReviewCount} average={publicRatingAverage} slug={vendor.slug} />
 
               {/* Inquiry Form */}
               <Card className="p-6 sm:p-8">

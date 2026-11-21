@@ -78,6 +78,7 @@ export default async function VendorDashboardPage() {
                   <BillingActions vendorId={vendor.id} status={subscriptions.get(vendor.id) ?? null} enabled={billingEnabled} />
                   <div className="mt-6 flex flex-wrap gap-3">
                     <Link href={`/vendor/dashboard/${vendor.id}`} className="rounded-xl bg-plum px-4 py-2.5 text-sm font-medium text-white">Manage listing</Link>
+                    <Link href={`/vendor/dashboard/${vendor.id}/reviews`} className="rounded-xl border border-border-soft px-4 py-2.5 text-sm font-medium text-plum">Customer reviews</Link>
                     {vendor.is_published && <Link href={`/vendor/${vendor.slug}`} className="rounded-xl border border-border-soft px-4 py-2.5 text-sm font-medium text-plum">View public page</Link>}
                   </div>
                 </div>
