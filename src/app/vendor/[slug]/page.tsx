@@ -11,6 +11,8 @@ import SaveVendorButton from '@/components/vendors/SaveVendorButton'
 import VendorAnalytics from '@/components/analytics/VendorAnalytics'
 import PublicReviews, { type PublicReview } from '@/components/vendors/PublicReviews'
 import { billingAdmin } from '@/lib/billing/stripe'
+import { vendorEntitlements } from '@/lib/vendors/entitlements'
+import ListingBadges from '@/components/vendors/ListingBadges'
 import type { Metadata } from 'next'
 
 interface Props {
@@ -95,6 +97,7 @@ export default async function VendorPage({ params }: Props) {
   const bannerPhoto = photos?.find(photo => photo.sort_order === 2) ?? directoryPhoto
   const galleryPhotos = photos?.filter(photo => photo.sort_order > 2) ?? []
   const hasPhotos = !!bannerPhoto
+  const listingBadges = (await vendorEntitlements([{ id: vendor.id, claimed_by: vendor.claimed_by, is_claimed: vendor.is_claimed }])).get(vendor.id)
 
   // Public pages use server-only access: the reviews table (including proof
   // of service, reviewer identity and moderation notes) has no browser grants.
@@ -169,6 +172,7 @@ export default async function VendorPage({ params }: Props) {
                   <h1 className="font-[family-name:var(--font-heading)] text-2xl sm:text-3xl text-ink mb-2">
                     {vendor.name}
                   </h1>
+                  <div className="mb-3"><ListingBadges verified={listingBadges?.verified} premiumPreview={listingBadges?.premiumPreview} /></div>
                   <div className="flex flex-wrap items-center gap-3">
                     <span className="flex items-center gap-1 text-sm text-muted">
                       <MapPin className="h-4 w-4 text-primary" />
