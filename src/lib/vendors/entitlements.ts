@@ -39,7 +39,7 @@ export async function vendorEntitlements(vendors: Array<{
   const byId = new Map(eligible.map(vendor => [vendor.id, vendor]))
   for (const subscription of data ?? []) {
     const vendor = byId.get(subscription.vendor_id)
-    if (vendor?.claimed_by === subscription.owner_id &&
+    if (vendor && vendor.claimed_by === subscription.owner_id &&
         subscription.status === 'active' && !!subscription.stripe_subscription_id) {
       result.set(vendor.id, { verified: true, premiumPreview: true })
     }
