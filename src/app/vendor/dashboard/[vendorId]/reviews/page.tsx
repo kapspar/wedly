@@ -5,6 +5,7 @@ import { billingAdmin } from '@/lib/billing/stripe'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import VendorReviewReply from '@/components/vendors/VendorReviewReply'
+import ReportReview from '@/components/vendors/ReportReview'
 export const metadata={title:'Customer Reviews — Vendor Dashboard'}
 function serviceMonth(date:string) {
   const [y,m]=date.split('-').map(Number)
@@ -25,12 +26,13 @@ export default async function VendorReviewsPage({params}:{params:Promise<{vendor
   return <><Navbar/><main className="min-h-[70vh] bg-ivory px-4 py-12"><div className="mx-auto max-w-3xl">
     <Link href="/vendor/dashboard" className="text-sm text-primary hover:underline">← Vendor dashboard</Link>
     <h1 className="mt-4 font-[family-name:var(--font-heading)] text-3xl text-plum">Reviews for {vendor.name}</h1>
-    <p className="mt-2 text-sm text-muted">You may reply to each approved review once. Responses are checked by PlanWedly before they appear publicly. To dispute a review or amend a response, contact PlanWedly support.</p>
+    <p className="mt-2 text-sm text-muted">You may reply to each approved review once. Responses are checked by PlanWedly before they appear publicly. Use the Report review option below to dispute a review. All reports are investigated by PlanWedly; reporting alone does not hide the review. To amend a response, contact support.</p>
     {error?<p className="mt-6 text-sm text-red-700">Unable to load reviews.</p>:<div className="mt-6 space-y-4">
       {(reviews??[]).map(r=><article key={r.id} className="rounded-xl border border-border-soft bg-white p-5">
         <div className="flex flex-wrap justify-between gap-2"><span className="font-semibold text-plum">{r.rating}/5 stars</span><span className="text-xs text-muted">Service: {serviceMonth(r.service_date)}</span></div>
         <p className="mt-3 whitespace-pre-line text-sm text-ink">{r.body}</p>
         {r.customer_verified&&<p className="mt-2 text-xs text-green-700">Verified Customer</p>}
+        <ReportReview reviewId={r.id}/>
         {r.response_status==='none'?<VendorReviewReply reviewId={r.id}/>:<>
           <p className="mt-3 text-xs font-medium text-plum">Your response · {r.response_status==='approved'?'Published':r.response_status==='pending'?'Awaiting moderator approval':'Not approved'}</p>
           <p className="mt-1 whitespace-pre-line text-sm text-muted">{r.vendor_response}</p>
