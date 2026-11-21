@@ -52,7 +52,7 @@ const editable = [
   ['whatsapp_url', 'WhatsApp URL'],
 ] as const
 
-export default function VendorListingEditor({ vendor, initialPhotos }: { vendor: Vendor; initialPhotos: PhotoWithSlot[] }) {
+export default function VendorListingEditor({ vendor, initialPhotos, premiumPreview }: { vendor: Vendor; initialPhotos: PhotoWithSlot[]; premiumPreview: boolean }) {
   const router = useRouter()
   const [fields, setFields] = useState({
     name: vendor.name,
@@ -131,65 +131,49 @@ export default function VendorListingEditor({ vendor, initialPhotos }: { vendor:
   }
 
   async function upload(file: File | undefined, slot: number) {
-    if (!file) return
+    if (!file || photoBusy) return
     setError('')
     setMessage('')
-    if (photos.some(p => p.sort_order === slot)) {
-      setError('Remove the current image in this placement before uploading another.')
+    if (photos.some(p=>p.sort_order===slot)) {
+      setError('Remove the existing image before uploading to this position.')
       return
     }
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
-      setError('Choose a JPG, PNG or WebP image smaller than 5 MB.')
+    if (slot>=3 && !premiumPreview) {
+      setError('Premium Preview is required to upload gallery photos.')
       return
     }
     setPhotoBusy(true)
-    const supabase = createClient()
-    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg'
-    const path = `${vendor.id}/${crypto.randomUUID()}.${ext}`
-    const { error: uploadError } = await supabase.storage.from('vendor-photos').upload(path, file, { contentType: file.type, upsert: false })
-    if (uploadError) {
-      setError('Photo upload failed: ' + uploadError.message)
-      setPhotoBusy(false)
-      return
-    }
-    const { data, error: insertError } = await supabase.from('vendor_photos')
-      .insert({ vendor_id: vendor.id, storage_path: path, alt_text: vendor.name, sort_order: slot })
-      .select('id,storage_path,alt_text,sort_order').single()
-    if (insertError || !data) {
-      await supabase.storage.from('vendor-photos').remove([path])
-      setError('Could not attach image: ' + (insertError?.message ?? 'Try again.'))
-      setPhotoBusy(false)
-      return
-    }
-    setPhotos(previous => [...previous, data])
-    setMessage('Image uploaded successfully.')
-    setPhotoBusy(false)
-    router.refresh()
+    try {
+      const body=new FormData()
+      body.set('vendorId',vendor.id)
+      body.set('slot',String(slot))
+      body.set('file',file)
+      const response=await fetch('/api/vendor/photos',{method:'POST',body})
+      const payload=await response.json() as {error?:string;photo?:PhotoWithSlot}
+      if(!response.ok||!payload.photo)throw new Error(payload.error??'Photo upload failed.')
+      setPhotos(previous=>[...previous,payload.photo!])
+      setMessage('Image uploaded.')
+      router.refresh()
+    }catch(error){
+      setError(error instanceof Error?error.message:'Photo upload failed.')
+    }finally{setPhotoBusy(false)}
   }
 
-  async function removePhoto(photo: PhotoWithSlot) {
+  async function removePhoto(photo:PhotoWithSlot) {
+    if(photoBusy)return
     setError('')
     setMessage('')
     setPhotoBusy(true)
-    const supabase = createClient()
-    const { data: deletedPhoto, error: deleteError } = await supabase.from('vendor_photos').delete()
-      .eq('id', photo.id).eq('vendor_id', vendor.id)
-      .select('id').maybeSingle()
-    if (deleteError || !deletedPhoto) {
-      setError('Could not remove the image. Please try again.')
-      setPhotoBusy(false)
-      return
-    }
-    setPhotos(previous => previous.filter(p => p.id !== photo.id))
-    const { error: removeError } = await supabase.storage.from('vendor-photos').remove([photo.storage_path])
-    setPhotoBusy(false)
-    if (removeError) {
-      setMessage('Image removed from the listing. You may upload another.')
-      setError('The old file could not be cleaned up. Please contact PlanWedly support.')
-    } else {
-      setMessage('Image removed. You may upload another.')
-    }
-    router.refresh()
+    try {
+      const response=await fetch('/api/vendor/photos',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({vendorId:vendor.id,photoId:photo.id})})
+      const payload=await response.json() as {error?:string}
+      if(!response.ok)throw new Error(payload.error??'Unable to remove image.')
+      setPhotos(previous=>previous.filter(p=>p.id!==photo.id))
+      setMessage('Image removed.')
+      router.refresh()
+    }catch(error){
+      setError(error instanceof Error?error.message:'Unable to remove image.')
+    }finally{setPhotoBusy(false)}
   }
 
   return (
@@ -256,6 +240,28 @@ export default function VendorListingEditor({ vendor, initialPhotos }: { vendor:
                 )}
               </div>
             )
+          })}
+        </div>
+      </section>
+      <section className="rounded-2xl border border-border-soft bg-white p-6 sm:p-8">
+        <h2 className="font-[family-name:var(--font-heading)] text-xl text-plum">Premium photo portfolio</h2>
+        <p className="mt-2 text-sm text-muted">Showcase up to 15 additional wedding photos. These appear publicly only while your Premium Preview subscription is active. Photos are preserved if Premium expires.</p>
+        {!premiumPreview&&<p className="mt-3 rounded-xl bg-primary-soft/40 p-3 text-sm text-plum">Upgrade to Premium Preview to unlock portfolio uploads. You can still remove photos previously uploaded.</p>}
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          {Array.from({length:15},(_,index)=>index+3).map(slot=>{
+            const photo=photos.find(p=>p.sort_order===slot)
+            const url=photo?`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vendor-photos/${photo.storage_path}`:''
+            return <div key={slot} className="rounded-xl border border-border-soft p-3">
+              <p className="mb-2 text-xs font-semibold text-plum">Portfolio photo {slot-2} of 15</p>
+              {photo?<div className="space-y-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={url} alt={photo.alt_text??'Portfolio photo'} className="h-36 w-full rounded-lg object-cover"/>
+                <button type="button" disabled={photoBusy} onClick={()=>void removePhoto(photo)} className="text-xs text-red-700 underline disabled:opacity-50">Remove image</button>
+              </div>:premiumPreview?<label className="block cursor-pointer rounded-lg border border-dashed border-primary px-3 py-6 text-center text-xs font-medium text-primary">
+                {photoBusy?'Working…':'Choose photo'}
+                <input type="file" accept="image/jpeg,image/png,image/webp" disabled={photoBusy} className="sr-only" onChange={e=>{void upload(e.target.files?.[0],slot);e.target.value=''}}/>
+              </label>:<p className="rounded-lg bg-ivory p-6 text-center text-xs text-muted">Premium only</p>}
+            </div>
           })}
         </div>
       </section>
