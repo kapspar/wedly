@@ -13,6 +13,7 @@ import PublicReviews, { type PublicReview } from '@/components/vendors/PublicRev
 import { billingAdmin } from '@/lib/billing/stripe'
 import { vendorEntitlements } from '@/lib/vendors/entitlements'
 import ListingBadges from '@/components/vendors/ListingBadges'
+import VendorAvailabilityCalendar from '@/components/vendors/VendorAvailabilityCalendar'
 import type { Metadata } from 'next'
 
 interface Props {
@@ -98,6 +99,11 @@ export default async function VendorPage({ params }: Props) {
   const galleryPhotos = photos?.filter(photo => photo.sort_order > 2) ?? []
   const hasPhotos = !!bannerPhoto
   const listingBadges = (await vendorEntitlements([{ id: vendor.id, claimed_by: vendor.claimed_by, is_claimed: vendor.is_claimed }])).get(vendor.id)
+
+  const today=new Date().toISOString().slice(0,10)
+  const {data:calendarEntries}=listingBadges?.premiumPreview?await billingAdmin().from('vendor_availability')
+    .select('available_date,status').eq('vendor_id',vendor.id)
+    .gte('available_date',today).order('available_date').limit(366):{data:[] as {available_date:string;status:string}[]}
 
   // Public pages use server-only access: the reviews table (including proof
   // of service, reviewer identity and moderation notes) has no browser grants.
@@ -256,6 +262,8 @@ export default async function VendorPage({ params }: Props) {
                   </div>
                 </Card>
               )}
+
+              {listingBadges?.premiumPreview && !!calendarEntries?.length && <VendorAvailabilityCalendar initialEntries={calendarEntries} />}
 
               {/* Only PlanWedly-moderated reviews; no public ratings for fewer than three. */}
               <PublicReviews reviews={publicReviews} count={approvedReviewCount} average={publicRatingAverage} slug={vendor.slug} />
