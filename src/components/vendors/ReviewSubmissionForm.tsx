@@ -44,9 +44,10 @@ export default function ReviewSubmissionForm({ vendorId }: { vendorId: string })
           </label>
         ))}
       </div>
-      <label className="block text-sm text-ink">When did you use this service? (optional)
-        <input name="service_date" type="date" max={new Date().toISOString().slice(0,10)} className="mt-2 block w-full rounded-lg border border-border-soft bg-white p-3" />
+      <label className="block text-sm text-ink">Date of service *
+        <input name="service_date" type="date" required max={new Date().toISOString().slice(0,10)} className="mt-2 block w-full rounded-lg border border-border-soft bg-white p-3" />
       </label>
+      <p className="text-xs text-muted">Use the date the vendor actually provided the service (for example, your wedding date), not the day you booked or paid. This helps future couples understand when a quoted price or experience applied.</p>
       <label className="block text-sm text-ink">Tell couples about your real experience *
         <textarea name="body" required minLength={20} maxLength={3000} rows={5} className="mt-2 block w-full rounded-lg border border-border-soft bg-white p-3" placeholder="Describe the service, communication and delivery." />
       </label>
