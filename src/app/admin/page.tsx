@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Shield, Store, Tag, MessageSquare, ClipboardCheck, Building2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { billingAdmin } from '@/lib/billing/stripe'
 import Navbar from '@/components/layout/Navbar'
 import Card from '@/components/ui/Card'
 
@@ -24,6 +25,18 @@ export default async function AdminPage() {
     supabase.from('vendor_claims').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
     supabase.from('vendor_listing_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
   ])
+
+  // Review submissions are deliberately not readable with the regular
+  // Supabase session. Count pending reviews using the server-only role, and
+  // only after verifying staff authorization.
+  const { data: isStaff, error: staffError } = await supabase.rpc('is_admin')
+  let pendingReviewCount = 0
+  if (!staffError && isStaff === true) {
+    const { count, error } = await billingAdmin().from('reviews')
+      .select('id', { count: 'exact', head: true }).eq('moderation_status', 'pending')
+    if (error) console.error('Could not load pending review count:', error.message)
+    else pendingReviewCount = count ?? 0
+  }
 
   const adminLinks = [
     {
@@ -57,9 +70,9 @@ export default async function AdminPage() {
     {
       href: '/admin/reviews',
       label: 'Customer Reviews',
-      description: 'Moderate reviews and verify genuine customers',
+      description: `${pendingReviewCount} awaiting moderation`,
       icon: ClipboardCheck,
-      count: 0,
+      count: pendingReviewCount,
     },
     {
       href: '/admin/inquiries',
