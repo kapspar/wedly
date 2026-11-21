@@ -8,6 +8,7 @@ import VendorCard from '@/components/vendors/VendorCard'
 import VendorSearch from '@/components/vendors/VendorSearch'
 import VendorCategoryIcon from '@/components/vendors/VendorCategoryIcon'
 import { cn } from '@/lib/utils'
+import { vendorEntitlements } from '@/lib/vendors/entitlements'
 import type { Metadata } from 'next'
 
 interface Props {
@@ -61,6 +62,8 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const { data: vendors } = await vendorQuery
 
   const cities = [...new Set(vendors?.map((v) => v.city) ?? [])].sort()
+
+  const badgeMap = await vendorEntitlements((vendors ?? []).map(vendor => ({ id: vendor.id, claimed_by: vendor.claimed_by, is_claimed: vendor.is_claimed })))
 
   return (
     <>
@@ -131,7 +134,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           {vendors && vendors.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {vendors.map((vendor) => (
-                <VendorCard key={vendor.id} vendor={vendor} imagePath={vendor.vendor_photos?.find(photo => photo.sort_order === 0)?.storage_path} />
+                <VendorCard key={vendor.id} vendor={{ ...vendor, ...badgeMap.get(vendor.id) }} imagePath={vendor.vendor_photos?.find(photo => photo.sort_order === 0)?.storage_path} />
               ))}
             </div>
           ) : (

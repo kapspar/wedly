@@ -5,6 +5,7 @@ import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import BillingActions from '@/components/vendors/BillingActions'
 import { billingAdmin } from '@/lib/billing/stripe'
+import ListingBadges from '@/components/vendors/ListingBadges'
 
 export const metadata = { title: 'Vendor Dashboard — PlanWedly' }
 
@@ -71,7 +72,7 @@ export default async function VendorDashboardPage() {
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {listings.map(vendor => (
                 <div key={vendor.id} className="rounded-2xl border border-border-soft bg-white p-6 shadow-sm">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-primary">Verified business</p>
+                  <ListingBadges verified={vendor.is_claimed} premiumPreview={subscriptions.get(vendor.id) === 'active'} />
                   <h3 className="mt-2 font-[family-name:var(--font-heading)] text-xl text-plum">{vendor.name}</h3>
                   <p className="mt-1 text-sm text-muted">{vendor.city} · {vendor.is_published ? 'Published' : 'Unpublished'}</p>
                   <p className="mt-3 text-sm text-muted line-clamp-2">{vendor.description || 'Add a description to introduce your business.'}</p>
@@ -116,7 +117,7 @@ export default async function VendorDashboardPage() {
               ))}
             </div>
           ) : <p className="mt-3 text-sm text-muted">No new business submissions.</p>}
-          <p className="mt-10 text-xs text-muted">The free plan includes a directory cover, business logo, and profile banner. Premium billing is in test mode and does not grant live paid benefits yet.</p>
+          <p className="mt-10 text-xs text-muted">The free plan includes a directory cover, business logo, and profile banner. Premium billing is in test mode. Premium Preview badges reflect testing only; live paid benefits are not yet available.</p>
         </div>
       </main>
       <Footer />
