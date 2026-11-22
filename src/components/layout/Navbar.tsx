@@ -92,6 +92,7 @@ export default function Navbar() {
                   <LayoutDashboard className="h-4 w-4" />
                   Dashboard
                 </Link>
+                <Link href="/account/settings" className="text-sm font-medium text-charcoal/70 hover:text-charcoal transition-colors">Account settings</Link>
                 <button
                   onClick={handleSignOut}
                   className="flex items-center gap-1.5 text-sm font-medium text-charcoal/70 hover:text-charcoal transition-colors"
@@ -165,6 +166,8 @@ export default function Navbar() {
                   <LayoutDashboard className="h-4 w-4" />
                   Dashboard
                 </Link>
+                <Link href="/account/settings" onClick={()=>setMenuOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-charcoal/70 hover:bg-peach-light/30">Account settings</Link>
                 <button
                   onClick={() => {
                     setMenuOpen(false)
