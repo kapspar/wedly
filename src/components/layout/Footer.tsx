@@ -47,6 +47,16 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2">
               <li>
+                <Link href="/privacy" className="text-sm text-white/60 hover:text-white transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="text-sm text-white/60 hover:text-white transition-colors">
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
                 <span className="text-sm text-white/40">
                   Toronto, Canada
                 </span>
