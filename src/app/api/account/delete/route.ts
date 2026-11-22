@@ -31,7 +31,9 @@ export async function POST(request: Request) {
     const { data: staff, error: staffError } = await admin.from('admin_access')
       .select('user_id').eq('user_id', user.id).maybeSingle()
     if (staffError) throw staffError
-    if (staff) return NextResponse.json({
+    const {data:adminRole,error:adminRoleError}=await supabase.rpc('is_admin')
+    if(adminRoleError) throw adminRoleError
+    if (staff || adminRole) return NextResponse.json({
       error: 'Admin and owner accounts cannot be deleted here. Transfer staff access first.'
     }, { status: 403 })
 
@@ -62,7 +64,10 @@ export async function POST(request: Request) {
       }
       // Query all subscriptions per customer to avoid missing duplicate
       // subscriptions (the webhooks may not have recorded every test checkout).
-      const customerIds=[...new Set((subscriptions??[]).map(s=>s.stripe_customer_id).filter(Boolean))]
+      if ((subscriptions??[]).some(s=>!s.stripe_customer_id)) return NextResponse.json({
+        error:'A billing record needs manual review before account deletion. Contact PlanWedly support.'
+      },{status:409})
+      const customerIds=[...new Set((subscriptions??[]).map(s=>s.stripe_customer_id).filter((id):id is string=>!!id))]
       for (const customerId of customerIds) {
         let startingAfter: string|undefined
         for (let page=0;page<10;page++) {
