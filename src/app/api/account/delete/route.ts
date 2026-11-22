@@ -40,10 +40,15 @@ export async function POST(request: Request) {
     if (vendorError) throw vendorError
     const ids=(vendors??[]).map(v=>v.id)
 
-    // Stop new checkout sessions for the account while it is being deleted.
-    const { error: holdError } = await admin.from('vendor_checkout_reservations')
-      .delete().eq('owner_id',user.id)
+    // An open Stripe Checkout session could create a new subscription after
+    // deletion. Do not proceed until its reservation has expired.
+    const { data: checkoutHolds, error: holdError } = await admin.from('vendor_checkout_reservations')
+      .select('vendor_id,expires_at').eq('owner_id',user.id)
+      .gt('expires_at',new Date().toISOString()).limit(1)
     if (holdError) throw holdError
+    if (checkoutHolds?.length) return NextResponse.json({
+      error: 'A checkout session is still open. Close it and retry after it expires (up to 35 minutes).'
+    }, {status:409})
 
     // Billing must be canceled in Stripe *before* deleting the account;
     // otherwise customers could be charged after losing their login.
