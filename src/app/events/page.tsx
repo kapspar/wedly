@@ -39,8 +39,7 @@ export default function EventsPage() {
       const { data: wedding } = await supabase
         .from('weddings')
         .select('id')
-        .eq('couple_id', user.id)
-        .single()
+                .maybeSingle()
 
       if (!wedding) return
       setWeddingId(wedding.id)

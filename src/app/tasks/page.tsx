@@ -32,8 +32,7 @@ export default function TasksPage() {
       const { data: wedding } = await supabase
         .from('weddings')
         .select('id')
-        .eq('couple_id', user.id)
-        .single()
+                .maybeSingle()
 
       if (!wedding) return
       setWeddingId(wedding.id)

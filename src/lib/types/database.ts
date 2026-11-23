@@ -24,6 +24,18 @@ export type WeddingStatus = 'planning' | 'completed' | 'cancelled'
 export interface Database {
   public: {
     Tables: {
+      wedding_members: {
+        Row: { wedding_id: string; user_id: string; role: string; joined_at: string }
+        Insert: { wedding_id: string; user_id: string; role?: string; joined_at?: string }
+        Update: { wedding_id?: string; user_id?: string; role?: string; joined_at?: string }
+        Relationships: []
+      }
+      wedding_invitations: {
+        Row: { id: string; wedding_id: string; email: string; token: string; expires_at: string; accepted_at: string | null; created_at: string }
+        Insert: { id?: string; wedding_id: string; email: string; token?: string; expires_at?: string; accepted_at?: string | null; created_at?: string }
+        Update: { email?: string; expires_at?: string; accepted_at?: string | null }
+        Relationships: []
+      }
       vendor_category_memberships: {
         Row: { vendor_id: string; category_id: string }
         Insert: { vendor_id: string; category_id: string }
@@ -705,6 +717,8 @@ export interface Database {
     }
     Views: Record<string, never>
     Functions: {
+      create_partner_invitation: { Args: { p_wedding: string; p_email: string }; Returns: string }
+      accept_partner_invitation: { Args: { p_token: string }; Returns: string }
       is_admin: { Args: Record<string, never>; Returns: boolean }
       review_vendor_claim: {
         Args: { p_claim_id: string; p_decision: string; p_note?: string | null }

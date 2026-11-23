@@ -32,8 +32,7 @@ export default async function DashboardPage() {
   const { data: wedding } = await supabase
     .from('weddings')
     .select('*')
-    .eq('couple_id', user.id)
-    .single()
+        .maybeSingle()
 
   if (!wedding) redirect('/onboarding')
 
@@ -73,6 +72,8 @@ export default async function DashboardPage() {
                 : 'No date set yet'}
             </p>
           </div>
+
+          <div className="mb-6"><Link href="/wedding/partner" className="inline-flex items-center gap-2 rounded-xl border border-primary/30 px-4 py-2 text-sm font-medium text-primary hover:bg-primary-soft/30">Invite your partner or manage sharing <ArrowRight className="h-4 w-4" /></Link></div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

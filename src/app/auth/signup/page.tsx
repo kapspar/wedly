@@ -25,7 +25,7 @@ export default function SignupPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user || !active) return
       const { data: wedding, error } = await supabase.from('weddings')
-        .select('id').eq('couple_id', user.id).limit(1).maybeSingle()
+        .select('id').limit(1).maybeSingle()
       if (!active) return
       const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
       if (profile?.role === 'vendor') router.replace('/vendor/get-started')
@@ -76,7 +76,7 @@ export default function SignupPage() {
         router.replace(destination)
       } else {
         const { data: wedding } = await supabase.from('weddings')
-          .select('id').eq('couple_id', signupData.user.id).limit(1).maybeSingle()
+          .select('id').limit(1).maybeSingle()
         router.replace(wedding ? '/dashboard' : '/onboarding')
       }
     } else {
