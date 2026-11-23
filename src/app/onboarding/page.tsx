@@ -49,7 +49,7 @@ export default function OnboardingPage() {
   const [partner1, setPartner1] = useState('')
   const [partner2, setPartner2] = useState('')
   const [weddingType, setWeddingType] = useState<WeddingType>('hindu')
-  const [hasDate, setHasDate] = useState<'yes' | 'auspicious' | 'unsure'>('unsure')
+  const [hasDate, setHasDate] = useState<'yes' | 'unsure'>('unsure')
   const [weddingDate, setWeddingDate] = useState('')
   const [selectedEvents, setSelectedEvents] = useState<EventType[]>(HINDU_DEFAULT_EVENTS as EventType[])
   const [budgets, setBudgets] = useState<Record<string, { enabled: boolean; amount: number }>>(
@@ -106,7 +106,7 @@ export default function OnboardingPage() {
         partner2_name: partner2,
         wedding_type: weddingType,
         wedding_date: hasDate === 'yes' && weddingDate ? weddingDate : null,
-        seeking_auspicious_date: hasDate === 'auspicious',
+        seeking_auspicious_date: false,
         slug,
       })
       .select()
@@ -281,7 +281,6 @@ export default function OnboardingPage() {
               <div className="space-y-3">
                 {[
                   { value: 'yes' as const, label: 'Yes, we have a date' },
-                  { value: 'auspicious' as const, label: 'Looking for an auspicious date' },
                   { value: 'unsure' as const, label: 'Not sure yet' },
                 ].map((opt) => (
                   <button
@@ -306,11 +305,6 @@ export default function OnboardingPage() {
                   value={weddingDate}
                   onChange={(e) => setWeddingDate(e.target.value)}
                 />
-              )}
-              {hasDate === 'auspicious' && (
-                <p className="text-sm text-muted bg-primary-soft/50 rounded-xl p-3">
-                  We&apos;re working on an auspicious date service — we&apos;ll notify you when it&apos;s ready!
-                </p>
               )}
             </div>
           )}
