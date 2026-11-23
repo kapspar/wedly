@@ -7,6 +7,21 @@ these files.** PlanWedly currently uses hosted Supabase Auth
 (project `frhtluslmjovvezpgopx`). That platform stores its email templates
 and sender separately from the Next.js website.
 
+## Official logo in email templates
+
+All five templates now reference the official PlanWedly floral W image at:
+https://www.planwedly.com/brand/planwedly-logo.png
+
+The hosted image must remain publicly accessible. If an email client blocks
+remote images, the text wordmark and message still display. Do not attach
+the image as an email attachment or paste the image file into the HTML editor.
+
+**Important:** Committing website files and this repository's email HTML does
+**not** change the live Supabase Auth templates. Open the hosted Supabase
+dashboard and paste each updated HTML file into the corresponding template,
+then save. The app-side SMTP configuration is separate and should already be
+set for the verified PlanWedly sender.
+
 ## Apply the templates
 
 1. Open https://supabase.com/dashboard/project/frhtluslmjovvezpgopx/auth/templates

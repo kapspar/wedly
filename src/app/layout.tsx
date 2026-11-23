@@ -11,9 +11,9 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   metadataBase: new URL(SITE_URL),
   icons: {
-    icon: [{ url: '/icon.svg?v=3', type: 'image/svg+xml' }],
-    shortcut: '/icon.svg?v=3',
-    apple: '/favicon.png',
+    icon: [{ url: '/brand/planwedly-logo.png', type: 'image/png', sizes: '120x120' }],
+    shortcut: '/brand/planwedly-logo.png',
+    apple: '/brand/planwedly-logo.png',
   },
   openGraph: {
     siteName: SITE_NAME,
