@@ -36,7 +36,7 @@ export default function OnboardingPage() {
       if (!active) return
       if (!user) { router.replace('/auth/login?redirect=/onboarding'); return }
       const { data: wedding, error: lookupError } = await supabase.from('weddings')
-        .select('id').eq('couple_id', user.id).limit(1).maybeSingle()
+        .select('id').limit(1).maybeSingle()
       if (!active) return
       if (lookupError) { setError('Unable to verify your wedding. Please refresh.'); setCheckingAccount(false); return }
       if (wedding) { router.replace('/dashboard'); return }
@@ -92,7 +92,7 @@ export default function OnboardingPage() {
     }
 
     const { data: existingWedding, error: existingError } = await supabase.from('weddings')
-      .select('id').eq('couple_id', user.id).limit(1).maybeSingle()
+      .select('id').limit(1).maybeSingle()
     if (existingError) { setError(existingError.message); setLoading(false); return }
     if (existingWedding) { router.replace('/dashboard'); return }
 
@@ -147,7 +147,7 @@ export default function OnboardingPage() {
       })
     }
 
-    router.push('/dashboard')
+    router.push('/wedding/partner')
     router.refresh()
   }
 

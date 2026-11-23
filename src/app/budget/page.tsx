@@ -37,8 +37,7 @@ export default function BudgetPage() {
       const { data: wedding } = await supabase
         .from('weddings')
         .select('id')
-        .eq('couple_id', user.id)
-        .single()
+                .maybeSingle()
 
       if (!wedding) { setLoading(false); return }
       setWeddingId(wedding.id)

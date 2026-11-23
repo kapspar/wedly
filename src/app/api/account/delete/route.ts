@@ -37,6 +37,13 @@ export async function POST(request: Request) {
       error: 'Admin and owner accounts cannot be deleted here. Transfer staff access first.'
     }, { status: 403 })
 
+    const {data:ownedWeddings,error:ownedError}=await admin.from('weddings').select('id').eq('couple_id',user.id)
+    if(ownedError) throw ownedError
+    if((ownedWeddings??[]).length){
+      const {data:partnerMembers,error:partnerError}=await admin.from('wedding_members').select('wedding_id').eq('role','partner').in('wedding_id',ownedWeddings!.map(w=>w.id)).limit(1)
+      if(partnerError) throw partnerError
+      if(partnerMembers?.length) return NextResponse.json({error:'Please contact support before deleting a shared wedding owner account. Your partner would otherwise lose the wedding.'},{status:409})
+    }
     const { data: vendors, error: vendorError } = await admin.from('vendors')
       .select('id,slug,name').eq('claimed_by',user.id)
     if (vendorError) throw vendorError

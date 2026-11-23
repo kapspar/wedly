@@ -33,7 +33,7 @@ export async function GET(request: Request) {
           if (isStaff || role === 'vendor') return NextResponse.redirect(new URL(home, origin))
           if (requested === '/onboarding') {
             const { data: wedding, error: lookupError } = await supabase.from('weddings')
-              .select('id').eq('couple_id', user.id).limit(1).maybeSingle()
+              .select('id').limit(1).maybeSingle()
             if (lookupError) return NextResponse.redirect(new URL(home, origin))
             return NextResponse.redirect(new URL(wedding ? home : '/onboarding', origin))
           }
