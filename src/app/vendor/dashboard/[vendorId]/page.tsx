@@ -49,7 +49,7 @@ export default async function EditVendorPage({ params }: { params: Promise<{ ven
           <h1 className="mt-5 font-[family-name:var(--font-heading)] text-3xl text-plum">Manage {vendor.name}</h1>
           <p className="mt-2 text-muted">Update your free business listing. Changes to these fields appear publicly.</p>
           <VendorListingEditor vendor={vendor} initialPhotos={photos ?? []} premiumPreview={badge?.premiumPreview??false} />
-          <VendorTaxonomyEditor vendorId={vendor.id} primaryCategoryId={vendor.category_id} categories={categories??[]} services={services??[]} initialCategories={(categoryMemberships??[]).map(x=>x.category_id)} initialServices={(serviceMemberships??[]).map(x=>x.service_id)}/>
+          <VendorTaxonomyEditor vendorId={vendor.id} primaryCategoryId={vendor.category_id} categories={(categories??[]) as {id:string;name:string}[]} services={(services??[]) as {id:string;category_id:string;name:string}[]} initialCategories={((categoryMemberships??[]) as {category_id:string}[]).map(x=>x.category_id)} initialServices={((serviceMemberships??[]) as {service_id:string}[]).map(x=>x.service_id)}/>
           <div className="mt-8">{badge?.premiumPreview?<VendorAvailabilityCalendar vendorId={vendor.id} initialEntries={availability??[]} editable/>:<p className="rounded-xl bg-white p-6 text-sm text-muted">The availability calendar is a Premium Preview benefit. Subscribe to unlock date publishing.</p>}</div>
           <div className="mt-8">{badge?.premiumPreview?
             <PremiumProfileEditor vendorId={vendor.id} initial={premiumProfile as PremiumProfileData|null}/>:
