@@ -195,6 +195,7 @@ export default async function VendorPage({ params }: Props) {
                       {vendor.city}
                       {vendor.area && `, ${vendor.area}`}
                     </span>
+                    {vendor.service_areas?.length > 0 && <span className="text-sm text-muted">Serves: {vendor.service_areas.join(', ')}</span>}
                     {vendor.pricing_range && (
                       <span className="text-sm text-muted bg-primary-soft px-3 py-0.5 rounded-full font-medium">
                         {vendor.pricing_range}

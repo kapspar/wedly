@@ -12,6 +12,7 @@ type Vendor = {
   description: string | null
   city: string
   area: string | null
+  service_areas: string[]
   pricing_range: string | null
   website_url: string | null
   phone: string | null
@@ -36,8 +37,8 @@ const imageSlots = [
 
 const editable = [
   ['name', 'Business name'],
-  ['city', 'City'],
-  ['area', 'Service area / neighbourhood'],
+  ['city', 'Base city'],
+  ['area', 'Local neighbourhood (optional)'],
   ['pricing_range', 'Pricing guidance'],
   ['website_url', 'Website'],
   ['phone', 'Phone'],
@@ -72,6 +73,7 @@ export default function VendorListingEditor({ vendor, initialPhotos, premiumPrev
     linkedin_url: vendor.linkedin_url ?? '',
     whatsapp_url: vendor.whatsapp_url ?? '',
   })
+  const [serviceAreas, setServiceAreas] = useState((vendor.service_areas ?? []).join(', '))
   const [photos, setPhotos] = useState(initialPhotos)
   const [busy, setBusy] = useState(false)
   const [photoBusy, setPhotoBusy] = useState(false)
@@ -95,6 +97,8 @@ export default function VendorListingEditor({ vendor, initialPhotos, premiumPrev
         return
       }
     }
+    const parsedAreas = [...new Map(serviceAreas.split(/[,\n]/).map(s=>s.trim()).filter(Boolean).map(s=>[s.toLocaleLowerCase('en-CA'),s])).values()]
+    if(parsedAreas.length>20 || parsedAreas.some(s=>s.length>80)){setError('Enter up to 20 service areas (80 characters each).');return}
     setBusy(true)
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -108,6 +112,7 @@ export default function VendorListingEditor({ vendor, initialPhotos, premiumPrev
         name: fields.name.trim(),
         city: fields.city.trim(),
         area: fields.area.trim() || null,
+        service_areas: parsedAreas,
         description: fields.description.trim() || null,
         pricing_range: fields.pricing_range.trim() || null,
         website_url: fields.website_url.trim() || null,
@@ -190,6 +195,11 @@ export default function VendorListingEditor({ vendor, initialPhotos, premiumPrev
                 className="w-full rounded-xl border border-border-soft px-4 py-3 text-sm text-ink" />
             </div>
           ))}
+        </div>
+        <div>
+          <label htmlFor="service-areas" className="mb-2 block text-sm font-medium text-ink">Where you provide services</label>
+          <textarea id="service-areas" rows={2} maxLength={1600} value={serviceAreas} onChange={e=>setServiceAreas(e.target.value)} placeholder="Ajax, Whitby, Toronto, Durham Region" className="w-full rounded-xl border border-border-soft px-4 py-3 text-sm text-ink" />
+          <p className="mt-1 text-xs text-muted">Enter cities or regions separated by commas. Your base city above is separate. Add only locations you actually serve.</p>
         </div>
         <div>
           <label htmlFor="description" className="mb-2 block text-sm font-medium text-ink">About your business</label>
