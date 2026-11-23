@@ -9,7 +9,6 @@ import {
   CheckSquare,
   ArrowRight,
   CalendarDays,
-  CalendarHeart,
   ListChecks,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
@@ -71,9 +70,7 @@ export default async function DashboardPage() {
             <p className="text-muted text-sm mt-1">
               {wedding.wedding_date
                 ? `Wedding on ${new Date(wedding.wedding_date).toLocaleDateString('en-CA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`
-                : wedding.seeking_auspicious_date
-                  ? 'Looking for an auspicious date'
-                  : 'No date set yet'}
+                : 'No date set yet'}
             </p>
           </div>
 
@@ -255,7 +252,6 @@ export default async function DashboardPage() {
               { href: '/saved', label: 'Saved Vendors', icon: Bookmark },
               { href: '/budget', label: 'Budget', icon: DollarSign },
               { href: '/events', label: 'Events', icon: CalendarDays },
-              { href: '/muhurtham', label: 'Muhurtham Preview', icon: CalendarHeart },
             ].map((link) => (
               <Link key={link.href} href={link.href}>
                 <Card className="p-4 text-center" hover>
