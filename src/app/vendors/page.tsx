@@ -13,21 +13,23 @@ export const metadata = { title: 'Browse Vendors' }
 export default async function VendorsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; city?: string }>
+  searchParams: Promise<{ q?: string; city?: string; serves?: string }>
 }) {
   const params = await searchParams
   const supabase = await createClient()
 
-  const [{ data: categories }, { data: allCities }] = await Promise.all([
+  const [{ data: categories }, { data: allCities }, { data: regionVendors }] = await Promise.all([
     supabase.from('vendor_categories').select('*').order('display_order'),
     supabase
       .from('vendors')
       .select('city')
       .eq('is_published', true)
       .order('city'),
+    supabase.from('vendors').select('service_areas').eq('is_published',true).eq('is_claimed',true),
   ])
 
   const cities = [...new Set((allCities ?? []).map((v) => v.city))].sort()
+  const regions = [...new Set((regionVendors??[]).flatMap(v=>v.service_areas??[]))].sort((a,b)=>a.localeCompare(b))
 
   let vendorQuery = supabase
     .from('vendors')
@@ -47,6 +49,8 @@ export default async function VendorsPage({
     vendorQuery = vendorQuery.ilike('city', `%${params.city}%`)
   }
 
+  if (params.serves) vendorQuery = vendorQuery.contains('service_areas',[params.serves])
+
   const { data: queriedVendors, error: vendorError } = await vendorQuery
   // Keep listings discoverable if a nested photo/category relationship fails.
   // Never turn a database error into a misleading "0 vendors found" result.
@@ -63,6 +67,7 @@ export default async function VendorsPage({
 
     if (params.q) { const q = params.q.replace(/[%_]/g, '\\  const { data: vendors } = await vendorQuery'); fallbackQuery = fallbackQuery.or(`name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`) }
     if (params.city) fallbackQuery = fallbackQuery.ilike('city', `%${params.city}%`)
+    if (params.serves) fallbackQuery = fallbackQuery.contains('service_areas',[params.serves])
     const fallback = await fallbackQuery
     if (fallback.error) console.error('Vendor directory fallback failed:', fallback.error.code, fallback.error.message)
     vendors = fallback.data as typeof queriedVendors
@@ -136,6 +141,8 @@ export default async function VendorsPage({
             </div>
           )}
 
+          {regions.length>0 && <div className="mb-6"><p className="mb-2 text-xs font-semibold text-muted">Serves this area (claimed vendors)</p><div className="flex flex-wrap gap-2"><Link href={`/vendors?${new URLSearchParams(Object.entries({q:params.q||'',city:params.city||''}).filter(([,v])=>v))}`} className={`rounded-full px-3 py-1 text-xs ${!params.serves?'bg-primary text-white':'bg-primary-soft text-muted'}`}>All service areas</Link>{regions.map(region=><Link key={region} href={`/vendors?${new URLSearchParams(Object.entries({q:params.q||'',city:params.city||'',serves:region}).filter(([,v])=>v))}`} className={`rounded-full px-3 py-1 text-xs ${params.serves===region?'bg-primary text-white':'bg-primary-soft text-muted'}`}>{region}</Link>)}</div></div>}
+
           {/* Results */}
           <p className="text-sm text-muted mb-6">
             {vendors?.length ?? 0} vendor{(vendors?.length ?? 0) !== 1 ? 's' : ''} found
@@ -152,7 +159,7 @@ export default async function VendorsPage({
               <p className="text-muted">
                 No vendors found. Try adjusting your search or filters.
               </p>
-              {(params.q || params.city) && (
+              {(params.q || params.city || params.serves) && (
                 <Link
                   href="/vendors"
                   className="mt-4 inline-block text-sm text-primary hover:underline"
