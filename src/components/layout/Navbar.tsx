@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { Menu, X, LogOut, LayoutDashboard, User } from 'lucide-react'
@@ -54,7 +55,8 @@ export default function Navbar() {
     <nav className="bg-[#FBF7FA]/95 backdrop-blur-md border-b border-[#EADCE9] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex items-center gap-2.5" aria-label="PlanWedly home">
+            <Image src="/brand/planwedly-logo.png" alt="" width={42} height={42} className="h-[42px] w-[42px] shrink-0 rounded-xl object-contain" priority />
             <span className="font-[family-name:var(--font-logo)] text-[1.8rem] italic font-light tracking-wide text-plum leading-none">
               PlanWedly
             </span>
