@@ -40,14 +40,24 @@ export default async function VendorPage({ params }: Props) {
   const { slug } = await params
   const supabase = await createClient()
 
-  const { data: vendor } = await supabase
+  // Fetch the listing independently of embedded PostgREST relationships.
+  // A broken relationship must never turn a published vendor into a 404.
+  const { data: vendor, error: vendorError } = await supabase
     .from('vendors')
-    .select('*, category:vendor_categories(*)')
+    .select('*')
     .eq('slug', slug)
     .eq('is_published', true)
-    .single()
+    .maybeSingle()
 
+  if (vendorError) console.error('Vendor detail lookup failed:', vendorError.code, vendorError.message)
   if (!vendor) notFound()
+
+  const { data: categoryRow, error: categoryError } = await supabase
+    .from('vendor_categories')
+    .select('id,name,slug,icon')
+    .eq('id', vendor.category_id)
+    .maybeSingle()
+  if (categoryError) console.error('Vendor category lookup failed:', categoryError.code, categoryError.message)
 
   const { data: photos } = await supabase
     .from('vendor_photos')
@@ -70,12 +80,7 @@ export default async function VendorPage({ params }: Props) {
     isSaved = !!saved
   }
 
-  const category = vendor.category as {
-    id: string
-    name: string
-    slug: string
-    icon: string | null
-  }
+  const category = categoryRow ?? { id: vendor.category_id, name: 'Vendors', slug: '', icon: null }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
 
@@ -173,7 +178,7 @@ export default async function VendorPage({ params }: Props) {
                       className="mb-4 h-20 w-20 rounded-2xl border border-border-soft bg-white object-contain p-1" />
                   )}
                   <Link
-                    href={`/vendors/${category.slug}`}
+                    href={category.slug ? `/vendors/${category.slug}` : '/vendors'}
                     className="inline-flex items-center gap-1 text-xs text-muted hover:text-plum transition-colors mb-3"
                   >
                     <ChevronLeft className="h-3 w-3" />
