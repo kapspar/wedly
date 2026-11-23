@@ -47,7 +47,26 @@ export default async function VendorsPage({
     vendorQuery = vendorQuery.ilike('city', `%${params.city}%`)
   }
 
-  const { data: vendors } = await vendorQuery
+  const { data: queriedVendors, error: vendorError } = await vendorQuery
+  // Keep listings discoverable if a nested photo/category relationship fails.
+  // Never turn a database error into a misleading "0 vendors found" result.
+  if (vendorError) {
+    console.error('Vendor directory query failed:', vendorError.code, vendorError.message)
+  }
+  let vendors = queriedVendors
+  if (vendorError) {
+    let fallbackQuery = supabase.from('vendors').select('*')
+      .eq('is_published', true)
+      .order('is_featured', { ascending: false })
+      .order('priority')
+      .order('name')
+
+    if (params.q) { const q = params.q.replace(/[%_]/g, '\\  const { data: vendors } = await vendorQuery'); fallbackQuery = fallbackQuery.or(`name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`) }
+    if (params.city) fallbackQuery = fallbackQuery.ilike('city', `%${params.city}%`)
+    const fallback = await fallbackQuery
+    if (fallback.error) console.error('Vendor directory fallback failed:', fallback.error.code, fallback.error.message)
+    vendors = fallback.data as typeof queriedVendors
+  }
 
   const badgeMap = await vendorEntitlements((vendors ?? []).map(vendor => ({ id: vendor.id, claimed_by: vendor.claimed_by, is_claimed: vendor.is_claimed })))
 
