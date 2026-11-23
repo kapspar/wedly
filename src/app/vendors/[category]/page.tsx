@@ -51,10 +51,11 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       serviceIds=(matches??[]).map(m=>m.vendor_id)
     }else serviceIds=[]
   }
+  const matchingIds=serviceIds===null?memberIds:memberIds.filter(id=>serviceIds.includes(id))
   let vendorQuery = supabase
     .from('vendors')
     .select('*, vendor_categories(name), vendor_photos(storage_path,sort_order)')
-    .in('id',(serviceIds??memberIds).length ? (serviceIds??memberIds) : ['00000000-0000-0000-0000-000000000000'])
+    .in('id',matchingIds.length ? matchingIds : ['00000000-0000-0000-0000-000000000000'])
     .eq('is_published', true)
     .order('is_featured', { ascending: false })
     .order('priority')
