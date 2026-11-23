@@ -71,7 +71,26 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     vendorQuery = vendorQuery.ilike('city', `%${sp.city}%`)
   }
 
-  const { data: vendors } = await vendorQuery
+  const { data: queriedVendors, error: vendorError } = await vendorQuery
+  // Keep listings discoverable if a nested photo/category relationship fails.
+  // Never turn a database error into a misleading "0 vendors found" result.
+  if (vendorError) {
+    console.error('Vendor directory query failed:', vendorError.code, vendorError.message)
+  }
+  let vendors = queriedVendors
+  if (vendorError) {
+    let fallbackQuery = supabase.from('vendors').select('*')
+      .eq('is_published', true)
+      .order('is_featured', { ascending: false })
+      .order('priority')
+      .order('name')
+      .in('id', matchingIds.length ? matchingIds : ['00000000-0000-0000-0000-000000000000'])
+    if (sp.q) { const q = sp.q.replace(/[%_]/g, '\\  const { data: vendors } = await vendorQuery'); fallbackQuery = fallbackQuery.or(`name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`) }
+    if (sp.city) fallbackQuery = fallbackQuery.ilike('city', `%${sp.city}%`)
+    const fallback = await fallbackQuery
+    if (fallback.error) console.error('Vendor directory fallback failed:', fallback.error.code, fallback.error.message)
+    vendors = fallback.data as typeof queriedVendors
+  }
 
   const cities = [...new Set(vendors?.map((v) => v.city) ?? [])].sort()
 
