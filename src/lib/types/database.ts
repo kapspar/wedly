@@ -24,6 +24,24 @@ export type WeddingStatus = 'planning' | 'completed' | 'cancelled'
 export interface Database {
   public: {
     Tables: {
+      vendor_category_memberships: {
+        Row: { vendor_id: string; category_id: string }
+        Insert: { vendor_id: string; category_id: string }
+        Update: { vendor_id?: string; category_id?: string }
+        Relationships: []
+      }
+      vendor_services: {
+        Row: { id: string; category_id: string; name: string; slug: string; display_order: number }
+        Insert: { id?: string; category_id: string; name: string; slug: string; display_order?: number }
+        Update: { id?: string; category_id?: string; name?: string; slug?: string; display_order?: number }
+        Relationships: []
+      }
+      vendor_service_memberships: {
+        Row: { vendor_id: string; service_id: string }
+        Insert: { vendor_id: string; service_id: string }
+        Update: { vendor_id?: string; service_id?: string }
+        Relationships: []
+      }
       profiles: {
         Row: {
           id: string
