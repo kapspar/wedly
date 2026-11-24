@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 
-type Vendor = {id:string;name:string;slug:string;city:string;area:string|null;serviceAreas:string[];category:string;claimed:boolean;isVenue:boolean}
+type Vendor = {id:string;name:string;slug:string;city:string;area:string|null;serviceAreas:string[];category:string;claimed:boolean;isVenue:boolean;streetAddress:string|null;latitude:number|null;longitude:number|null}
 type MapResults = { geometry: { location: unknown } }[]
 type GoogleApi = {
   maps: {
@@ -15,7 +15,7 @@ type GoogleApi = {
   }
 }
 declare global { interface Window {google?:GoogleApi; __planwedlyGoogleMapReady?:()=>void } }
-type CityGroup = { key:string; city:string; vendors:Vendor[] }
+type CityGroup = { key:string; city:string; label:string; vendors:Vendor[]; exactPosition?:{lat:number;lng:number} }
 const canonical=(s:string)=>s.trim().toLocaleLowerCase('en-CA')
 /**
  * Approximate city centres, not storefront or home addresses.
@@ -73,7 +73,13 @@ export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiK
   const filtered=useMemo(()=>vendors.filter(v=>(!category||v.category===category)&&(!service||v.serviceAreas.includes(service))),[vendors,category,service])
   const groups=useMemo(()=>{
     const grouped=new Map<string,CityGroup>()
-    for(const vendor of filtered){const key=canonical(vendor.city);const group=grouped.get(key);if(group)group.vendors.push(vendor);else grouped.set(key,{key,city:vendor.city,vendors:[vendor]})}
+    for(const vendor of filtered){
+      const exact=vendor.isVenue && vendor.streetAddress && vendor.latitude!==null && vendor.longitude!==null
+      const key=exact?'venue:'+vendor.id:'city:'+canonical(vendor.city)
+      const group=grouped.get(key)
+      if(group)group.vendors.push(vendor)
+      else grouped.set(key,{key,city:vendor.city,label:exact?vendor.name:vendor.city,vendors:[vendor],...(exact?{exactPosition:{lat:vendor.latitude!,lng:vendor.longitude!}}:{})})
+    }
     return [...grouped.values()]
   },[filtered])
 
@@ -89,11 +95,11 @@ export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiK
         let completed=0, successes=0
         let failedLookups=0
         const markCity=(group:CityGroup,position:unknown)=>{
-          const marker=new maps.Marker({map,position,title:group.city+': '+group.vendors.length+' wedding listing(s)'})
+          const marker=new maps.Marker({map,position,title:group.label+': '+group.vendors.length+' wedding listing(s)'})
           bounds.extend(position)
           marker.addListener('click',()=>{
             const popup=document.createElement('div')
-            popup.textContent=group.city+' — '+group.vendors.map(v=>v.name+(v.isVenue&&!v.claimed?' (unclaimed venue)':'')).join(', ')
+            popup.textContent=group.label+' — '+group.vendors.map(v=>v.name+(v.isVenue&&!v.claimed?' (unclaimed venue)':'')).join(', ')
             const cityInfo=new maps.InfoWindow({content:popup})
             cityInfo.open({map,anchor:marker})
           })
@@ -112,7 +118,7 @@ export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiK
         // Geocoding is only a fallback for cities not in our verified GTA centre list.
         let geocoder:InstanceType<typeof maps.Geocoder>|null=null
         for(const group of groups){
-          const known=cityCentre(group.city)
+          const known=group.exactPosition ?? cityCentre(group.city)
           if(known){
             markCity(group,known)
             finishCity()
@@ -150,20 +156,20 @@ export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiK
         </select>
       </label>
     </div>
-    <p className="text-sm text-muted">{filtered.length} vendor listing{filtered.length===1?'':'s'} in {groups.length} base cit{groups.length===1?'y':'ies'}</p>
+    <p className="text-sm text-muted">{filtered.length} vendor listing{filtered.length===1?'':'s'} across {groups.length} map location{groups.length===1?'':'s'}</p>
     {!apiKey&&<p className="rounded-xl border border-primary/20 bg-primary-soft/30 p-4 text-sm text-ink">Map pins will appear once Google Maps is configured. You can still explore every claimed vendor below.</p>}
     {apiKey&&groups.length>0&&<div className="relative overflow-hidden rounded-2xl border border-border-soft bg-primary-soft/30">
-      <div ref={root} className="h-[420px] w-full" aria-label="Map of wedding venues and claimed vendors by approximate city" />
+      <div ref={root} className="h-[420px] w-full" aria-label="Map of verified venue locations and claimed vendors by approximate base city" />
       {!mapReady&&!mapError&&<div className="pointer-events-none absolute left-3 top-3 rounded-lg bg-white/90 px-3 py-2 text-sm text-muted">Loading city-level pins…</div>}
     </div>}
     {mapError&&<p role="status" className="text-sm text-red-700">{mapError}</p>}
     <div className="grid gap-4 md:grid-cols-2">
       {groups.map(group=><section key={group.key} className="rounded-2xl border border-border-soft bg-white p-5">
-        <h2 className="font-[family-name:var(--font-heading)] text-xl text-plum">{group.city} <span className="text-sm font-normal text-muted">({group.vendors.length})</span></h2>
+        <h2 className="font-[family-name:var(--font-heading)] text-xl text-plum">{group.label} <span className="text-sm font-normal text-muted">({group.vendors.length})</span></h2>
         <ul className="mt-3 space-y-3">{group.vendors.map(v=><li key={v.id} className="border-t border-border-soft pt-3">
           <Link href={'/vendor/'+encodeURIComponent(v.slug)} className="font-medium text-primary hover:underline">{v.name}</Link>
-          <p className="text-xs text-muted">{v.category}{v.isVenue&&!v.claimed?' · Unclaimed listing':''}{!v.isVenue?(v.serviceAreas.length?' · Serves '+v.serviceAreas.join(', '):' · Service areas not yet specified'):''}</p>
-          <a href={'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(v.city+', Ontario, Canada')} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-xs text-muted underline underline-offset-2">See base city on Google Maps</a>
+          <p className="text-xs text-muted">{v.category}{v.isVenue&&!v.claimed?' · Unclaimed listing':''}{v.isVenue&&v.streetAddress?' · '+v.streetAddress:''}{!v.isVenue?(v.serviceAreas.length?' · Serves '+v.serviceAreas.join(', '):' · Service areas not yet specified'):''}</p>
+          <a href={'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(v.isVenue&&v.streetAddress?v.streetAddress+', '+v.city+', Ontario, Canada':v.city+', Ontario, Canada')} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-xs text-muted underline underline-offset-2">{v.isVenue?'See venue address on Google Maps':'See base city on Google Maps'}</a>
         </li>)}</ul>
       </section>)}
     </div>

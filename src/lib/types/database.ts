@@ -255,6 +255,9 @@ export interface Database {
           city: string
           area: string | null
           service_areas: string[]
+          street_address: string | null
+          latitude: number | null
+          longitude: number | null
           pricing_range: string | null
           website_url: string | null
           phone: string | null
@@ -285,6 +288,9 @@ export interface Database {
           city: string
           area?: string | null
           service_areas?: string[]
+          street_address?: string | null
+          latitude?: number | null
+          longitude?: number | null
           pricing_range?: string | null
           website_url?: string | null
           phone?: string | null
@@ -314,6 +320,9 @@ export interface Database {
           city?: string
           area?: string | null
           service_areas?: string[]
+          street_address?: string | null
+          latitude?: number | null
+          longitude?: number | null
           pricing_range?: string | null
           website_url?: string | null
           phone?: string | null

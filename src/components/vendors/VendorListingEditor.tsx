@@ -13,6 +13,7 @@ type Vendor = {
   city: string
   area: string | null
   service_areas: string[]
+  street_address: string | null
   pricing_range: string | null
   website_url: string | null
   phone: string | null
@@ -39,6 +40,7 @@ const editable = [
   ['name', 'Business name'],
   ['city', 'Base city'],
   ['area', 'Local neighbourhood (optional)'],
+  ['street_address', 'Public venue street address (venues only)'],
   ['pricing_range', 'Pricing guidance'],
   ['website_url', 'Website'],
   ['phone', 'Phone'],
@@ -59,6 +61,7 @@ export default function VendorListingEditor({ vendor, initialPhotos, premiumPrev
     name: vendor.name,
     city: vendor.city,
     area: vendor.area ?? '',
+    street_address: vendor.street_address ?? '',
     description: vendor.description ?? '',
     pricing_range: vendor.pricing_range ?? '',
     website_url: vendor.website_url ?? '',
@@ -113,6 +116,7 @@ export default function VendorListingEditor({ vendor, initialPhotos, premiumPrev
         city: fields.city.trim(),
         area: fields.area.trim() || null,
         service_areas: parsedAreas,
+        street_address: fields.street_address.trim() || null,
         description: fields.description.trim() || null,
         pricing_range: fields.pricing_range.trim() || null,
         website_url: fields.website_url.trim() || null,
