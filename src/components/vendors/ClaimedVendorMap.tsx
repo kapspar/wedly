@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 
-type Vendor = {id:string;name:string;slug:string;city:string;area:string|null;serviceAreas:string[];category:string}
+type Vendor = {id:string;name:string;slug:string;city:string;area:string|null;serviceAreas:string[];category:string;claimed:boolean;isVenue:boolean}
 type MapResults = { geometry: { location: unknown } }[]
 type GoogleApi = {
   maps: {
@@ -89,11 +89,11 @@ export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiK
         let completed=0, successes=0
         let failedLookups=0
         const markCity=(group:CityGroup,position:unknown)=>{
-          const marker=new maps.Marker({map,position,title:group.city+': '+group.vendors.length+' claimed vendor(s)'})
+          const marker=new maps.Marker({map,position,title:group.city+': '+group.vendors.length+' wedding listing(s)'})
           bounds.extend(position)
           marker.addListener('click',()=>{
             const popup=document.createElement('div')
-            popup.textContent=group.city+' — '+group.vendors.map(v=>v.name).join(', ')
+            popup.textContent=group.city+' — '+group.vendors.map(v=>v.name+(v.isVenue&&!v.claimed?' (unclaimed venue)':'')).join(', ')
             const cityInfo=new maps.InfoWindow({content:popup})
             cityInfo.open({map,anchor:marker})
           })
@@ -107,7 +107,7 @@ export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiK
             if(successes===1)map.setZoom(10)
             setMapReady(true)
             if(failedLookups>0)setMapError('Some cities could not be located. The vendor list below is complete.')
-          }else setMapError('No city locations could be placed on the map. Use the vendor links below.')
+          }else setMapError('No approximate city locations could be placed on the map. Use the vendor links below.')
         }
         // Geocoding is only a fallback for cities not in our verified GTA centre list.
         let geocoder:InstanceType<typeof maps.Geocoder>|null=null
@@ -150,10 +150,10 @@ export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiK
         </select>
       </label>
     </div>
-    <p className="text-sm text-muted">{filtered.length} claimed vendor{filtered.length===1?'':'s'} in {groups.length} base cit{groups.length===1?'y':'ies'}</p>
+    <p className="text-sm text-muted">{filtered.length} vendor listing{filtered.length===1?'':'s'} in {groups.length} base cit{groups.length===1?'y':'ies'}</p>
     {!apiKey&&<p className="rounded-xl border border-primary/20 bg-primary-soft/30 p-4 text-sm text-ink">Map pins will appear once Google Maps is configured. You can still explore every claimed vendor below.</p>}
     {apiKey&&groups.length>0&&<div className="relative overflow-hidden rounded-2xl border border-border-soft bg-primary-soft/30">
-      <div ref={root} className="h-[420px] w-full" aria-label="Map of claimed vendors by base city" />
+      <div ref={root} className="h-[420px] w-full" aria-label="Map of wedding venues and claimed vendors by approximate city" />
       {!mapReady&&!mapError&&<div className="pointer-events-none absolute left-3 top-3 rounded-lg bg-white/90 px-3 py-2 text-sm text-muted">Loading city-level pins…</div>}
     </div>}
     {mapError&&<p role="status" className="text-sm text-red-700">{mapError}</p>}
@@ -162,11 +162,11 @@ export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiK
         <h2 className="font-[family-name:var(--font-heading)] text-xl text-plum">{group.city} <span className="text-sm font-normal text-muted">({group.vendors.length})</span></h2>
         <ul className="mt-3 space-y-3">{group.vendors.map(v=><li key={v.id} className="border-t border-border-soft pt-3">
           <Link href={'/vendor/'+encodeURIComponent(v.slug)} className="font-medium text-primary hover:underline">{v.name}</Link>
-          <p className="text-xs text-muted">{v.category}{v.serviceAreas.length?' · Serves '+v.serviceAreas.join(', '):' · Service areas not yet specified'}</p>
+          <p className="text-xs text-muted">{v.category}{v.isVenue&&!v.claimed?' · Unclaimed listing':''}{!v.isVenue?(v.serviceAreas.length?' · Serves '+v.serviceAreas.join(', '):' · Service areas not yet specified'):''}</p>
           <a href={'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(v.city+', Ontario, Canada')} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-xs text-muted underline underline-offset-2">See base city on Google Maps</a>
         </li>)}</ul>
       </section>)}
     </div>
-    {!groups.length&&<div className="rounded-xl bg-white p-8 text-center text-muted">No claimed vendors match these filters. Try another category or region.</div>}
+    {!groups.length&&<div className="rounded-xl bg-white p-8 text-center text-muted">No venue or claimed vendor matches these filters. Try another category or region.</div>}
   </div>
 }
