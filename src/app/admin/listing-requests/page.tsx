@@ -9,7 +9,7 @@ export const metadata = { title: 'New Business Reviews — PlanWedly Admin' }
 export default async function AdminNewListingRequestsPage() {
   const supabase = await createClient()
   const { data: requests, error } = await supabase.from('vendor_listing_requests')
-    .select('id,requester_id,name,city,business_email,phone,website_url,instagram_url,tiktok_url,facebook_url,youtube_url,pinterest_url,snapchat_url,linkedin_url,whatsapp_url,description,status,review_note,resulting_vendor_id,created_at,category:vendor_categories!vendors_category_id_fkey(name)')
+    .select('id,requester_id,name,city,business_email,phone,website_url,instagram_url,tiktok_url,facebook_url,youtube_url,pinterest_url,snapchat_url,linkedin_url,whatsapp_url,description,status,review_note,resulting_vendor_id,created_at,category:vendor_categories!vendor_listing_requests_category_id_fkey(name)')
     .order('created_at', { ascending: false }).limit(100)
   const ids = [...new Set((requests ?? []).map(r => r.requester_id))]
   const { data: requesters } = ids.length
