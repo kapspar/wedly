@@ -17,6 +17,51 @@ type GoogleApi = {
 declare global { interface Window {google?:GoogleApi; __planwedlyGoogleMapReady?:()=>void } }
 type CityGroup = { key:string; city:string; vendors:Vendor[] }
 const canonical=(s:string)=>s.trim().toLocaleLowerCase('en-CA')
+/**
+ * Approximate city centres, not storefront or home addresses.
+ * Use local coordinates for core GTA cities to avoid paid geocoding requests
+ * and keep the map functional if the Geocoding API is disabled.
+ */
+const CITY_CENTRES: Record<string, {lat:number;lng:number}> = {
+  'toronto':{lat:43.6532,lng:-79.3832},
+  'scarborough':{lat:43.7731,lng:-79.2578},
+  'north york':{lat:43.7615,lng:-79.4111},
+  'etobicoke':{lat:43.6205,lng:-79.5132},
+  'east york':{lat:43.6912,lng:-79.3272},
+  'mississauga':{lat:43.5890,lng:-79.6441},
+  'brampton':{lat:43.7315,lng:-79.7624},
+  'vaughan':{lat:43.8361,lng:-79.4983},
+  'woodbridge':{lat:43.7820,lng:-79.5920},
+  'markham':{lat:43.8561,lng:-79.3370},
+  'richmond hill':{lat:43.8828,lng:-79.4403},
+  'thornhill':{lat:43.8161,lng:-79.4245},
+  'stouffville':{lat:43.9703,lng:-79.2500},
+  'whitchurch-stouffville':{lat:43.9703,lng:-79.2500},
+  'aurora':{lat:44.0065,lng:-79.4504},
+  'newmarket':{lat:44.0592,lng:-79.4613},
+  'pickering':{lat:43.8384,lng:-79.0868},
+  'ajax':{lat:43.8509,lng:-79.0204},
+  'whitby':{lat:43.8975,lng:-78.9429},
+  'oshawa':{lat:43.8971,lng:-78.8658},
+  'clarington':{lat:43.9358,lng:-78.6080},
+  'bowmanville':{lat:43.9126,lng:-78.6880},
+  'oakville':{lat:43.4675,lng:-79.6877},
+  'burlington':{lat:43.3255,lng:-79.7990},
+  'milton':{lat:43.5183,lng:-79.8774},
+  'halton hills':{lat:43.6502,lng:-79.9030},
+  'georgetown':{lat:43.6502,lng:-79.9030},
+  'caledon':{lat:43.8668,lng:-79.8664},
+  'hamilton':{lat:43.2557,lng:-79.8711},
+  'barrie':{lat:44.3894,lng:-79.6903},
+  'guelph':{lat:43.5448,lng:-80.2482},
+  'kitchener':{lat:43.4516,lng:-80.4925},
+  'waterloo':{lat:43.4643,lng:-80.5204},
+  'cambridge':{lat:43.3616,lng:-80.3144}
+}
+const cityCentre=(city:string)=>{
+  const normalized=canonical(city).replace(/,?\\s+(ontario|on|canada)\\b.*$/,'').replace(/,.*$/,'').trim()
+  return CITY_CENTRES[normalized]
+}
 export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiKey:string}) {
   const [category,setCategory]=useState('')
   const [service,setService]=useState('')
@@ -40,29 +85,45 @@ export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiK
       try{
         const maps=window.google.maps
         const map=new maps.Map(root.current,{center:{lat:43.75,lng:-79.4},zoom:9,mapTypeControl:false,streetViewControl:false,fullscreenControl:true})
-        const geocoder=new maps.Geocoder()
         const bounds=new maps.LatLngBounds()
         let completed=0, successes=0
+        let failedLookups=0
+        const markCity=(group:CityGroup,position:unknown)=>{
+          const marker=new maps.Marker({map,position,title:group.city+': '+group.vendors.length+' claimed vendor(s)'})
+          bounds.extend(position)
+          marker.addListener('click',()=>{
+            const popup=document.createElement('div')
+            popup.textContent=group.city+' — '+group.vendors.map(v=>v.name).join(', ')
+            const cityInfo=new maps.InfoWindow({content:popup})
+            cityInfo.open({map,anchor:marker})
+          })
+          successes++
+        }
+        const finishCity=()=>{
+          completed++
+          if(completed!==groups.length)return
+          if(successes){
+            map.fitBounds(bounds)
+            if(successes===1)map.setZoom(10)
+            setMapReady(true)
+            if(failedLookups>0)setMapError('Some cities could not be located. The vendor list below is complete.')
+          }else setMapError('No city locations could be placed on the map. Use the vendor links below.')
+        }
+        // Geocoding is only a fallback for cities not in our verified GTA centre list.
+        let geocoder:InstanceType<typeof maps.Geocoder>|null=null
         for(const group of groups){
+          const known=cityCentre(group.city)
+          if(known){
+            markCity(group,known)
+            finishCity()
+            continue
+          }
+          geocoder ??= new maps.Geocoder()
           geocoder.geocode({address:group.city+', Ontario, Canada'},(results,status)=>{
             if(!active)return
-            completed++
-            if(status==='OK'&&results?.[0]){
-              successes++
-              const position=results[0].geometry.location
-              const marker=new maps.Marker({map,position,title:group.city+': '+group.vendors.length+' claimed vendor(s)'})
-              bounds.extend(position)
-              marker.addListener('click',()=>{
-                const popup=document.createElement('div')
-                popup.textContent=group.city+' — '+group.vendors.map(v=>v.name).join(', ')
-                const cityInfo=new maps.InfoWindow({content:popup})
-                cityInfo.open({map,anchor:marker})
-              })
-            }
-            if(completed===groups.length){
-              if(successes>0){map.fitBounds(bounds); if(successes===1)map.setZoom(10); setMapReady(true)}
-              else setMapError('Google Maps could not locate these cities. Use the directory links below.')
-            }
+            if(status==='OK'&&results?.[0])markCity(group,results[0].geometry.location)
+            else {failedLookups++;console.warn('PlanWedly map lookup failed for',group.city,'status:',status)}
+            finishCity()
           })
         }
       }catch{setMapError('The map could not load. Use the directory links below.')}
