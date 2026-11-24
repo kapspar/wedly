@@ -65,7 +65,7 @@ export default async function VendorsPage({
       .order('priority')
       .order('name')
 
-    if (params.q) { const q = params.q.replace(/[%_]/g, '\\replace(/[%_]/g, '\\  const { data: vendors } = await vendorQuery')'); fallbackQuery = fallbackQuery.or(`name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`) }
+    if (params.q) { const q = params.q.replace(/[%_]/g, '\\$&'); fallbackQuery = fallbackQuery.or(`name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`) }
     if (params.city) fallbackQuery = fallbackQuery.ilike('city', `%${params.city}%`)
     if (params.serves) fallbackQuery = fallbackQuery.contains('service_areas',[params.serves])
     const fallback = await fallbackQuery

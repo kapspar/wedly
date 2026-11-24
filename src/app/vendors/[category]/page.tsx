@@ -85,7 +85,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       .order('priority')
       .order('name')
       .in('id', matchingIds.length ? matchingIds : ['00000000-0000-0000-0000-000000000000'])
-    if (sp.q) { const q = sp.q.replace(/[%_]/g, '\\replace(/[%_]/g, '\\  const { data: vendors } = await vendorQuery')'); fallbackQuery = fallbackQuery.or(`name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`) }
+    if (sp.q) { const q = sp.q.replace(/[%_]/g, '\\$&'); fallbackQuery = fallbackQuery.or(`name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`) }
     if (sp.city) fallbackQuery = fallbackQuery.ilike('city', `%${sp.city}%`)
     const fallback = await fallbackQuery
     if (fallback.error) console.error('Vendor directory fallback failed:', fallback.error.code, fallback.error.message)
