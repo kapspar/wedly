@@ -112,11 +112,10 @@ export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiK
             map.fitBounds(bounds)
             if(successes===1)map.setZoom(10)
             setMapReady(true)
-            if(failedLookups>0)setMapError('Some cities could not be located. The vendor list below is complete.')
-          }else setMapError('No approximate city locations could be placed on the map. Use the vendor links below.')
+            if(failedLookups>0)setMapError('Some base cities do not have map coordinates yet. The directory below is complete.')
+          }else setMapError('No mapped locations are available yet. Use the vendor links below.')
         }
-        // Geocoding is only a fallback for cities not in our verified GTA centre list.
-        let geocoder:InstanceType<typeof maps.Geocoder>|null=null
+        // Do not geocode on page visits: each request costs money, and unknown cities remain in the directory.
         for(const group of groups){
           const known=group.exactPosition ?? (group.exactAddress ? undefined : cityCentre(group.city))
           if(known){
@@ -124,13 +123,8 @@ export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiK
             finishCity()
             continue
           }
-          geocoder ??= new maps.Geocoder()
-          geocoder.geocode({address:group.exactAddress ?? group.city+', Ontario, Canada'},(results,status)=>{
-            if(!active)return
-            if(status==='OK'&&results?.[0])markCity(group,results[0].geometry.location)
-            else {failedLookups++;console.warn('PlanWedly map lookup failed for',group.label,'status:',status)}
-            finishCity()
-          })
+          failedLookups++
+          finishCity()
         }
       }catch{setMapError('The map could not load. Use the directory links below.')}
     }
@@ -160,7 +154,7 @@ export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiK
     {!apiKey&&<p className="rounded-xl border border-primary/20 bg-primary-soft/30 p-4 text-sm text-ink">Map pins will appear once Google Maps is configured. You can still explore every claimed vendor below.</p>}
     {apiKey&&groups.length>0&&<div className="relative overflow-hidden rounded-2xl border border-border-soft bg-primary-soft/30">
       <div ref={root} className="h-[420px] w-full" aria-label="Map of verified venue locations and claimed vendors by approximate base city" />
-      {!mapReady&&!mapError&&<div className="pointer-events-none absolute left-3 top-3 rounded-lg bg-white/90 px-3 py-2 text-sm text-muted">Loading city-level pins…</div>}
+      {!mapReady&&!mapError&&<div className="pointer-events-none absolute left-3 top-3 rounded-lg bg-white/90 px-3 py-2 text-sm text-muted">Loading venue and city pins…</div>}
     </div>}
     {mapError&&<p role="status" className="text-sm text-red-700">{mapError}</p>}
     <div className="grid gap-4 md:grid-cols-2">
