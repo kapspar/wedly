@@ -21,7 +21,7 @@ export default async function EditVendorPage({ params }: { params: Promise<{ ven
   if (profile?.role !== 'vendor') redirect('/dashboard')
 
   const { data: vendor } = await supabase.from('vendors')
-    .select('id,name,slug,description,city,area,service_areas,pricing_range,website_url,phone,email,category_id,instagram_url,tiktok_url,facebook_url,youtube_url,pinterest_url,snapchat_url,linkedin_url,whatsapp_url,claimed_by,is_claimed')
+    .select('id,name,slug,description,city,area,service_areas,street_address,pricing_range,website_url,phone,email,category_id,instagram_url,tiktok_url,facebook_url,youtube_url,pinterest_url,snapchat_url,linkedin_url,whatsapp_url,claimed_by,is_claimed')
     .eq('id', vendorId).eq('claimed_by', user.id).eq('is_claimed', true).maybeSingle()
   if (!vendor) notFound()
   const { data: photos } = await supabase.from('vendor_photos').select('id,storage_path,alt_text,sort_order')
