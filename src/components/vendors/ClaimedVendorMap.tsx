@@ -15,7 +15,7 @@ type GoogleApi = {
   }
 }
 declare global { interface Window {google?:GoogleApi; __planwedlyGoogleMapReady?:()=>void } }
-type CityGroup = { key:string; city:string; label:string; vendors:Vendor[]; exactPosition?:{lat:number;lng:number} }
+type CityGroup = { key:string; city:string; label:string; vendors:Vendor[]; exactPosition?:{lat:number;lng:number}; exactAddress?:string }
 const canonical=(s:string)=>s.trim().toLocaleLowerCase('en-CA')
 /**
  * Approximate city centres, not storefront or home addresses.
@@ -74,11 +74,11 @@ export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiK
   const groups=useMemo(()=>{
     const grouped=new Map<string,CityGroup>()
     for(const vendor of filtered){
-      const exact=vendor.isVenue && vendor.streetAddress && vendor.latitude!==null && vendor.longitude!==null
+      const exact=Boolean(vendor.isVenue && vendor.streetAddress)
       const key=exact?'venue:'+vendor.id:'city:'+canonical(vendor.city)
       const group=grouped.get(key)
       if(group)group.vendors.push(vendor)
-      else grouped.set(key,{key,city:vendor.city,label:exact?vendor.name:vendor.city,vendors:[vendor],...(exact?{exactPosition:{lat:vendor.latitude!,lng:vendor.longitude!}}:{})})
+      else grouped.set(key,{key,city:vendor.city,label:exact?vendor.name:vendor.city,vendors:[vendor],...(exact?{exactAddress:vendor.streetAddress!,...(vendor.latitude!==null&&vendor.longitude!==null?{exactPosition:{lat:vendor.latitude,lng:vendor.longitude}}:{})}:{})})
     }
     return [...grouped.values()]
   },[filtered])
@@ -118,17 +118,17 @@ export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiK
         // Geocoding is only a fallback for cities not in our verified GTA centre list.
         let geocoder:InstanceType<typeof maps.Geocoder>|null=null
         for(const group of groups){
-          const known=group.exactPosition ?? cityCentre(group.city)
+          const known=group.exactPosition ?? (group.exactAddress ? undefined : cityCentre(group.city))
           if(known){
             markCity(group,known)
             finishCity()
             continue
           }
           geocoder ??= new maps.Geocoder()
-          geocoder.geocode({address:group.city+', Ontario, Canada'},(results,status)=>{
+          geocoder.geocode({address:group.exactAddress ?? group.city+', Ontario, Canada'},(results,status)=>{
             if(!active)return
             if(status==='OK'&&results?.[0])markCity(group,results[0].geometry.location)
-            else {failedLookups++;console.warn('PlanWedly map lookup failed for',group.city,'status:',status)}
+            else {failedLookups++;console.warn('PlanWedly map lookup failed for',group.label,'status:',status)}
             finishCity()
           })
         }
