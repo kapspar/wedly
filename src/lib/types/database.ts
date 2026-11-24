@@ -258,6 +258,7 @@ export interface Database {
           street_address: string | null
           latitude: number | null
           longitude: number | null
+          coordinates_expires_at: string | null
           pricing_range: string | null
           website_url: string | null
           phone: string | null
@@ -291,6 +292,7 @@ export interface Database {
           street_address?: string | null
           latitude?: number | null
           longitude?: number | null
+          coordinates_expires_at?: string | null
           pricing_range?: string | null
           website_url?: string | null
           phone?: string | null
@@ -323,6 +325,7 @@ export interface Database {
           street_address?: string | null
           latitude?: number | null
           longitude?: number | null
+          coordinates_expires_at?: string | null
           pricing_range?: string | null
           website_url?: string | null
           phone?: string | null

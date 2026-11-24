@@ -117,6 +117,7 @@ export default function VendorListingEditor({ vendor, initialPhotos, premiumPrev
         area: fields.area.trim() || null,
         service_areas: parsedAreas,
         street_address: fields.street_address.trim() || null,
+        ...(fields.street_address.trim() !== (vendor.street_address ?? '').trim() ? { latitude: null, longitude: null, coordinates_expires_at: null } : {}),
         description: fields.description.trim() || null,
         pricing_range: fields.pricing_range.trim() || null,
         website_url: fields.website_url.trim() || null,
