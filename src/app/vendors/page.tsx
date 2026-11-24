@@ -33,7 +33,7 @@ export default async function VendorsPage({
 
   let vendorQuery = supabase
     .from('vendors')
-    .select('*, vendor_categories(name), vendor_photos(storage_path,sort_order)')
+    .select('*, vendor_categories!vendors_category_id_fkey(name), vendor_photos(storage_path,sort_order)')
     .eq('is_published', true)
     .order('is_featured', { ascending: false })
     .order('priority')

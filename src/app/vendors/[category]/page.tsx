@@ -54,7 +54,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const matchingIds=serviceIds===null?memberIds:memberIds.filter(id=>serviceIds.includes(id))
   let vendorQuery = supabase
     .from('vendors')
-    .select('*, vendor_categories(name), vendor_photos(storage_path,sort_order)')
+    .select('*, vendor_categories!vendors_category_id_fkey(name), vendor_photos(storage_path,sort_order)')
     .in('id',matchingIds.length ? matchingIds : ['00000000-0000-0000-0000-000000000000'])
     .eq('is_published', true)
     .order('is_featured', { ascending: false })
