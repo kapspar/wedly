@@ -7,7 +7,7 @@ type Vendor = {id:string;name:string;slug:string;city:string;area:string|null;se
 type MapResults = { geometry: { location: unknown } }[]
 type GoogleApi = {
   maps: {
-    Map: new (node:HTMLElement, options:Record<string,unknown>) => { fitBounds:(bounds:unknown)=>void }
+    Map: new (node:HTMLElement, options:Record<string,unknown>) => { fitBounds:(bounds:unknown)=>void; setZoom:(zoom:number)=>void }
     Marker: new (options:Record<string,unknown>) => { addListener:(name:string,listener:()=>void)=>void }
     InfoWindow: new (options:Record<string,unknown>) => { open:(options:Record<string,unknown>)=>void; close:()=>void }
     LatLngBounds: new ()=> {extend:(loc:unknown)=>void}
@@ -42,7 +42,6 @@ export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiK
         const map=new maps.Map(root.current,{center:{lat:43.75,lng:-79.4},zoom:9,mapTypeControl:false,streetViewControl:false,fullscreenControl:true})
         const geocoder=new maps.Geocoder()
         const bounds=new maps.LatLngBounds()
-        const info=new maps.InfoWindow({})
         let completed=0, successes=0
         for(const group of groups){
           geocoder.geocode({address:group.city+', Ontario, Canada'},(results,status)=>{
@@ -54,18 +53,14 @@ export default function ClaimedVendorMap({vendors,apiKey}:{vendors:Vendor[];apiK
               const marker=new maps.Marker({map,position,title:group.city+': '+group.vendors.length+' claimed vendor(s)'})
               bounds.extend(position)
               marker.addListener('click',()=>{
-                info.close()
-                // Keep map popup plain text; vendor links are provided in adjacent accessible list.
-                info.open({map,anchor:marker})
-                const names=group.vendors.map(v=>v.name).join(', ')
-                // InfoWindow content is passed at construction below, avoiding HTML injection.
-                info.close()
-                const cityInfo=new maps.InfoWindow({content:group.city+' — '+names})
+                const popup=document.createElement('div')
+                popup.textContent=group.city+' — '+group.vendors.map(v=>v.name).join(', ')
+                const cityInfo=new maps.InfoWindow({content:popup})
                 cityInfo.open({map,anchor:marker})
               })
             }
             if(completed===groups.length){
-              if(successes>0){if(successes===1){map.fitBounds(bounds)}else map.fitBounds(bounds);setMapReady(true)}
+              if(successes>0){map.fitBounds(bounds); if(successes===1)map.setZoom(10); setMapReady(true)}
               else setMapError('Google Maps could not locate these cities. Use the directory links below.')
             }
           })
