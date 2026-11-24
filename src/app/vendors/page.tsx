@@ -33,7 +33,7 @@ export default async function VendorsPage({
 
   let vendorQuery = supabase
     .from('vendors')
-    .select('*, vendor_categories(name), vendor_photos(storage_path,sort_order)')
+    .select('*, vendor_categories!vendors_category_id_fkey(name), vendor_photos(storage_path,sort_order)')
     .eq('is_published', true)
     .order('is_featured', { ascending: false })
     .order('priority')
@@ -65,7 +65,7 @@ export default async function VendorsPage({
       .order('priority')
       .order('name')
 
-    if (params.q) { const q = params.q.replace(/[%_]/g, '\\  const { data: vendors } = await vendorQuery'); fallbackQuery = fallbackQuery.or(`name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`) }
+    if (params.q) { const q = params.q.replace(/[%_]/g, '\\$&'); fallbackQuery = fallbackQuery.or(`name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`) }
     if (params.city) fallbackQuery = fallbackQuery.ilike('city', `%${params.city}%`)
     if (params.serves) fallbackQuery = fallbackQuery.contains('service_areas',[params.serves])
     const fallback = await fallbackQuery

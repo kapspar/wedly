@@ -10,7 +10,7 @@ export default async function VendorMapPage() {
   const supabase = await createClient()
   // A map pin must never be shown for unclaimed or unpublished directory entries.
   const { data, error } = await supabase.from('vendors')
-    .select('id,name,slug,city,area,service_areas,vendor_categories(name)')
+    .select('id,name,slug,city,area,service_areas,vendor_categories!vendors_category_id_fkey(name)')
     .eq('is_published', true)
     .eq('is_claimed', true)
     .not('claimed_by', 'is', null)
