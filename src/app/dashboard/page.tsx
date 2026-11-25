@@ -73,7 +73,6 @@ export default async function DashboardPage() {
     ...(events?.length ? [] : [{href:'/events',title:'Choose your wedding events',detail:'Set up the celebrations that matter to you.'}]),
     ...(totalBudget <= 0 ? [{href:'/budget',title:'Set a starting budget',detail:'Estimates are editable as your plans evolve.'}] : []),
     ...(pendingTasks.length ? [{href:'/tasks',title:pendingTasks[0].title,detail:`${pendingTasks.length} tasks remaining in your checklist.`}] : [{href:'/tasks',title:'Review your wedding checklist',detail:'Add the next decisions you need to make.'}]),
-    ...(guestCount===0 ? [{href:'/dashboard',title:'Estimate your guest count',detail:'Talk through your initial guest list together.'}] : []),
   ].slice(0,4)
 
   return (
@@ -89,7 +88,7 @@ export default async function DashboardPage() {
             <p className="text-xs uppercase tracking-wide font-medium text-primary mt-2">{weddingTypeLabel}</p>
             <p className="text-muted text-sm mt-1">
               {wedding.wedding_date
-                ? `Wedding on ${new Date(wedding.wedding_date).toLocaleDateString('en-CA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`
+                ? `Wedding on ${new Date(wedding.wedding_date + 'T12:00:00').toLocaleDateString('en-CA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`
                 : 'No date set yet'}
             </p>
           </div>
@@ -189,7 +188,7 @@ export default async function DashboardPage() {
                         {event.venue_name && <p className="text-xs text-muted">{event.venue_name}</p>}
                       </div>
                       <span className="text-xs text-muted">
-                        {event.event_date ? new Date(event.event_date).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) : 'No date'}
+                        {event.event_date ? new Date(event.event_date + 'T12:00:00').toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) : 'No date'}
                       </span>
                     </div>
                   ))}
