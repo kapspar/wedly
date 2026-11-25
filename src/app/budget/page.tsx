@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { DollarSign, Save, Plus } from 'lucide-react'
+import { DollarSign, Save, Plus, CreditCard } from 'lucide-react'
+import BudgetCommitmentTracker, {type Commitment, type VendorChoice, type WeddingEventChoice} from '@/components/budget/BudgetCommitmentTracker'
 import { createClient } from '@/lib/supabase/client'
 import posthog from 'posthog-js'
 import Navbar from '@/components/layout/Navbar'
@@ -27,6 +28,10 @@ export default function BudgetPage() {
   const [newBudget, setNewBudget] = useState('')
   const [adding, setAdding] = useState(false)
   const [message, setMessage] = useState('')
+  const [commitments,setCommitments]=useState<Commitment[]>([])
+  const [vendors,setVendors]=useState<VendorChoice[]>([])
+  const [events,setEvents]=useState<WeddingEventChoice[]>([])
+  const [error,setError]=useState('')
 
   useEffect(() => {
     const load = async () => {
@@ -42,19 +47,27 @@ export default function BudgetPage() {
       if (!wedding) { setLoading(false); return }
       setWeddingId(wedding.id)
 
-      const { data } = await supabase
-        .from('budget_categories')
-        .select('*')
-        .eq('wedding_id', wedding.id)
-        .order('category')
-
-      if (data) setItems(data.map(d => ({ ...d, budgeted: Number(d.budgeted), spent: Number(d.spent) })))
+      const [budgetQuery,paymentsQuery,eventsQuery,shortlistQuery]=await Promise.all([
+        supabase.from('budget_categories').select('*').eq('wedding_id',wedding.id).order('category'),
+        supabase.from('budget_commitments').select('*').eq('wedding_id',wedding.id).order('created_at',{ascending:false}),
+        supabase.from('wedding_events').select('id,event_type,custom_label').eq('wedding_id',wedding.id).order('sort_order'),
+        supabase.from('wedding_vendor_shortlist').select('vendor_id,quote_amount,vendor:vendors!wedding_vendor_shortlist_vendor_id_fkey(name)').eq('wedding_id',wedding.id).neq('stage','declined'),
+      ])
+      if(budgetQuery.error || paymentsQuery.error || eventsQuery.error || shortlistQuery.error) {
+        setError(budgetQuery.error?.message || paymentsQuery.error?.message || eventsQuery.error?.message || shortlistQuery.error?.message || 'Unable to load the complete budget')
+      } else {
+        setItems((budgetQuery.data??[]).map(d=>({...d,budgeted:Number(d.budgeted),spent:Number(d.spent)})))
+        setCommitments((paymentsQuery.data??[]).map(d=>({...d,total_amount:Number(d.total_amount),paid_amount:Number(d.paid_amount)})))
+        setEvents(eventsQuery.data??[])
+        setVendors((shortlistQuery.data??[]).map(s=>({id:s.vendor_id,name:s.vendor?.name||'Vendor',quote_amount:s.quote_amount===null?null:Number(s.quote_amount)})))
+      }
       setLoading(false)
     }
     load()
   }, [])
 
   const handleSave = async () => {
+    if (!weddingId || saving) return
     setSaving(true)
     const supabase = createClient()
     setMessage('')
@@ -63,7 +76,7 @@ export default function BudgetPage() {
         supabase
           .from('budget_categories')
           .update({ budgeted: item.budgeted, spent: item.spent, is_enabled: item.is_enabled })
-          .eq('id', item.id)
+          .eq('id', item.id).eq('wedding_id',weddingId)
       )
     )
     const hasError = results.some(result => result.error)
@@ -95,7 +108,11 @@ export default function BudgetPage() {
   }
 
   const totalBudget = items.filter(i => i.is_enabled).reduce((sum, i) => sum + i.budgeted, 0)
-  const totalSpent = items.filter(i => i.is_enabled).reduce((sum, i) => sum + i.spent, 0)
+  const manualSpent = items.filter(i => i.is_enabled).reduce((sum, i) => sum + i.spent, 0)
+  const trackedPaid = commitments.filter(c=>items.some(i=>i.id===c.category_id&&i.is_enabled)).reduce((sum,c)=>sum+c.paid_amount,0)
+  const trackedCommitments = commitments.filter(c=>items.some(i=>i.id===c.category_id&&i.is_enabled))
+  const outstanding = trackedCommitments.reduce((sum,c)=>sum+Math.max(c.total_amount-c.paid_amount,0),0)
+  const totalSpent = manualSpent + trackedPaid
   const remaining = totalBudget - totalSpent
 
   return (
@@ -115,6 +132,7 @@ export default function BudgetPage() {
           </div>
 
           {message && <p role="status" className="mb-4 rounded-xl bg-primary-soft/50 px-4 py-3 text-sm text-ink">{message}</p>}
+          {error && <p role="alert" className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
 
           {/* Summary */}
           <div className="grid grid-cols-3 gap-4 mb-8">
@@ -123,7 +141,7 @@ export default function BudgetPage() {
               <p className="text-lg font-bold text-ink">{formatCurrency(totalBudget)}</p>
             </Card>
             <Card className="p-4 text-center">
-              <p className="text-xs text-muted mb-1">Spent</p>
+              <p className="text-xs text-muted mb-1">Paid / spent</p>
               <p className="text-lg font-bold text-primary">{formatCurrency(totalSpent)}</p>
             </Card>
             <Card className="p-4 text-center">
@@ -134,6 +152,10 @@ export default function BudgetPage() {
             </Card>
           </div>
 
+          {!loading && <div className="mb-6 grid grid-cols-2 gap-3">
+            <Card className="p-4"><p className="text-xs text-muted">Outstanding booked/planned balances</p><p className="mt-1 text-lg font-bold text-plum">{formatCurrency(outstanding)}</p></Card>
+            <Card className="p-4"><p className="text-xs text-muted">Tracked payments</p><p className="mt-1 text-lg font-bold text-primary">{formatCurrency(trackedPaid)}</p></Card>
+          </div>}
           {loading ? (
             <div className="text-center py-12 text-muted">Loading...</div>
           ) : (
@@ -172,7 +194,7 @@ export default function BudgetPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <label className="text-[10px] text-muted">Spent</label>
+                      <label className="text-[10px] text-muted">Other paid</label>
                       <div className="flex items-center gap-1">
                         <span className="text-xs text-muted">$</span>
                         <input
@@ -194,6 +216,14 @@ export default function BudgetPage() {
             </Card>
           )}
           {!loading && weddingId && (
+            <div className="mt-6">
+              <div className="mb-3 flex items-center gap-2"><CreditCard className="h-5 w-5 text-primary"/><h2 className="font-[family-name:var(--font-heading)] text-xl text-plum">Payments & commitments</h2></div>
+              <p className="mb-4 text-sm text-muted">Track vendor prices, deposits, outstanding balances, due dates and event costs. Payments here are added to the category’s “Other paid” amount; don’t enter the same payment twice.</p>
+              <BudgetCommitmentTracker weddingId={weddingId} categories={items.map(i=>({id:i.id,name:i.category,enabled:i.is_enabled}))} events={events} vendors={vendors} commitments={commitments} setCommitments={setCommitments}/>
+            </div>
+          )}
+
+          {!loading && weddingId && (
             <Card className="mt-5 p-5 space-y-3">
               <h2 className="font-[family-name:var(--font-heading)] text-lg">Add custom budget category</h2>
               <div className="grid grid-cols-1 sm:grid-cols-[1fr_130px_auto] gap-3 items-end">
@@ -201,7 +231,7 @@ export default function BudgetPage() {
                 <label className="text-sm font-medium">Budget ($)<input type="number" min="0" step="0.01" value={newBudget} onChange={e => setNewBudget(e.target.value)} placeholder="0" className="mt-1 block w-full rounded-xl border border-border-soft px-3 py-2.5" /></label>
                 <Button type="button" onClick={addCategory} disabled={adding || !newCategory.trim()}><Plus className="h-4 w-4" /> Add</Button>
               </div>
-              <p className="text-xs text-muted">Custom categories save immediately. Use Save above to keep changes to existing amounts.</p>
+              <p className="text-xs text-muted">Custom categories save immediately. “Other paid” is for spending not already entered in the payments tracker. Use Save above to keep changes to existing category amounts.</p>
             </Card>
           )}
         </div>
