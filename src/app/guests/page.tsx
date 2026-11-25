@@ -36,6 +36,7 @@ export default function GuestsPage(){
  const [eventFilter,setEventFilter]=useState('all')
  const [statusFilter,setStatusFilter]=useState('all')
  const [householdFilter,setHouseholdFilter]=useState('all')
+ const [links,setLinks]=useState<Record<string,string>>({})
  useEffect(()=>{
   let active=true
   async function load(){
@@ -121,6 +122,32 @@ export default function GuestsPage(){
   }
   setBusy('')
  }
+ async function createRsvpLink(guestId:string){
+  if(busy)return
+  setBusy(guestId);setError('');setSuccess('')
+  const {data,error:linkError}=await createClient().rpc('create_guest_rsvp_link',{p_guest:guestId})
+  if(linkError||!data)setError(linkError?.message||'Unable to create RSVP link.')
+  else {
+   const url=window.location.origin+'/rsvp/'+data
+   setLinks(current=>({...current,[guestId]:url}))
+   setSuccess('Personal RSVP link created. Copy and send it to the guest yourself.')
+  }
+  setBusy('')
+ }
+ async function revokeRsvpLink(guestId:string){
+  if(busy||!window.confirm('Revoke this guest’s RSVP link? Previously shared links will stop working.'))return
+  setBusy(guestId);setError('');setSuccess('')
+  const {error:revokeError}=await createClient().rpc('revoke_guest_rsvp_link',{p_guest:guestId})
+  if(revokeError)setError(revokeError.message)
+  else {setLinks(current=>{const next={...current};delete next[guestId];return next});setSuccess('Invitation link revoked.')}
+  setBusy('')
+ }
+ async function copyRsvpLink(guestId:string){
+  const link=links[guestId]
+  if(!link)return
+  try{await navigator.clipboard.writeText(link);setSuccess('RSVP link copied. Send it directly to the guest.')}
+  catch{setSuccess('Select the link below to copy it manually.')}
+ }
  async function removeGuest(id:string){
   if(busy||!window.confirm('Delete this guest/household and its event invitations?'))return
   setBusy(id);setError('');setSuccess('')
@@ -194,9 +221,19 @@ export default function GuestsPage(){
         return <label key={ev.id} className="text-xs text-muted">{eventName(ev)}
          <select aria-label={eventName(ev)+' invitation for '+g.name} value={status} disabled={!!busy} onChange={e=>setInvitation(g.id,ev.id,e.target.value)} className="mt-1 block w-full rounded-lg border border-border-soft p-2 text-sm text-ink"><option value="none">Not on this event list</option>{statuses.map(x=><option value={x.value} key={x.value}>{x.label}</option>)}</select>
         </label>})}</div></div>}
+       {!!events.length&&<div className="mt-4 rounded-xl border border-primary/20 bg-primary-soft/20 p-3">
+        <p className="text-xs font-semibold text-plum">Guest RSVP link</p>
+        <p className="mt-1 text-xs text-muted">Add this guest to at least one event above, then generate a private link. Guests can respond without an account. Send the link personally; PlanWedly does not send emails.</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+         <button type="button" disabled={!!busy||!invites.some(i=>i.guest_id===g.id)} onClick={()=>createRsvpLink(g.id)} className="rounded-lg border border-primary px-3 py-2 text-xs font-medium text-primary disabled:opacity-40">{links[g.id]?'Show / refresh RSVP link':'Create RSVP link'}</button>
+         {links[g.id]&&<button type="button" onClick={()=>copyRsvpLink(g.id)} className="rounded-lg bg-primary px-3 py-2 text-xs font-medium text-white">Copy RSVP link</button>}
+         <button type="button" disabled={!!busy} onClick={()=>revokeRsvpLink(g.id)} className="rounded-lg border border-border-soft px-3 py-2 text-xs text-muted">Revoke old link</button>
+        </div>
+        {links[g.id]&&<input readOnly aria-label={'RSVP link for '+g.name} onFocus={e=>e.target.select()} value={links[g.id]} className="mt-3 w-full rounded-lg border border-border-soft bg-white p-2 text-xs text-ink"/>}
+       </div>}
        <label className="mt-3 block text-xs text-muted">Notes<textarea rows={2} maxLength={2000} key={g.id+(g.notes||'')} defaultValue={g.notes||''} disabled={!!busy} onBlur={e=>{const value=e.target.value.trim()||null;if(value!==g.notes)void update(g.id,{notes:value})}} className="mt-1 block w-full resize-y rounded-lg border border-border-soft p-2 text-sm text-ink"/></label>
       </div>)}</div>
     </section>)}</div>}
-  <p className="mt-6 text-xs text-muted">One entry can represent one person or a household of several people. Event invitation statuses are tracked separately from the overall RSVP. This is a private planning tracker and does not send invitations or emails.</p>
+  <p className="mt-6 text-xs text-muted">One entry can represent one person or a household of several people. Event invitation statuses are tracked separately from the overall RSVP. Guests can reply through personal links when you send them. PlanWedly does not send invitation emails automatically.</p>
  </div></main><Footer/></>
 }
