@@ -71,13 +71,12 @@ export default async function VendorPage({ params }: Props) {
 
   let isSaved = false
   if (user) {
-    const { data: saved } = await supabase
-      .from('saved_vendors')
-      .select('vendor_id')
-      .eq('couple_id', user.id)
-      .eq('vendor_id', vendor.id)
-      .maybeSingle()
-    isSaved = !!saved
+    const {data:wedding}=await supabase.from('weddings').select('id').limit(1).maybeSingle()
+    if(wedding){
+      const {data:saved}=await supabase.from('wedding_vendor_shortlist')
+        .select('vendor_id').eq('wedding_id',wedding.id).eq('vendor_id',vendor.id).maybeSingle()
+      isSaved=!!saved
+    }
   }
 
   const category = categoryRow ?? { id: vendor.category_id, name: 'Vendors', slug: '', icon: null }
