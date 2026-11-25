@@ -119,8 +119,8 @@ export default function BudgetPage() {
     <>
       <Navbar />
       <main className="flex-1">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-          <div className="flex items-center justify-between mb-6">
+        <div className="max-w-3xl mx-auto min-w-0 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
             <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-plum flex items-center gap-2">
               <DollarSign className="h-6 w-6 text-primary" />
               Budget Planner
@@ -135,7 +135,7 @@ export default function BudgetPage() {
           {error && <p role="alert" className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
 
           {/* Summary */}
-          <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-1 gap-3 mb-8 sm:grid-cols-3">
             <Card className="p-4 text-center">
               <p className="text-xs text-muted mb-1">Total Budget</p>
               <p className="text-lg font-bold text-ink">{formatCurrency(totalBudget)}</p>
@@ -161,55 +161,44 @@ export default function BudgetPage() {
           ) : (
             <Card className="divide-y divide-peach-light/50">
               {items.map((item, idx) => (
-                <div key={item.id} className="p-4 flex items-center gap-4">
-                  <input
-                    type="checkbox"
-                    checked={item.is_enabled}
-                    onChange={(e) => {
-                      const next = [...items]
-                      next[idx] = { ...next[idx], is_enabled: e.target.checked }
-                      setItems(next)
-                    }}
-                    className="accent-rose-gold w-4 h-4"
-                  />
-                  <span className="text-sm text-ink flex-1 capitalize">
-                    {item.category.replace(/_/g, ' ')}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <div className="text-right">
-                      <label className="text-[10px] text-muted">Budget</label>
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs text-muted">$</span>
-                        <input
-                          type="number"
+                <div key={item.id} className="p-4 sm:p-5">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <input
+                      type="checkbox"
+                      checked={item.is_enabled}
+                      aria-label={'Include '+item.category.replace(/_/g,' ')+' in budget'}
+                      onChange={(e) => {
+                        setItems(prev => prev.map(x => x.id === item.id ? {...x,is_enabled:e.target.checked} : x))
+                      }}
+                      className="accent-rose-gold h-5 w-5 shrink-0"
+                    />
+                    <span className="min-w-0 flex-1 break-words text-sm font-medium text-ink capitalize">
+                      {item.category.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                  <div className="mt-3 grid grid-cols-2 gap-3 sm:ml-8">
+                    <label className="block min-w-0 text-xs text-muted">Budget (CAD)
+                      <div className="relative mt-1">
+                        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">$</span>
+                        <input type="number" min="0" step="0.01"
                           value={item.budgeted}
-                          onChange={(e) => {
-                            const next = [...items]
-                            next[idx] = { ...next[idx], budgeted: Number(e.target.value) }
-                            setItems(next)
-                          }}
+                          onChange={(e) => setItems(prev => prev.map(x => x.id === item.id ? {...x,budgeted:Number(e.target.value)}:x))}
                           disabled={!item.is_enabled}
-                          className="w-20 text-right text-sm bg-transparent border-b border-border-soft focus:outline-none focus:border-primary disabled:text-muted/70"
+                          className="w-full min-w-0 rounded-lg border border-border-soft bg-white py-2 pl-7 pr-2 text-right text-base text-ink focus:outline-primary disabled:opacity-50"
                         />
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <label className="text-[10px] text-muted">Other paid</label>
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs text-muted">$</span>
-                        <input
-                          type="number"
+                    </label>
+                    <label className="block min-w-0 text-xs text-muted">Other paid (CAD)
+                      <div className="relative mt-1">
+                        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">$</span>
+                        <input type="number" min="0" step="0.01"
                           value={item.spent}
-                          onChange={(e) => {
-                            const next = [...items]
-                            next[idx] = { ...next[idx], spent: Number(e.target.value) }
-                            setItems(next)
-                          }}
+                          onChange={(e) => setItems(prev => prev.map(x => x.id === item.id ? {...x,spent:Number(e.target.value)}:x))}
                           disabled={!item.is_enabled}
-                          className="w-20 text-right text-sm bg-transparent border-b border-border-soft focus:outline-none focus:border-primary disabled:text-muted/70"
+                          className="w-full min-w-0 rounded-lg border border-border-soft bg-white py-2 pl-7 pr-2 text-right text-base text-ink focus:outline-primary disabled:opacity-50"
                         />
                       </div>
-                    </div>
+                    </label>
                   </div>
                 </div>
               ))}
