@@ -322,6 +322,7 @@ export default async function DashboardPage() {
               { href: '/budget', label: 'Budget', icon: DollarSign },
               { href: '/events', label: 'Events', icon: CalendarDays },
               { href: '/guests', label: 'Guest List', icon: Users },
+              { href: '/plans', label: 'Plan Templates', icon: Sparkles },
               { href: '/wedding/partner', label: 'Plan Together', icon: Users },
             ].map((link) => (
               <Link key={link.href} href={link.href}>
