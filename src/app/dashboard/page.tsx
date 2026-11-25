@@ -7,6 +7,9 @@ import {
   Bookmark,
   MessageSquare,
   CheckSquare,
+  Users,
+  Sparkles,
+  AlertCircle,
   ArrowRight,
   CalendarDays,
   ListChecks,
@@ -42,12 +45,16 @@ export default async function DashboardPage() {
     { data: savedVendors },
     { data: inquiries },
     { data: tasks },
+    { data: members },
+    { data: guests },
   ] = await Promise.all([
     supabase.from('budget_categories').select('*').eq('wedding_id', wedding.id),
     supabase.from('wedding_events').select('*').eq('wedding_id', wedding.id).order('sort_order'),
     supabase.from('saved_vendors').select('*, vendor:vendors(name, slug, city)').eq('couple_id', user.id),
     supabase.from('inquiries').select('*, vendor:vendors(name, slug)').eq('couple_id', user.id).order('created_at', { ascending: false }).limit(5),
     supabase.from('tasks').select('*').eq('wedding_id', wedding.id).order('sort_order'),
+    supabase.from('wedding_members').select('user_id,role').eq('wedding_id', wedding.id),
+    supabase.from('guest_list').select('party_size').eq('wedding_id', wedding.id),
   ])
 
   const countdown = daysUntil(wedding.wedding_date)
@@ -55,6 +62,18 @@ export default async function DashboardPage() {
   const totalSpent = budgetData?.reduce((sum, b) => sum + Number(b.spent), 0) ?? 0
   const completedTasks = tasks?.filter((t) => t.is_completed).length ?? 0
   const totalTasks = tasks?.length ?? 0
+  const pendingTasks = (tasks ?? []).filter(task => !task.is_completed)
+  const partnerJoined = (members ?? []).some(member => member.role === 'partner')
+  const guestCount = (guests ?? []).reduce((sum, guest) => sum + Number(guest.party_size || 1), 0)
+  const weddingTypeLabel = wedding.wedding_type === 'hindu' ? 'Hindu wedding' : wedding.wedding_type === 'christian_catholic' ? 'Christian / Catholic wedding' : 'Interfaith wedding'
+  const budgetPercent = totalBudget > 0 ? Math.round(totalSpent / totalBudget * 100) : 0
+  const nextSteps = [
+    ...(!partnerJoined ? [{href:'/wedding/partner', title:'Invite your partner', detail:'Plan together with shared tasks, events and budget.'}] : []),
+    ...(!wedding.wedding_date ? [{href:'/events',title:'Start planning your dates',detail:'You can add event dates even if the main wedding date is undecided.'}] : []),
+    ...(events?.length ? [] : [{href:'/events',title:'Choose your wedding events',detail:'Set up the celebrations that matter to you.'}]),
+    ...(totalBudget <= 0 ? [{href:'/budget',title:'Set a starting budget',detail:'Estimates are editable as your plans evolve.'}] : []),
+    ...(pendingTasks.length ? [{href:'/tasks',title:pendingTasks[0].title,detail:`${pendingTasks.length} tasks remaining in your checklist.`}] : [{href:'/tasks',title:'Review your wedding checklist',detail:'Add the next decisions you need to make.'}]),
+  ].slice(0,4)
 
   return (
     <>
@@ -66,14 +85,22 @@ export default async function DashboardPage() {
             <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-plum">
               {wedding.partner1_name} & {wedding.partner2_name}
             </h1>
+            <p className="text-xs uppercase tracking-wide font-medium text-primary mt-2">{weddingTypeLabel}</p>
             <p className="text-muted text-sm mt-1">
               {wedding.wedding_date
-                ? `Wedding on ${new Date(wedding.wedding_date).toLocaleDateString('en-CA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`
+                ? `Wedding on ${new Date(wedding.wedding_date + 'T12:00:00').toLocaleDateString('en-CA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`
                 : 'No date set yet'}
             </p>
           </div>
 
-          <div className="mb-6"><Link href="/wedding/partner" className="inline-flex items-center gap-2 rounded-xl border border-primary/30 px-4 py-2 text-sm font-medium text-primary hover:bg-primary-soft/30">Invite your partner or manage sharing <ArrowRight className="h-4 w-4" /></Link></div>
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-3">
+            <Link href="/wedding/partner" className="inline-flex items-center gap-2 rounded-xl border border-primary/30 px-4 py-2 text-sm font-medium text-primary hover:bg-primary-soft/30">
+              <Users className="h-4 w-4" />
+              {partnerJoined ? 'Partner connected — manage sharing' : 'Invite your partner to plan together'}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <span className="text-xs text-muted">{partnerJoined ? 'Your planning workspace is shared.' : 'You can invite your partner now or later.'}</span>
+          </div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -90,9 +117,9 @@ export default async function DashboardPage() {
               <p className="text-xs text-muted">of {formatCurrency(totalBudget)} budget</p>
             </Card>
             <Card className="p-5 text-center">
-              <Bookmark className="h-6 w-6 text-primary mx-auto mb-2" />
-              <p className="text-2xl font-bold text-ink">{savedVendors?.length ?? 0}</p>
-              <p className="text-xs text-muted">saved vendors</p>
+              <Users className="h-6 w-6 text-primary mx-auto mb-2" />
+              <p className="text-2xl font-bold text-ink">{guestCount}</p>
+              <p className="text-xs text-muted">guests planned</p>
             </Card>
             <Card className="p-5 text-center">
               <CheckSquare className="h-6 w-6 text-primary mx-auto mb-2" />
@@ -102,6 +129,41 @@ export default async function DashboardPage() {
               <p className="text-xs text-muted">tasks done</p>
             </Card>
           </div>
+
+          {/* A clear next-action list based on the couple's actual progress. */}
+          <Card className="mb-8 p-6 border-primary/20">
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <h2 className="font-[family-name:var(--font-heading)] text-xl text-plum flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" /> Your next steps
+              </h2>
+              <span className="text-xs text-muted">{completedTasks}/{totalTasks} checklist tasks done</span>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {nextSteps.map((item, index) => (
+                <Link key={item.title} href={item.href} className="group rounded-xl border border-border-soft bg-ivory/60 p-4 hover:border-primary/40 transition-colors">
+                  <div className="flex justify-between items-start gap-2">
+                    <div><p className="text-xs font-semibold text-primary mb-1">STEP {index + 1}</p>
+                      <p className="text-sm font-semibold text-ink group-hover:text-plum">{item.title}</p>
+                      <p className="text-xs text-muted mt-1">{item.detail}</p></div>
+                    <ArrowRight className="h-4 w-4 text-primary shrink-0" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </Card>
+
+          {totalBudget > 0 && (
+            <div className="mb-8 rounded-xl border border-border-soft p-4 bg-white">
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="text-ink font-medium">Overall budget used</span>
+                <span className="text-muted">{budgetPercent}% · {formatCurrency(totalSpent)} of {formatCurrency(totalBudget)}</span>
+              </div>
+              <div className="h-2 rounded-full bg-primary-soft overflow-hidden">
+                <div className="h-full bg-primary rounded-full" style={{width:`${Math.min(budgetPercent,100)}%`}} />
+              </div>
+              {totalSpent>totalBudget && <p className="text-xs text-amber-700 mt-2 flex items-center gap-1"><AlertCircle className="h-3 w-3" /> Spending is above your current budget.</p>}
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Events */}
@@ -126,7 +188,7 @@ export default async function DashboardPage() {
                         {event.venue_name && <p className="text-xs text-muted">{event.venue_name}</p>}
                       </div>
                       <span className="text-xs text-muted">
-                        {event.event_date ? new Date(event.event_date).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) : 'No date'}
+                        {event.event_date ? new Date(event.event_date + 'T12:00:00').toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) : 'No date'}
                       </span>
                     </div>
                   ))}
@@ -161,7 +223,7 @@ export default async function DashboardPage() {
                         <div
                           className="h-full bg-primary rounded-full transition-all"
                           style={{
-                            width: `${Math.min((Number(b.spent) / Number(b.budgeted)) * 100, 100)}%`,
+                            width: `${Number(b.budgeted) > 0 ? Math.min((Number(b.spent) / Number(b.budgeted)) * 100, 100) : 0}%`,
                           }}
                         />
                       </div>
@@ -186,7 +248,7 @@ export default async function DashboardPage() {
               </div>
               {tasks && tasks.length > 0 ? (
                 <div className="space-y-2">
-                  {tasks.slice(0, 5).map((task) => (
+                  {[...pendingTasks, ...(tasks ?? []).filter(task => task.is_completed)].slice(0, 5).map((task) => (
                     <div key={task.id} className="flex items-center gap-3 py-1.5">
                       <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${task.is_completed ? 'border-primary bg-primary' : 'border-border-soft'}`}>
                         {task.is_completed && <Heart className="h-2.5 w-2.5 text-white" fill="currentColor" />}
@@ -249,10 +311,12 @@ export default async function DashboardPage() {
           {/* Quick Links */}
           <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
+              { href: '/tasks', label: 'Checklist', icon: CheckSquare },
               { href: '/vendors', label: 'Browse Vendors', icon: Heart },
               { href: '/saved', label: 'Saved Vendors', icon: Bookmark },
               { href: '/budget', label: 'Budget', icon: DollarSign },
               { href: '/events', label: 'Events', icon: CalendarDays },
+              { href: '/wedding/partner', label: 'Plan Together', icon: Users },
             ].map((link) => (
               <Link key={link.href} href={link.href}>
                 <Card className="p-4 text-center" hover>

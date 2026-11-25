@@ -64,3 +64,38 @@ export const COLORS = {
   charcoal: '#2F2F2F',
   sage: '#A8C3A0',
 }
+
+
+/** Starter tasks for a new couple. These are suggestions, not religious requirements. */
+export const SHARED_STARTER_TASKS = [
+  'Decide which wedding events you want to host',
+  'Agree on your budget and priorities',
+  'Create an initial guest list',
+  'Shortlist venues that fit your guest count',
+  'Discuss your wedding plans with both families',
+  'Compare photographers and videographers',
+  'Record deposits and important payment dates',
+] as const
+
+export const HINDU_STARTER_TASKS = [
+  'Discuss ceremony traditions and preferred rituals with your families',
+  'Contact a priest about ceremony requirements and availability',
+  'Plan attire and jewellery for each chosen event',
+] as const
+
+export const CHRISTIAN_STARTER_TASKS = [
+  'Confirm church or ceremony location and booking requirements',
+  'Discuss ceremony preparation and documents with your officiant',
+  'Plan readings, music and ceremony participants',
+] as const
+
+export const INTERFAITH_STARTER_TASKS = [
+  'Discuss which family traditions you want to include',
+  'Confirm ceremony and officiant requirements for each tradition',
+  'Coordinate the sequence of ceremonies and celebrations',
+] as const
+
+export function starterTasksForWedding(type: 'hindu' | 'christian_catholic' | 'interfaith') {
+  const tailored = type === 'hindu' ? HINDU_STARTER_TASKS : type === 'christian_catholic' ? CHRISTIAN_STARTER_TASKS : INTERFAITH_STARTER_TASKS
+  return [...SHARED_STARTER_TASKS, ...tailored]
+}
