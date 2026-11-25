@@ -25,7 +25,7 @@ type CategoryChoice = {id:string;name:string;enabled:boolean}
 const money=(value:number)=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD',maximumFractionDigits:2}).format(value)
 const eventName=(event:WeddingEventChoice)=>event.custom_label?.trim()||EVENT_TYPES.find(t=>t.value===event.event_type)?.label||event.event_type
 const parseMoney=(value:string)=>value.trim()!=='' && Number.isFinite(Number(value))?Number(value):NaN
-const validMoney=(value:number)=>Number.isFinite(value)&&value>=0&&value<=99999999&&Math.round(value*100)===value*100
+const validMoney=(value:number)=>Number.isFinite(value)&&value>=0&&value<=99999999&&Math.abs(value*100-Math.round(value*100))<0.00001
 const today=()=>{
  const now=new Date()
  return [now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0')].join('-')

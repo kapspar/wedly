@@ -41,6 +41,7 @@ export default async function DashboardPage() {
 
   const [
     { data: budgetData },
+    { data: commitments },
     { data: events },
     { data: savedVendors },
     { data: inquiries },
@@ -49,6 +50,7 @@ export default async function DashboardPage() {
     { data: guests },
   ] = await Promise.all([
     supabase.from('budget_categories').select('*').eq('wedding_id', wedding.id),
+    supabase.from('budget_commitments').select('category_id,paid_amount,total_amount,due_date').eq('wedding_id',wedding.id),
     supabase.from('wedding_events').select('*').eq('wedding_id', wedding.id).order('sort_order'),
     supabase.from('wedding_vendor_shortlist').select('vendor_id,stage').eq('wedding_id', wedding.id),
     supabase.from('inquiries').select('*, vendor:vendors(name, slug)').eq('couple_id', user.id).order('created_at', { ascending: false }).limit(5),
@@ -58,8 +60,10 @@ export default async function DashboardPage() {
   ])
 
   const countdown = daysUntil(wedding.wedding_date)
-  const totalBudget = budgetData?.reduce((sum, b) => sum + Number(b.budgeted), 0) ?? 0
-  const totalSpent = budgetData?.reduce((sum, b) => sum + Number(b.spent), 0) ?? 0
+  const totalBudget = budgetData?.filter(b=>b.is_enabled).reduce((sum, b) => sum + Number(b.budgeted), 0) ?? 0
+  const trackedPaid = (commitments??[]).filter(c=>budgetData?.some(b=>b.id===c.category_id && b.is_enabled)).reduce((sum,c)=>sum+Number(c.paid_amount),0)
+  const totalSpent = (budgetData?.filter(b=>b.is_enabled).reduce((sum,b)=>sum+Number(b.spent),0)??0)+trackedPaid
+  const trackedOwed = (commitments??[]).filter(c=>budgetData?.some(b=>b.id===c.category_id && b.is_enabled)).reduce((sum,c)=>sum+Math.max(Number(c.total_amount)-Number(c.paid_amount),0),0)
   const completedTasks = tasks?.filter((t) => t.is_completed).length ?? 0
   const totalTasks = tasks?.length ?? 0
   const pendingTasks = (tasks ?? []).filter(task => !task.is_completed)
@@ -161,6 +165,7 @@ export default async function DashboardPage() {
               <div className="h-2 rounded-full bg-primary-soft overflow-hidden">
                 <div className="h-full bg-primary rounded-full" style={{width:`${Math.min(budgetPercent,100)}%`}} />
               </div>
+              {trackedOwed>0&&<p className="mt-2 text-xs text-muted">{formatCurrency(trackedOwed)} still owed on recorded costs.</p>}
               {totalSpent>totalBudget && <p className="text-xs text-amber-700 mt-2 flex items-center gap-1"><AlertCircle className="h-3 w-3" /> Spending is above your current budget.</p>}
             </div>
           )}
@@ -216,14 +221,14 @@ export default async function DashboardPage() {
                       <div className="flex justify-between text-sm mb-1">
                         <span className="text-ink capitalize">{b.category.replace(/_/g, ' ')}</span>
                         <span className="text-muted">
-                          {formatCurrency(Number(b.spent))} / {formatCurrency(Number(b.budgeted))}
+                          {formatCurrency(Number(b.spent) + (commitments??[]).filter(c=>c.category_id===b.id).reduce((sum,c)=>sum+Number(c.paid_amount),0))} / {formatCurrency(Number(b.budgeted))}
                         </span>
                       </div>
                       <div className="h-1.5 bg-primary-soft rounded-full overflow-hidden">
                         <div
                           className="h-full bg-primary rounded-full transition-all"
                           style={{
-                            width: `${Number(b.budgeted) > 0 ? Math.min((Number(b.spent) / Number(b.budgeted)) * 100, 100) : 0}%`,
+                            width: `${Number(b.budgeted) > 0 ? Math.min(((Number(b.spent)+(commitments??[]).filter(c=>c.category_id===b.id).reduce((sum,c)=>sum+Number(c.paid_amount),0)) / Number(b.budgeted)) * 100, 100) : 0}%`,
                           }}
                         />
                       </div>
