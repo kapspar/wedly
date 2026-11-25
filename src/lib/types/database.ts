@@ -651,6 +651,8 @@ export interface Database {
           title: string
           is_completed: boolean
           due_date: string | null
+          priority: 'high' | 'normal' | 'low'
+          event_id: string | null
           sort_order: number
           created_at: string
         }
@@ -660,6 +662,8 @@ export interface Database {
           title: string
           is_completed?: boolean
           due_date?: string | null
+          priority?: 'high' | 'normal' | 'low'
+          event_id?: string | null
           sort_order?: number
           created_at?: string
         }
@@ -667,9 +671,18 @@ export interface Database {
           title?: string
           is_completed?: boolean
           due_date?: string | null
+          priority?: 'high' | 'normal' | 'low'
+          event_id?: string | null
           sort_order?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "tasks_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "wedding_events"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tasks_wedding_id_fkey"
             columns: ["wedding_id"]
