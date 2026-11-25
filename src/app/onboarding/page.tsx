@@ -16,6 +16,7 @@ import {
   HINDU_DEFAULT_EVENTS,
   CHRISTIAN_DEFAULT_EVENTS,
   INTERFAITH_DEFAULT_EVENTS,
+  starterTasksForWedding,
 } from '@/lib/constants'
 import type { WeddingType, EventType } from '@/lib/types/database'
 
@@ -26,6 +27,7 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [setupIncomplete, setSetupIncomplete] = useState(false)
   const [checkingAccount, setCheckingAccount] = useState(true)
 
   useEffect(() => {
@@ -67,6 +69,7 @@ export default function OnboardingPage() {
           ? CHRISTIAN_DEFAULT_EVENTS
           : INTERFAITH_DEFAULT_EVENTS
     setSelectedEvents(defaults as EventType[])
+    setBudgets(prev => ({...prev, priest: {...prev.priest, enabled: type !== 'christian_catholic'}}))
   }
 
   const toggleEvent = (event: EventType) => {
@@ -79,6 +82,7 @@ export default function OnboardingPage() {
     if (checkingAccount) return
     setLoading(true)
     setError('')
+    setSetupIncomplete(false)
 
     const supabase = createClient()
     const {
@@ -133,20 +137,32 @@ export default function OnboardingPage() {
         is_enabled: true,
       }))
 
+    const taskInserts = starterTasksForWedding(weddingType).map((title, i) => ({
+      wedding_id: wedding.id,
+      title,
+      sort_order: i,
+    }))
+
     const setupResults = await Promise.all([
-      supabase.from('wedding_events').insert(eventInserts),
-      supabase.from('budget_categories').insert(budgetInserts),
+      eventInserts.length ? supabase.from('wedding_events').insert(eventInserts) : Promise.resolve({error:null}),
+      budgetInserts.length ? supabase.from('budget_categories').insert(budgetInserts) : Promise.resolve({error:null}),
+      supabase.from('tasks').insert(taskInserts),
     ])
-
-    if (!setupResults.some((result) => result.error)) {
-      posthog.capture('onboarding_completed', {
-        wedding_type: weddingType,
-        date_preference: hasDate,
-        event_count: selectedEvents.length,
-        budget_category_count: budgetInserts.length,
-      })
+    const failed = setupResults.filter(result => result.error)
+    if (failed.length > 0) {
+      console.error('Wedding initial setup incomplete:', failed.map(result => result.error?.code))
+      setSetupIncomplete(true)
+      setError('Your wedding was created, but some planning items could not be saved. Open your dashboard and check your events, budget and tasks. Do not submit this setup again.')
+      setLoading(false)
+      return
     }
-
+    posthog.capture('onboarding_completed', {
+      wedding_type: weddingType,
+      date_preference: hasDate,
+      event_count: selectedEvents.length,
+      budget_category_count: budgetInserts.length,
+      starter_task_count: taskInserts.length,
+    })
     router.push('/wedding/partner')
     router.refresh()
   }
@@ -317,7 +333,7 @@ export default function OnboardingPage() {
                   Wedding Events
                 </h2>
                 <p className="text-sm text-muted mt-1">
-                  Select the events you&apos;re planning
+                  Choose the celebrations you want to include. We've suggested options for your wedding tradition.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -347,7 +363,7 @@ export default function OnboardingPage() {
                   Budget Setup
                 </h2>
                 <p className="text-sm text-muted mt-1">
-                  Set your budget for each category (you can adjust later)
+                  Start with suggested amounts in CAD. You can change or remove any category later.
                 </p>
               </div>
               <div className="space-y-3 max-h-80 overflow-y-auto">
@@ -407,6 +423,8 @@ export default function OnboardingPage() {
             </p>
           )}
 
+          {setupIncomplete && <a href="/dashboard" className="mt-4 inline-block rounded-xl bg-primary px-5 py-3 text-sm font-medium text-white">Open your wedding dashboard</a>}
+
           {/* Navigation */}
           <div className="flex justify-between gap-3 mt-6 sm:mt-8">
             <Button
@@ -423,7 +441,7 @@ export default function OnboardingPage() {
                 <ArrowRight className="h-4 w-4" />
               </Button>
             ) : (
-              <Button onClick={handleSubmit} loading={loading}>
+              <Button onClick={handleSubmit} loading={loading} disabled={setupIncomplete}>
                 Complete Setup
                 <Check className="h-4 w-4" />
               </Button>
