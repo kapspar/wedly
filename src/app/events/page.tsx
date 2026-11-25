@@ -26,6 +26,9 @@ interface WeddingEvent {
 
 export default function EventsPage() {
   const [events, setEvents] = useState<WeddingEvent[]>([])
+  const [loadedEvents, setLoadedEvents] = useState<WeddingEvent[]>([])
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
   const [weddingId, setWeddingId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -50,7 +53,7 @@ export default function EventsPage() {
         .eq('wedding_id', wedding.id)
         .order('sort_order')
 
-      if (data) setEvents(data)
+      if (data) { setEvents(data); setLoadedEvents(data) }
       setLoading(false)
     }
     load()
@@ -84,32 +87,56 @@ export default function EventsPage() {
   }
 
   const handleSave = async () => {
-    if (!weddingId) return
+    if (!weddingId || saving) return
     setSaving(true)
+    setError('')
+    setMessage('')
     const supabase = createClient()
-
-    const { error: deleteError } = await supabase.from('wedding_events').delete().eq('wedding_id', weddingId)
-
-    const inserts = events.map((e, i) => ({
-      wedding_id: weddingId,
-      event_type: e.event_type,
-      custom_label: e.custom_label || null,
-      event_date: e.event_date || null,
-      event_time: e.event_time || null,
-      venue_name: e.venue_name || null,
-      notes: e.notes || null,
-      sort_order: i,
-    }))
-
-    const { error: insertError } = inserts.length > 0
-      ? await supabase.from('wedding_events').insert(inserts)
-      : { error: null }
-
-    if (!deleteError && !insertError) {
-      posthog.capture('wedding_events_saved', { event_count: events.length })
-    }
-
-    setSaving(false)
+    // Never delete and reinsert the entire event list: a partner might be editing it too.
+    const fields = (event:WeddingEvent,sort_order:number) => ({
+      event_type:event.event_type,
+      custom_label:event.custom_label || null,
+      event_date:event.event_date || null,
+      event_time:event.event_time || null,
+      venue_name:event.venue_name || null,
+      notes:event.notes || null,
+      sort_order,
+    })
+    const initial = new Map(loadedEvents.map(event=>[event.id,event]))
+    const removedIds=loadedEvents.filter(event=>!events.some(current=>current.id===event.id)).map(event=>event.id)
+    const changed=events.flatMap((event,i)=>{
+      const previous=initial.get(event.id)
+      return previous && !event.isNew && JSON.stringify(fields(event,i)) !== JSON.stringify(fields(previous,previous.sort_order))
+        ? [{event,sort_order:i}] : []
+    })
+    const newlyAdded=events.flatMap((event,i)=>event.isNew || !initial.has(event.id) ? [{...fields(event,i),wedding_id:weddingId}]:[])
+    try {
+      for (const entry of changed) {
+        const {error:writeError}=await supabase.from('wedding_events')
+          .update(fields(entry.event,entry.sort_order))
+          .eq('id',entry.event.id).eq('wedding_id',weddingId)
+        if(writeError)throw writeError
+      }
+      if(newlyAdded.length) {
+        const {error:insertError}=await supabase.from('wedding_events').insert(newlyAdded)
+        if(insertError)throw insertError
+      }
+      if(removedIds.length) {
+        const {error:removeError}=await supabase.from('wedding_events')
+          .delete().eq('wedding_id',weddingId).in('id',removedIds)
+        if(removeError)throw removeError
+      }
+      const {data, error:reloadError}=await supabase.from('wedding_events')
+        .select('*').eq('wedding_id',weddingId).order('sort_order')
+      if(reloadError)throw reloadError
+      setEvents(data ?? [])
+      setLoadedEvents(data ?? [])
+      setMessage('Wedding events saved and updated for both partners.')
+      posthog.capture('wedding_events_saved',{event_count:data?.length??0})
+    } catch {
+      // Do not misreport a partial write as success. Preserve editing state.
+      setError('Some changes could not be saved. Please refresh the page before trying again.')
+    } finally {setSaving(false)}
   }
 
   return (
@@ -134,6 +161,8 @@ export default function EventsPage() {
             </div>
           </div>
 
+          {message && <p role="status" className="mb-5 rounded-lg bg-primary-soft/40 px-4 py-3 text-sm text-plum">{message}</p>}
+          {error && <p role="alert" className="mb-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
           {loading ? (
             <div className="text-center py-12 text-muted">Loading...</div>
           ) : events.length === 0 ? (
