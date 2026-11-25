@@ -805,11 +805,52 @@ export interface Database {
           },
         ]
       }
+      guest_event_invitations: {
+        Row: {
+          guest_id: string
+          event_id: string
+          wedding_id: string
+          rsvp_status: string
+          created_at: string
+        }
+        Insert: {
+          guest_id: string
+          event_id: string
+          wedding_id: string
+          rsvp_status?: string
+          created_at?: string
+        }
+        Update: { rsvp_status?: string }
+        Relationships: [
+          {
+            foreignKeyName: "guest_event_invitations_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guest_list"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guest_event_invitations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "wedding_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guest_event_invitations_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guest_list: {
         Row: {
           id: string
           wedding_id: string
           name: string
+          household_name: string | null
           email: string | null
           phone: string | null
           party_size: number
@@ -824,6 +865,7 @@ export interface Database {
           id?: string
           wedding_id: string
           name: string
+          household_name?: string | null
           email?: string | null
           phone?: string | null
           party_size?: number
@@ -836,6 +878,7 @@ export interface Database {
         }
         Update: {
           name?: string
+          household_name?: string | null
           email?: string | null
           phone?: string | null
           party_size?: number
