@@ -180,6 +180,77 @@ export interface Database {
           },
         ]
       }
+      budget_commitments: {
+        Row: {
+          id: string
+          wedding_id: string
+          category_id: string
+          event_id: string | null
+          vendor_id: string | null
+          description: string
+          total_amount: number
+          paid_amount: number
+          due_date: string | null
+          notes: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          wedding_id: string
+          category_id: string
+          event_id?: string | null
+          vendor_id?: string | null
+          description: string
+          total_amount: number
+          paid_amount?: number
+          due_date?: string | null
+          notes?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string
+          event_id?: string | null
+          vendor_id?: string | null
+          description?: string
+          total_amount?: number
+          paid_amount?: number
+          due_date?: string | null
+          notes?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_commitments_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_commitments_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "budget_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_commitments_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "wedding_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_commitments_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       budget_categories: {
         Row: {
           id: string
