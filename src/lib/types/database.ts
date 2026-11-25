@@ -901,6 +901,13 @@ export interface Database {
     }
     Views: Record<string, never>
     Functions: {
+      create_guest_rsvp_link: { Args: { p_guest:string }; Returns:string }
+      revoke_guest_rsvp_link: { Args: { p_guest:string }; Returns:undefined }
+      get_guest_rsvp: { Args: { p_token:string }; Returns:Json }
+      submit_guest_rsvp: { Args: { p_token:string; p_event:string; p_response:string }; Returns:boolean }
+      get_wedding_plan_template: { Args: { p_slug?:string|null; p_token?:string|null }; Returns:Json }
+      create_wedding_plan_share: { Args: { p_wedding:string }; Returns:string }
+      apply_wedding_plan_template: { Args: { p_wedding:string; p_slug?:string|null; p_token?:string|null }; Returns:Json }
       create_partner_invitation: { Args: { p_wedding: string; p_email: string }; Returns: string }
       accept_partner_invitation: { Args: { p_token: string }; Returns: string }
       is_admin: { Args: Record<string, never>; Returns: boolean }
