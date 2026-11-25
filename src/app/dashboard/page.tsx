@@ -50,7 +50,7 @@ export default async function DashboardPage() {
   ] = await Promise.all([
     supabase.from('budget_categories').select('*').eq('wedding_id', wedding.id),
     supabase.from('wedding_events').select('*').eq('wedding_id', wedding.id).order('sort_order'),
-    supabase.from('saved_vendors').select('*, vendor:vendors(name, slug, city)').eq('couple_id', user.id),
+    supabase.from('wedding_vendor_shortlist').select('vendor_id,stage').eq('wedding_id', wedding.id),
     supabase.from('inquiries').select('*, vendor:vendors(name, slug)').eq('couple_id', user.id).order('created_at', { ascending: false }).limit(5),
     supabase.from('tasks').select('*').eq('wedding_id', wedding.id).order('sort_order'),
     supabase.from('wedding_members').select('user_id,role').eq('wedding_id', wedding.id),
@@ -313,7 +313,7 @@ export default async function DashboardPage() {
             {[
               { href: '/tasks', label: 'Checklist', icon: CheckSquare },
               { href: '/vendors', label: 'Browse Vendors', icon: Heart },
-              { href: '/saved', label: 'Saved Vendors', icon: Bookmark },
+              { href: '/saved', label: 'Vendor Shortlist', icon: Bookmark },
               { href: '/budget', label: 'Budget', icon: DollarSign },
               { href: '/events', label: 'Events', icon: CalendarDays },
               { href: '/wedding/partner', label: 'Plan Together', icon: Users },

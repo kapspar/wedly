@@ -571,6 +571,48 @@ export interface Database {
           },
         ]
       }
+      wedding_vendor_shortlist: {
+        Row: {
+          wedding_id: string
+          vendor_id: string
+          stage: 'saved' | 'contacted' | 'quoted' | 'booked' | 'declined'
+          quote_amount: number | null
+          notes: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          wedding_id: string
+          vendor_id: string
+          stage?: 'saved' | 'contacted' | 'quoted' | 'booked' | 'declined'
+          quote_amount?: number | null
+          notes?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          stage?: 'saved' | 'contacted' | 'quoted' | 'booked' | 'declined'
+          quote_amount?: number | null
+          notes?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wedding_vendor_shortlist_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wedding_vendor_shortlist_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       saved_vendors: {
         Row: {
           couple_id: string

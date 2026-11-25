@@ -27,11 +27,14 @@ export default function SaveVendorButton({ vendorId, initialSaved, userId }: Pro
     setLoading(true)
     const supabase = createClient()
 
+    const {data:wedding,error:lookupError}=await supabase.from('weddings').select('id').limit(1).maybeSingle()
+    if(lookupError||!wedding){setLoading(false);router.push('/onboarding');return}
+
     if (saved) {
       const { error } = await supabase
-        .from('saved_vendors')
+        .from('wedding_vendor_shortlist')
         .delete()
-        .eq('couple_id', userId)
+        .eq('wedding_id', wedding.id)
         .eq('vendor_id', vendorId)
       if (!error) {
         setSaved(false)
@@ -39,8 +42,8 @@ export default function SaveVendorButton({ vendorId, initialSaved, userId }: Pro
       }
     } else {
       const { error } = await supabase
-        .from('saved_vendors')
-        .insert({ couple_id: userId, vendor_id: vendorId })
+        .from('wedding_vendor_shortlist')
+        .upsert({ wedding_id: wedding.id, vendor_id: vendorId }, {onConflict:'wedding_id,vendor_id',ignoreDuplicates:true})
       if (!error) {
         setSaved(true)
         posthog.capture('vendor_saved')
@@ -64,7 +67,7 @@ export default function SaveVendorButton({ vendorId, initialSaved, userId }: Pro
       )}
     >
       <Bookmark className="h-4 w-4" fill={saved ? 'currentColor' : 'none'} aria-hidden="true" />
-      {saved ? 'Saved' : 'Save'}
+      {saved ? 'Shortlisted' : 'Shortlist'}
     </button>
   )
 }
