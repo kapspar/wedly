@@ -45,12 +45,23 @@ export default async function VendorDashboardPage() {
     <>
       <Navbar />
       <main className="min-h-[70vh] bg-ivory px-4 py-12 sm:py-16">
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-6xl">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">PlanWedly for business</p>
           <h1 className="mt-2 font-[family-name:var(--font-heading)] text-3xl sm:text-4xl text-plum">Your vendor dashboard</h1>
-          <p className="mt-3 text-muted">Manage your verified business listing and keep track of ownership requests.</p>
+          <p className="mt-3 text-muted">Manage your businesses, customer inquiries and ownership requests in one place.</p>
 
-          <div className="mt-9 flex items-center justify-between gap-4">
+          <nav aria-label="Vendor dashboard sections" className="mt-6 flex flex-wrap gap-2 text-sm">
+            {[['My listings', '#listings'], ['Ownership requests', '#claims'], ['New submissions', '#submissions']].map(([label, href]) => <a key={href} href={href} className="rounded-xl border border-border-soft bg-white px-4 py-2 font-medium text-plum hover:underline">{label}</a>)}
+          </nav>
+          <section aria-label="Business overview" className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {[
+              ['My businesses', listingError ? 'Unavailable' : String(listings?.length ?? 0)],
+              ['Published listings', listingError ? 'Unavailable' : String((listings ?? []).filter(v => v.is_published).length)],
+              ['Pending claims', claims ? String(pendingClaims.length) : 'Unavailable'],
+              ['Pending submissions', submissions ? String(submissions.filter(v => v.status === 'pending').length) : 'Unavailable'],
+            ].map(([label, value]) => <div key={label} className="min-w-0 rounded-2xl border border-border-soft bg-white p-4 sm:p-5"><p className="text-xs font-medium text-muted sm:text-sm">{label}</p><p className="mt-2 break-words text-xl font-semibold text-plum sm:text-2xl">{value}</p></div>)}
+          </section>
+          <div id="listings" className="mt-9 flex scroll-mt-24 flex-wrap items-center justify-between gap-4">
             <h2 className="font-[family-name:var(--font-heading)] text-2xl text-plum">My listings</h2>
             <div className="flex flex-wrap items-center gap-4">
               <Link href="/vendors" className="text-sm font-medium text-primary hover:underline">Browse vendors</Link>
@@ -76,6 +87,13 @@ export default async function VendorDashboardPage() {
                   <h3 className="mt-2 font-[family-name:var(--font-heading)] text-xl text-plum">{vendor.name}</h3>
                   <p className="mt-1 text-sm text-muted">{vendor.city} · {vendor.is_published ? 'Published' : 'Unpublished'}</p>
                   <p className="mt-3 text-sm text-muted line-clamp-2">{vendor.description || 'Add a description to introduce your business.'}</p>
+                  <div className="mt-4 rounded-xl border border-border-soft p-3">
+                    <p className="text-xs font-semibold text-plum">Basic profile checklist</p>
+                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-ivory" role="progressbar" aria-label="Basic profile completeness" aria-valuemin={0} aria-valuemax={3} aria-valuenow={[vendor.name, vendor.city, vendor.description].filter(v => v?.trim()).length}>
+                      <div className="h-full rounded-full bg-primary" style={{ width: `${[vendor.name, vendor.city, vendor.description].filter(v => v?.trim()).length / 3 * 100}%` }} />
+                    </div>
+                    <p className="mt-2 text-xs text-muted">{[vendor.name, vendor.city, vendor.description].filter(v => v?.trim()).length} of 3 basic fields completed · Name, city and description</p>
+                  </div>
                   <BillingActions vendorId={vendor.id} status={subscriptions.get(vendor.id) ?? null} enabled={billingEnabled} />
                   <div className="mt-6 flex flex-wrap gap-3">
                     <Link href={`/vendor/dashboard/${vendor.id}`} className="rounded-xl bg-plum px-4 py-2.5 text-sm font-medium text-white">Manage listing</Link>
@@ -89,7 +107,7 @@ export default async function VendorDashboardPage() {
             </div>
           )}
 
-          <h2 className="mt-12 font-[family-name:var(--font-heading)] text-2xl text-plum">Ownership requests</h2>
+          <h2 id="claims" className="mt-12 scroll-mt-24 font-[family-name:var(--font-heading)] text-2xl text-plum">Ownership requests</h2>
           {pendingClaims.length ? (
             <div className="mt-4 space-y-3">
               {pendingClaims.map(claim => {
@@ -104,7 +122,7 @@ export default async function VendorDashboardPage() {
               })}
             </div>
           ) : <p className="mt-3 text-sm text-muted">No pending ownership requests.</p>}
-          <h2 className="mt-12 font-[family-name:var(--font-heading)] text-2xl text-plum">New business submissions</h2>
+          <h2 id="submissions" className="mt-12 scroll-mt-24 font-[family-name:var(--font-heading)] text-2xl text-plum">New business submissions</h2>
           {(submissions ?? []).length ? (
             <div className="mt-4 space-y-3">
               {submissions!.map(item => (
