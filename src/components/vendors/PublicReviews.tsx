@@ -30,8 +30,8 @@ function Stars({ rating }: { rating: number }) {
   </span>
 }
 
-export default function PublicReviews({reviews,count,average,slug}:{
-  reviews:PublicReview[];count:number;average:number|null;slug:string
+export default function PublicReviews({reviews,count,average,slug,readOnly=false}:{
+  reviews:PublicReview[];count:number;average:number|null;slug:string;readOnly?:boolean
 }) {
   return <Card className="p-6 sm:p-8" >
     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -39,7 +39,7 @@ export default function PublicReviews({reviews,count,average,slug}:{
         <h2 className="font-[family-name:var(--font-heading)] text-xl text-ink">Customer Reviews</h2>
         <p className="mt-1 text-xs text-muted">Only moderated, approved reviews are shown.</p>
       </div>
-      <Link href={`/vendor/${slug}/review`} className="rounded-lg border border-primary px-3 py-2 text-xs font-semibold text-primary hover:bg-primary-soft/30">Leave a Review</Link>
+      {!readOnly && <Link href={`/vendor/${slug}/review`} className="rounded-lg border border-primary px-3 py-2 text-xs font-semibold text-primary hover:bg-primary-soft/30">Leave a Review</Link>}
     </div>
     {count===0?<p className="mt-5 text-sm text-muted">No approved customer reviews yet.</p>:<>
       <div className="mt-5 flex items-center gap-3">
@@ -59,7 +59,7 @@ export default function PublicReviews({reviews,count,average,slug}:{
               {([['Communication',review.communication_rating],['Quality',review.quality_rating],['Value',review.value_rating],['Reliability',review.reliability_rating]] as const).filter(([,v])=>v!==null).map(([label,value])=>
                 <span key={label} className="rounded-full bg-primary-soft/40 px-2 py-1 text-xs text-muted">{label}: {value}/5</span>)}
             </div>}
-          <ReportReview reviewId={review.id}/>
+          {!readOnly && <ReportReview reviewId={review.id}/>}
           {review.response_status==='approved'&&review.vendor_response&&<div className="mt-4 rounded-lg border-l-2 border-primary bg-primary-soft/20 p-3">
             <p className="text-xs font-semibold text-plum">Response from the business</p>
             <p className="mt-2 whitespace-pre-line text-sm text-ink">{review.vendor_response}</p>

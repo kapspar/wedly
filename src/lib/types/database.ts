@@ -571,6 +571,7 @@ export interface Database {
           id: string
           vendor_id: string
           storage_path: string
+          storage_bucket: string
           alt_text: string | null
           sort_order: number
           created_at: string
@@ -579,6 +580,7 @@ export interface Database {
           id?: string
           vendor_id: string
           storage_path: string
+          storage_bucket?: string
           alt_text?: string | null
           sort_order?: number
           created_at?: string
@@ -909,6 +911,8 @@ export interface Database {
     }
     Views: Record<string, never>
     Functions: {
+      attach_vendor_photo: { Args: { p_vendor_id: string; p_owner_id: string; p_slot: number; p_path: string }; Returns: string | null }
+      reorder_vendor_portfolio: { Args: { p_vendor_id: string; p_owner_id: string; p_current: string[]; p_order: string[] }; Returns: string }
       create_guest_rsvp_link: { Args: { p_guest:string }; Returns:string }
       revoke_guest_rsvp_link: { Args: { p_guest:string }; Returns:undefined }
       get_guest_rsvp: { Args: { p_token:string }; Returns:Json }
