@@ -333,7 +333,7 @@ export default function OnboardingPage() {
                   Wedding Events
                 </h2>
                 <p className="text-sm text-muted mt-1">
-                  Choose the celebrations you want to include. We've suggested options for your wedding tradition.
+                  Choose the celebrations you want to include. We&apos;ve suggested options for your wedding tradition.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-3">

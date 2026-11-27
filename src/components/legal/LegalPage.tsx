@@ -46,7 +46,7 @@ export default function LegalPage({
             </div>
           </section>)}
         </div>
-        <p className="mt-8 text-xs leading-6 text-muted">This page describes PlanWedly's current service. If you have questions, contact us using the details above. See the other legal page for related information.</p>
+        <p className="mt-8 text-xs leading-6 text-muted">This page describes PlanWedly&apos;s current service. If you have questions, contact us using the details above. See the other legal page for related information.</p>
       </div>
     </main>
     <Footer />

@@ -54,7 +54,7 @@ export default function ReviewSubmissionForm({ vendorId }: { vendorId: string })
       <label className="block text-sm text-ink">Optional proof of service (private)
         <input name="evidence" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="mt-2 block w-full text-sm" />
       </label>
-      <p className="text-xs text-muted">Evidence is accessible to authorized PlanWedly reviewers only, not vendors or the public. Remove addresses, signatures, account numbers and other sensitive information before uploading. Maximum 5 MB. Please do not upload someone else's personal information without their permission.</p>
+      <p className="text-xs text-muted">Evidence is accessible to authorized PlanWedly reviewers only, not vendors or the public. Remove addresses, signatures, account numbers and other sensitive information before uploading. Maximum 5 MB. Please do not upload someone else&apos;s personal information without their permission.</p>
       {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
       {message && <p role="status" className="text-sm text-green-700">{message}</p>}
       <button disabled={busy || !!message} type="submit" className="rounded-xl bg-plum px-6 py-3 text-sm font-semibold text-white disabled:opacity-50">{busy?'Submitting…':'Submit review for moderation'}</button>

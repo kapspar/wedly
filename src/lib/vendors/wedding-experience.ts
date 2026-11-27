@@ -28,6 +28,7 @@ export function experienceFields(slug: string) {
 
 export type ExperienceCategory = { id: string; name: string; slug: string }
 export type WeddingExperience = {
+  traditions: string[]
   cultures: string[]
   ceremonies: string[]
   notes: string

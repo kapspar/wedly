@@ -1,5 +1,7 @@
 'use client'
 
+import { safeRedirect } from '@/lib/auth/redirect'
+
 import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -11,8 +13,7 @@ import Input from '@/components/ui/Input'
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const rawRedirect = searchParams.get('redirect') || '/dashboard'
-  const redirect = rawRedirect.startsWith('/') && !rawRedirect.startsWith('//') && !rawRedirect.includes('\\') ? rawRedirect : '/dashboard'
+  const redirect = safeRedirect(searchParams.get('redirect'))
   const authError = searchParams.get('error')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')

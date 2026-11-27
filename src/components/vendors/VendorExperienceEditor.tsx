@@ -8,7 +8,9 @@ import {
   type ExperienceCategory, type WeddingExperience,
 } from '@/lib/vendors/wedding-experience'
 
-const emptyExperience: WeddingExperience = { cultures: [], ceremonies: [], notes: '', category_details: {} }
+import { selectedTraditions, weddingTraditions } from '@/lib/vendors/traditions'
+
+const emptyExperience: WeddingExperience = { traditions: [], cultures: [], ceremonies: [], notes: '', category_details: {} }
 const fieldClass = 'w-full rounded-xl border border-border-soft px-3 py-2.5 text-base text-ink'
 
 export default function VendorExperienceEditor({ vendorId, categories, initial }: {
@@ -20,7 +22,7 @@ export default function VendorExperienceEditor({ vendorId, categories, initial }
   const [experience, setExperience] = useState(initial ?? emptyExperience)
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
 
-  function toggle(group: 'cultures' | 'ceremonies', value: string) {
+  function toggle(group: 'traditions' | 'cultures' | 'ceremonies', value: string) {
     setExperience(previous => ({
       ...previous,
       [group]: previous[group].includes(value)
@@ -41,6 +43,7 @@ export default function VendorExperienceEditor({ vendorId, categories, initial }
       }))
       const { error } = await db.from('vendor_wedding_experience').upsert({
         vendor_id: vendorId,
+        traditions: selectedTraditions(experience.traditions).map(([key]) => key),
         cultures: experienceOptions('cultures', experience.cultures),
         ceremonies: experienceOptions('ceremonies', experience.ceremonies),
         notes: experience.notes.trim(),
@@ -56,8 +59,19 @@ export default function VendorExperienceEditor({ vendorId, categories, initial }
   return (
     <form id="experience" onSubmit={save} className="mt-6 scroll-mt-24 rounded-2xl border border-border-soft bg-white p-4 sm:p-8">
       <h2 className="font-[family-name:var(--font-heading)] text-xl text-plum">Wedding experience</h2>
-      <p className="mt-2 text-sm text-muted">Select the cultures and ceremonies you’ve worked with. Couples will see this on your published listing.</p>
+      <p className="mt-2 text-sm text-muted">Select the wedding traditions you’ve worked with. Couples can filter by specific traditions and see them on your published listing.</p>
       <fieldset disabled={status === 'saving'} className="mt-5 min-w-0 space-y-6">
+        <fieldset className="min-w-0">
+          <legend className="mb-2 font-medium text-ink">Specific wedding traditions</legend>
+          <div className="flex flex-wrap gap-2">
+            {weddingTraditions.map(([key, label]) => (
+              <label key={key} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-border-soft px-3 text-sm text-ink has-checked:bg-primary-soft/50">
+                <input type="checkbox" checked={experience.traditions.includes(key)} onChange={() => toggle('traditions', key)} />
+                {label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
         {(Object.keys(weddingExperienceOptions) as ('cultures' | 'ceremonies')[]).map(group => (
           <fieldset key={group}>
             <legend className="mb-2 font-medium text-ink">{group === 'cultures' ? 'Cultural traditions' : 'Religious and ceremony traditions'}</legend>
