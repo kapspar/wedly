@@ -11,6 +11,7 @@ import SaveVendorButton from '@/components/vendors/SaveVendorButton'
 import VendorAnalytics from '@/components/analytics/VendorAnalytics'
 import PublicReviews, { type PublicReview } from '@/components/vendors/PublicReviews'
 import { billingAdmin } from '@/lib/billing/stripe'
+import { galleryStart, httpsLink, photoSrc } from '@/lib/vendors/portfolio'
 import { vendorEntitlements } from '@/lib/vendors/entitlements'
 import ListingBadges from '@/components/vendors/ListingBadges'
 import VendorAvailabilityCalendar from '@/components/vendors/VendorAvailabilityCalendar'
@@ -20,15 +21,18 @@ import type { Metadata } from 'next'
 
 interface Props {
   params: Promise<{ slug: string }>
+  searchParams: Promise<{ preview?: string }>
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+  if ((await searchParams).preview === '1') return { title: 'Listing preview — PlanWedly', robots: { index: false, follow: false } }
   const { slug } = await params
   const supabase = await createClient()
   const { data: vendor } = await supabase
     .from('vendors')
     .select('name, description, city')
     .eq('slug', slug)
+    .eq('is_published', true)
     .single()
   if (!vendor) return { title: 'Vendor Not Found' }
   return {
@@ -37,18 +41,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function VendorPage({ params }: Props) {
+export default async function VendorPage({ params, searchParams }: Props) {
   const { slug } = await params
+  const preview = (await searchParams).preview === '1'
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (preview && !user) notFound()
 
-  // Fetch the listing independently of embedded PostgREST relationships.
-  // A broken relationship must never turn a published vendor into a 404.
-  const { data: vendor, error: vendorError } = await supabase
-    .from('vendors')
-    .select('*')
-    .eq('slug', slug)
-    .eq('is_published', true)
-    .maybeSingle()
+  // Keep the vendor lookup independent of optional relationships.
+  const query = supabase.from('vendors').select('*').eq('slug', slug)
+  const { data: vendor, error: vendorError } = await (preview
+    ? query.eq('claimed_by', user!.id).eq('is_claimed', true)
+    : query.eq('is_published', true)).maybeSingle()
 
   if (vendorError) console.error('Vendor detail lookup failed:', vendorError.code, vendorError.message)
   if (!vendor) notFound()
@@ -73,18 +77,16 @@ export default async function VendorPage({ params }: Props) {
     }
   }
 
-  const { data: photos } = await supabase
-    .from('vendor_photos')
-    .select('*')
-    .eq('vendor_id', vendor.id)
-    .order('sort_order')
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const listingBadges = (await vendorEntitlements([vendor])).get(vendor.id)
+  const { data: photos } = await supabase.from('vendor_photos')
+    .select('id,storage_path,storage_bucket,alt_text,sort_order').eq('vendor_id', vendor.id).lt('sort_order', galleryStart)
+  const { data: galleryPhotos } = listingBadges?.premiumPreview
+    ? await billingAdmin().from('vendor_photos').select('id,storage_path,storage_bucket,alt_text,sort_order')
+      .eq('vendor_id', vendor.id).gte('sort_order', galleryStart).order('sort_order')
+    : { data: null }
 
   let isSaved = false
-  if (user) {
+  if (user && !preview) {
     const {data:wedding}=await supabase.from('weddings').select('id').limit(1).maybeSingle()
     if(wedding){
       const {data:saved}=await supabase.from('wedding_vendor_shortlist')
@@ -95,12 +97,7 @@ export default async function VendorPage({ params }: Props) {
 
   const category = categoryRow ?? { id: vendor.category_id, name: 'Vendors', slug: '', icon: null }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
-
-  function getPhotoUrl(storagePath: string) {
-    return `${supabaseUrl}/storage/v1/object/public/vendor-photos/${storagePath}`
-  }
-
+  const website = httpsLink(vendor.website_url) ?? (/^http:\/\//i.test(vendor.website_url ?? '') ? vendor.website_url : null)
   const socialLinks = [
     { key: 'instagram', label: 'Instagram', url: vendor.instagram_url },
     { key: 'tiktok', label: 'TikTok', url: vendor.tiktok_url },
@@ -110,14 +107,15 @@ export default async function VendorPage({ params }: Props) {
     { key: 'snapchat', label: 'Snapchat', url: vendor.snapchat_url },
     { key: 'linkedin', label: 'LinkedIn', url: vendor.linkedin_url },
     { key: 'whatsapp', label: 'WhatsApp', url: vendor.whatsapp_url },
-  ].filter((link) => link.url && /^https:\/\//i.test(link.url))
+  ].flatMap(link => {
+    const url = httpsLink(link.url)
+    return url ? [{ ...link, url }] : []
+  })
 
   const directoryPhoto = photos?.find(photo => photo.sort_order === 0)
   const logoPhoto = photos?.find(photo => photo.sort_order === 1)
   const bannerPhoto = photos?.find(photo => photo.sort_order === 2) ?? directoryPhoto
-  const galleryPhotos = photos?.filter(photo => photo.sort_order > 2) ?? []
   const hasPhotos = !!bannerPhoto
-  const listingBadges = (await vendorEntitlements([{ id: vendor.id, claimed_by: vendor.claimed_by, is_claimed: vendor.is_claimed }])).get(vendor.id)
 
   const today=new Date().toISOString().slice(0,10)
   const {data:calendarEntries}=listingBadges?.premiumPreview?await billingAdmin().from('vendor_availability')
@@ -153,8 +151,13 @@ export default async function VendorPage({ params }: Props) {
   return (
     <>
       <Navbar />
-      <VendorAnalytics vendorId={vendor.id} />
-      <main className="flex-1">
+      {!preview && <VendorAnalytics vendorId={vendor.id} />}
+      {preview && <aside className="flex flex-wrap items-center justify-center gap-x-4 bg-plum px-4 py-3 text-sm text-white">
+        <span>{vendor.is_published ? 'Public listing preview' : 'Unpublished listing preview'}</span>
+        <Link className="inline-flex min-h-11 items-center font-semibold underline" href={`/vendor/dashboard/${vendor.id}`}>Back to editor</Link>
+        {vendor.is_published && <Link className="inline-flex min-h-11 items-center font-semibold underline" href={`/vendor/${vendor.slug}`}>Open live listing</Link>}
+      </aside>}
+      <main className="flex-1 [overflow-wrap:anywhere]">
         {/* Hero banner */}
         <div className="relative">
           <div
@@ -167,7 +170,7 @@ export default async function VendorPage({ params }: Props) {
             {bannerPhoto ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
-                src={getPhotoUrl(bannerPhoto.storage_path)}
+                src={photoSrc(bannerPhoto)}
                 alt={bannerPhoto.alt_text ?? vendor.name}
                 className="w-full h-full object-cover"
               />
@@ -187,7 +190,7 @@ export default async function VendorPage({ params }: Props) {
                 <div>
                   {logoPhoto && (
                     /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={getPhotoUrl(logoPhoto.storage_path)} alt={`${vendor.name} logo`}
+                    <img src={photoSrc(logoPhoto)} alt={`${vendor.name} logo`}
                       className="mb-4 h-20 w-20 rounded-2xl border border-border-soft bg-white object-contain p-1" />
                   )}
                   <Link
@@ -221,7 +224,7 @@ export default async function VendorPage({ params }: Props) {
                     )}
                   </div>
                 </div>
-                <div className="flex flex-col items-start sm:items-end gap-3">
+                {!preview && <div className="flex flex-col items-start sm:items-end gap-3">
                   <SaveVendorButton vendorId={vendor.id} initialSaved={isSaved} userId={user?.id} />
                   {user && vendor.claimed_by !== user.id && (
                     <Link href={`/vendor/${vendor.slug}/review`}
@@ -237,7 +240,7 @@ export default async function VendorPage({ params }: Props) {
                       Claim This Business
                     </Link>
                   )}
-                </div>
+                </div>}
               </div>
             </Card>
           </div>
@@ -261,7 +264,7 @@ export default async function VendorPage({ params }: Props) {
               )}
 
               {/* Gallery */}
-              {listingBadges?.premiumPreview && galleryPhotos.length > 0 && (
+              {listingBadges?.premiumPreview && galleryPhotos && galleryPhotos.length > 0 && (
                 <Card className="p-6 sm:p-8">
                   <h2 className="font-[family-name:var(--font-heading)] text-xl text-ink mb-5">
                     Gallery
@@ -276,7 +279,7 @@ export default async function VendorPage({ params }: Props) {
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={getPhotoUrl(photo.storage_path)}
+                          src={photoSrc(photo)}
                           alt={photo.alt_text ?? `${vendor.name} photo ${idx + 1}`}
                           className="w-full h-full object-cover"
                           loading={idx === 0 ? 'eager' : 'lazy'}
@@ -292,10 +295,10 @@ export default async function VendorPage({ params }: Props) {
               {listingBadges?.premiumPreview && !!calendarEntries?.length && <VendorAvailabilityCalendar initialEntries={calendarEntries} />}
 
               {/* Only PlanWedly-moderated reviews; no public ratings for fewer than three. */}
-              <PublicReviews reviews={publicReviews} count={approvedReviewCount} average={publicRatingAverage} slug={vendor.slug} />
+              <PublicReviews reviews={publicReviews} count={approvedReviewCount} average={publicRatingAverage} slug={vendor.slug} readOnly={preview} />
 
               {/* Inquiry Form */}
-              <Card className="p-6 sm:p-8">
+              {!preview && <Card className="p-6 sm:p-8">
                 <h2 className="font-[family-name:var(--font-heading)] text-xl text-ink mb-2">
                   Send an Inquiry
                 </h2>
@@ -308,7 +311,7 @@ export default async function VendorPage({ params }: Props) {
                   vendorSlug={vendor.slug}
                   userId={user?.id}
                 />
-              </Card>
+              </Card>}
             </div>
 
             {/* Sidebar */}
@@ -319,9 +322,9 @@ export default async function VendorPage({ params }: Props) {
                   Contact
                 </h3>
                 <div className="space-y-3">
-                  {vendor.website_url && (
+                  {website && (
                     <a
-                      href={vendor.website_url}
+                      href={website}
                       data-analytics-outbound="website"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -353,7 +356,7 @@ export default async function VendorPage({ params }: Props) {
                   {socialLinks.map(link => (
                     <a
                       key={link.key}
-                      href={link.url!}
+                      href={link.url}
                       data-analytics-outbound={link.key}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -364,7 +367,7 @@ export default async function VendorPage({ params }: Props) {
                       <ExternalLink className="h-3 w-3 opacity-40 group-hover:opacity-100 flex-shrink-0" />
                     </a>
                   ))}
-                  {!vendor.website_url && !vendor.phone && !vendor.email && socialLinks.length === 0 && (
+                  {!website && !vendor.phone && !vendor.email && socialLinks.length === 0 && (
                     <p className="text-sm text-muted">
                       Use the inquiry form below to get in touch.
                     </p>

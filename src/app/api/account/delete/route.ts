@@ -121,15 +121,16 @@ export async function POST(request: Request) {
     // owner-only business content before returning listings to unclaimed state.
     if(ids.length) {
       const {data:photos,error:photoError}=await admin.from('vendor_photos')
-        .select('storage_path').in('vendor_id',ids).limit(1000)
+        .select('storage_path,storage_bucket').in('vendor_id',ids).limit(1000)
       if(photoError) throw photoError
       if((photos??[]).length===1000) return NextResponse.json({
         error:'Your business has too many photos for automatic cleanup. Contact support.'
       },{status:409})
-      const photoPaths=(photos??[]).map(p=>p.storage_path)
-      if(photoPaths.length) {
-        const {error}=await admin.storage.from('vendor-photos').remove(photoPaths)
-        if(error) throw error
+      for (const bucket of ['vendor-photos', 'vendor-portfolio']) {
+        const paths = (photos ?? []).filter(photo => photo.storage_bucket === bucket).map(photo => photo.storage_path)
+        if (!paths.length) continue
+        const { error } = await admin.storage.from(bucket).remove(paths)
+        if (error) throw error
       }
     }
 

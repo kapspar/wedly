@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type FormEvent } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
   categoryExperienceEntries, experienceFields, experienceOptions, weddingExperienceOptions,
@@ -15,6 +16,7 @@ export default function VendorExperienceEditor({ vendorId, categories, initial }
   categories: ExperienceCategory[]
   initial: WeddingExperience | null
 }) {
+  const router = useRouter()
   const [experience, setExperience] = useState(initial ?? emptyExperience)
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
 
@@ -45,6 +47,7 @@ export default function VendorExperienceEditor({ vendorId, categories, initial }
         category_details,
       }, { onConflict: 'vendor_id' })
       setStatus(error ? 'error' : 'saved')
+      if (!error) router.refresh()
     } catch {
       setStatus('error')
     }
