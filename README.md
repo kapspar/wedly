@@ -184,3 +184,7 @@ The site uses a unified ivory-and-plum design system defined in `src/app/globals
 - Historical `rose-gold`, `peach` and `sage` CSS utilities are mapped to the new palette for backward compatibility; migrate to semantic tokens when touching pages.
 
 For visual QA, check the homepage, signup/login, onboarding, dashboard, budget, events, tasks, saved vendors, vendor directory/detail and admin screens at mobile and desktop widths. Do not infer feature completion from this design refresh.
+
+### Public vendor map
+
+The public map is off by default. Set the server-side environment variable `PUBLIC_VENDOR_MAP_ENABLED=true` and redeploy to restore the map route and directory link. With the flag off, `/vendors/map` redirects to `/vendors` before loading map data or Google Maps.

@@ -4,6 +4,7 @@ import { MessageSquare } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import { weddingDateLabel } from '@/lib/vendors/inbox'
 import Card from '@/components/ui/Card'
 
 export const metadata = { title: 'My Inquiries' }
@@ -70,16 +71,14 @@ export default async function InquiriesPage() {
                       </span>
                     </div>
                     <p className="text-sm text-muted">{inq.message}</p>
-                    <div className="flex gap-4 mt-3 text-xs text-muted">
+                    <div className="mt-3 flex flex-wrap gap-4 break-words text-xs text-muted">
                       {inq.event_date && (
                         <span>
                           Event:{' '}
-                          {new Date(inq.event_date).toLocaleDateString('en-CA', {
-                            month: 'short',
-                            day: 'numeric',
-                          })}
+                          {weddingDateLabel(inq.event_date)}
                         </span>
                       )}
+                      {inq.event_location && <span>{inq.event_location}</span>}
                       {inq.guest_count && <span>{inq.guest_count} guests</span>}
                     </div>
                   </Card>
