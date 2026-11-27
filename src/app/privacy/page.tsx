@@ -25,14 +25,14 @@ export default function PrivacyPolicyPage() {
         <li><strong>Inquiries:</strong> messages sent to a particular vendor, wedding dates, guest counts and optional service budget information you decide to share.</li>
         <li><strong>Reviews and moderation:</strong> ratings, written reviews, dates of service, optional supporting documents, business responses, reports and moderation outcomes.</li>
         <li><strong>Usage and technical information:</strong> interactions with pages, vendor profile views and outbound clicks, basic browser/device information, and information collected through cookies or comparable technologies where enabled.</li>
-        <li><strong>Billing information:</strong> subscription status, identifiers and invoices or other transaction records made available to us by our payment processor. Payment-card details are handled by the processor, not entered into PlanWedly's own forms.</li>
+        <li><strong>Billing information:</strong> subscription status, identifiers and invoices or other transaction records made available to us by our payment processor. Payment-card details are handled by the processor, not entered into PlanWedly&apos;s own forms.</li>
       </ul>
     </>},
     {id:'google-sign-in',title:'Google sign-in and Google user data',body:<>
-      <p>If you choose <strong>Continue with Google</strong>, Google authenticates you and may provide PlanWedly, through our authentication provider, with your Google account identifier, email address, name, profile image and email-verification status, depending on the permissions you grant and Google's response.</p>
+      <p>If you choose <strong>Continue with Google</strong>, Google authenticates you and may provide PlanWedly, through our authentication provider, with your Google account identifier, email address, name, profile image and email-verification status, depending on the permissions you grant and Google&apos;s response.</p>
       <p>We use this information to create or connect your PlanWedly account, sign you in, identify your account and personalize basic profile details. <strong>PlanWedly does not need access to your Gmail messages, Google Drive files, contacts or calendar events for Google sign-in.</strong> Connecting a calendar in a future feature would require a separate permission flow and updated disclosure.</p>
       <p>We do not sell Google sign-in profile data or use it for advertising targeting. We share the necessary authentication information with our authentication and hosting service providers to operate sign-in, not with wedding vendors merely because you used Google to log in. We do not use Google user data to train generalized AI models.</p>
-      <p>You can manage a Google account's third-party connections in your Google settings and can request deletion of your PlanWedly account separately. Removing Google access alone does not automatically erase PlanWedly's account records.</p>
+      <p>You can manage a Google account&apos;s third-party connections in your Google settings and can request deletion of your PlanWedly account separately. Removing Google access alone does not automatically erase PlanWedly&apos;s account records.</p>
     </>},
     {id:'how-used',title:'How we use information',body:<>
       <ul>
@@ -54,7 +54,7 @@ export default function PrivacyPolicyPage() {
         <li><strong>Service providers</strong> assist with authentication and data hosting (Supabase), website delivery (Vercel), analytics (including PostHog), Google sign-in (Google) and payment processing (Stripe). An email delivery provider may also process your address when transactional email is configured.</li>
         <li><strong>Legal or safety purposes:</strong> information may be disclosed when required by law, to protect rights or safety, or to investigate misuse, subject to applicable legal requirements.</li>
       </ul>
-      <p>We do not sell couples' personal information or private Google sign-in data to vendors or advertisers. Business listings may include publicly provided professional contact details.</p>
+      <p>We do not sell couples&apos; personal information or private Google sign-in data to vendors or advertisers. Business listings may include publicly provided professional contact details.</p>
     </>},
     {id:'cookies-analytics',title:'Cookies and analytics',body:<>
       <p>PlanWedly uses necessary session and authentication storage to keep accounts signed in. It also offers controls for analytics technologies, including PostHog, where those controls are presented. Some vendor-engagement metrics count an approximate browser-tab session once per vendor, day and interaction; these are not a guarantee of unique visitors.</p>

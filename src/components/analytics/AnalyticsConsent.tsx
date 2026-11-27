@@ -1,32 +1,50 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import posthog from 'posthog-js'
 
 const CONSENT_KEY = 'planwedly-analytics-consent'
 
 type ConsentChoice = 'accepted' | 'declined' | null
 
+const consentChanged = 'planwedly-analytics-consent-changed'
+
+function subscribe(listener: () => void) {
+  window.addEventListener('storage', listener)
+  window.addEventListener(consentChanged, listener)
+  return () => {
+    window.removeEventListener('storage', listener)
+    window.removeEventListener(consentChanged, listener)
+  }
+}
+
+function consentSnapshot(): ConsentChoice {
+  try {
+    const stored = window.localStorage.getItem(CONSENT_KEY)
+    return stored === 'accepted' || stored === 'declined' ? stored : null
+  } catch {
+    return null
+  }
+}
+
 export default function AnalyticsConsent() {
-  const [choice, setChoice] = useState<ConsentChoice>(null)
-  const [ready, setReady] = useState(false)
+  const stored = useSyncExternalStore<ConsentChoice | 'pending'>(subscribe, consentSnapshot, () => 'pending')
+  const [sessionChoice, setSessionChoice] = useState<ConsentChoice>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const choice = stored === 'pending' ? null : stored ?? sessionChoice
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(CONSENT_KEY)
-    if (stored === 'accepted') {
-      setChoice('accepted')
-      posthog.opt_in_capturing()
-    } else if (stored === 'declined') {
-      setChoice('declined')
-      posthog.opt_out_capturing()
-    }
-    setReady(true)
-  }, [])
+    if (choice === 'accepted' && !posthog.has_opted_in_capturing()) posthog.opt_in_capturing()
+    if (choice === 'declined' && !posthog.has_opted_out_capturing()) posthog.opt_out_capturing()
+  }, [choice])
 
   function choose(next: Exclude<ConsentChoice, null>) {
-    window.localStorage.setItem(CONSENT_KEY, next)
-    setChoice(next)
+    try {
+      window.localStorage.setItem(CONSENT_KEY, next)
+      window.dispatchEvent(new Event(consentChanged))
+    } catch {
+      setSessionChoice(next)
+    }
     setSettingsOpen(false)
     if (next === 'accepted') {
       posthog.opt_in_capturing()
@@ -36,7 +54,7 @@ export default function AnalyticsConsent() {
     }
   }
 
-  if (!ready) return null
+  if (stored === 'pending') return null
 
   return (
     <>
@@ -44,7 +62,7 @@ export default function AnalyticsConsent() {
         <button
           type="button"
           onClick={() => setSettingsOpen(true)}
-          className="fixed bottom-3 left-3 z-[100] rounded-full border border-[#EADCE9] bg-white px-3 py-1.5 text-xs text-[#563454] shadow-sm hover:shadow-md"
+          className="m-3 w-fit rounded-full sm:fixed sm:bottom-3 sm:left-3 sm:z-[100] border border-[#EADCE9] bg-white px-3 py-1.5 text-xs text-[#563454] shadow-sm hover:shadow-md"
         >
           Analytics settings
         </button>
@@ -54,7 +72,7 @@ export default function AnalyticsConsent() {
           role="dialog"
           aria-label="Analytics preferences"
           aria-modal="false"
-          className="fixed bottom-4 left-4 right-4 z-[100] mx-auto max-w-xl rounded-2xl border border-[#EADCE9] bg-white p-5 shadow-xl"
+          className="m-4 max-w-xl sm:fixed sm:bottom-4 sm:left-4 sm:right-4 sm:z-[100] sm:mx-auto rounded-2xl border border-[#EADCE9] bg-white p-5 shadow-xl"
         >
           <h2 className="mb-2 text-base font-semibold text-[#563454]">Help us improve PlanWedly</h2>
           <p className="mb-4 text-sm text-gray-700">

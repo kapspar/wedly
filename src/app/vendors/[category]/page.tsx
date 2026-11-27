@@ -1,3 +1,5 @@
+import VendorTraditionFilter from '@/components/vendors/VendorTraditionFilter'
+import { directoryHref, directoryPattern, directorySearch, traditionFilter } from '@/lib/vendors/traditions'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
@@ -13,7 +15,7 @@ import type { Metadata } from 'next'
 
 interface Props {
   params: Promise<{ category: string }>
-  searchParams: Promise<{ q?: string; city?: string; service?: string }>
+  searchParams: Promise<{ q?: string; city?: string; service?: string; tradition?: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -52,8 +54,13 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     }else serviceIds=[]
   }
   const matchingIds=serviceIds===null?memberIds:memberIds.filter(id=>serviceIds.includes(id))
-  let vendorQuery = supabase
-    .from('vendors')
+  const tradition = traditionFilter(sp.tradition)
+  const q = directorySearch(sp.q)
+  const cityPattern = directoryPattern(sp.city)
+  const source = () => tradition
+    ? supabase.rpc('vendors_with_tradition', { p_tradition: tradition })
+    : supabase.from('vendors')
+  let vendorQuery = source()
     .select('*, vendor_categories!vendors_category_id_fkey(name), vendor_photos(storage_path,sort_order)')
     .in('id',matchingIds.length ? matchingIds : ['00000000-0000-0000-0000-000000000000'])
     .eq('is_published', true)
@@ -61,15 +68,8 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     .order('priority')
     .order('name')
 
-  if (sp.q) {
-    const q = sp.q.replace(/[%_]/g, '\\$&')
-    vendorQuery = vendorQuery.or(
-      `name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`
-    )
-  }
-  if (sp.city) {
-    vendorQuery = vendorQuery.ilike('city', `%${sp.city}%`)
-  }
+  if (q) vendorQuery = vendorQuery.or(q)
+  if (cityPattern) vendorQuery = vendorQuery.ilike('city', cityPattern)
 
   const { data: queriedVendors, error: vendorError } = await vendorQuery
   // Keep listings discoverable if a nested photo/category relationship fails.
@@ -78,17 +78,19 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     console.error('Vendor directory query failed:', vendorError.code, vendorError.message)
   }
   let vendors = queriedVendors
+  let loadFailed = false
   if (vendorError) {
-    let fallbackQuery = supabase.from('vendors').select('*')
+    let fallbackQuery = source().select('*')
       .eq('is_published', true)
       .order('is_featured', { ascending: false })
       .order('priority')
       .order('name')
       .in('id', matchingIds.length ? matchingIds : ['00000000-0000-0000-0000-000000000000'])
-    if (sp.q) { const q = sp.q.replace(/[%_]/g, '\\$&'); fallbackQuery = fallbackQuery.or(`name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`) }
-    if (sp.city) fallbackQuery = fallbackQuery.ilike('city', `%${sp.city}%`)
+    if (q) fallbackQuery = fallbackQuery.or(q)
+    if (cityPattern) fallbackQuery = fallbackQuery.ilike('city', cityPattern)
     const fallback = await fallbackQuery
     if (fallback.error) console.error('Vendor directory fallback failed:', fallback.error.code, fallback.error.message)
+    loadFailed = !!fallback.error
     vendors = fallback.data as typeof queriedVendors
   }
 
@@ -103,7 +105,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         <div className="bg-gradient-to-b from-primary-soft/60 to-ivory py-10 sm:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Link
-              href="/vendors"
+              href={directoryHref('/vendors', { q: sp.q, city: sp.city, tradition })}
               className="inline-flex items-center gap-1 text-sm text-muted hover:text-ink mb-4"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -121,21 +123,23 @@ export default async function CategoryPage({ params, searchParams }: Props) {
               <p className="text-muted mb-6 max-w-lg">{cat.description}</p>
             )}
             <div className="max-w-xl">
-              <VendorSearch basePath={`/vendors/${category}`} initialQuery={sp.q} />
+              <VendorSearch basePath={`/vendors/${category}`} initialQuery={typeof sp.q === 'string' ? sp.q : ''} filters={{ city: sp.city, service: sp.service, tradition }} />
             </div>
           </div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {(services??[]).length>0&&<div className="mb-6 flex flex-wrap gap-2">
-            <Link href={`/vendors/${category}`} className={`rounded-full px-3 py-2 text-sm ${!sp.service?'bg-primary text-white':'bg-white text-muted'}`}>All services</Link>
-            {services?.map(service=><Link key={service.id} href={`/vendors/${category}?service=${encodeURIComponent(service.slug)}`} className={`rounded-full px-3 py-2 text-sm ${sp.service===service.slug?'bg-primary text-white':'bg-white text-muted'}`}>{service.name}</Link>)}
+            <Link href={directoryHref(`/vendors/${category}`, { q: sp.q, city: sp.city, tradition })} className={`rounded-full px-3 py-2 text-sm ${!sp.service?'bg-primary text-white':'bg-white text-muted'}`}>All services</Link>
+            {services?.map(service=><Link key={service.id} href={directoryHref(`/vendors/${category}`, { q: sp.q, city: sp.city, tradition, service: service.slug })} className={`rounded-full px-3 py-2 text-sm ${sp.service===service.slug?'bg-primary text-white':'bg-white text-muted'}`}>{service.name}</Link>)}
           </div>}
+          <VendorTraditionFilter key={tradition ?? 'all'} path={`/vendors/${category}`} tradition={tradition} filters={{ q: sp.q, city: sp.city, service: sp.service }} />
+
           {/* City filter */}
           {cities.length > 1 && (
             <div className="flex flex-wrap gap-2 mb-6">
               <Link
-                href={sp.q ? `/vendors/${category}?q=${encodeURIComponent(sp.q)}` : `/vendors/${category}`}
+                href={directoryHref(`/vendors/${category}`, { q: sp.q, service: sp.service, tradition })}
                 className={cn(
                   'px-3 py-1 rounded-full text-xs transition-colors',
                   !sp.city
@@ -148,7 +152,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
               {cities.map((city) => (
                 <Link
                   key={city}
-                  href={`/vendors/${category}?${sp.q ? `q=${encodeURIComponent(sp.q)}&` : ''}city=${encodeURIComponent(city)}`}
+                  href={directoryHref(`/vendors/${category}`, { q: sp.q, city, service: sp.service, tradition })}
                   className={cn(
                     'px-3 py-1 rounded-full text-xs transition-colors',
                     sp.city === city
@@ -162,11 +166,11 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             </div>
           )}
 
-          <p className="text-sm text-muted mb-6">
+          {loadFailed ? <p role="alert" className="mb-6 text-sm text-red-700">The vendor directory is unavailable. Please try again.</p> : <p className="text-sm text-muted mb-6">
             {vendors?.length ?? 0} vendor{(vendors?.length ?? 0) !== 1 ? 's' : ''} found
-          </p>
+          </p>}
 
-          {vendors && vendors.length > 0 ? (
+          {loadFailed ? null : vendors && vendors.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {vendors.map((vendor) => (
                 <VendorCard key={vendor.id} vendor={{ ...vendor, ...badgeMap.get(vendor.id) }} imagePath={vendor.vendor_photos?.find(photo => photo.sort_order === 0)?.storage_path} />
@@ -175,11 +179,11 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           ) : (
             <div className="text-center py-16">
               <p className="text-muted">
-                {sp.q || sp.city
+                {sp.q || sp.city || sp.service || tradition
                   ? 'No vendors match your search. Try adjusting your filters.'
                   : 'No vendors found in this category.'}
               </p>
-              {(sp.q || sp.city) && (
+              {(sp.q || sp.city || sp.service || tradition) && (
                 <Link
                   href={`/vendors/${category}`}
                   className="mt-4 inline-block text-sm text-primary hover:underline"

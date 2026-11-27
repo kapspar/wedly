@@ -35,7 +35,7 @@ export default async function EditVendorPage({ params }: { params: Promise<{ ven
     supabase.from('vendor_services').select('id,category_id,name').order('display_order'),
     supabase.from('vendor_category_memberships').select('category_id').eq('vendor_id',vendor.id),
     supabase.from('vendor_service_memberships').select('service_id').eq('vendor_id',vendor.id),
-    supabase.from('vendor_wedding_experience').select('cultures,ceremonies,notes,category_details').eq('vendor_id',vendor.id).maybeSingle(),
+    supabase.from('vendor_wedding_experience').select('traditions,cultures,ceremonies,notes,category_details').eq('vendor_id',vendor.id).maybeSingle(),
   ])
   const categoryIds = new Set([vendor.category_id, ...(memberships.data ?? []).map(row => row.category_id)])
   const experienceCategories = (categories.data ?? []).filter(category => categoryIds.has(category.id))
@@ -46,7 +46,7 @@ export default async function EditVendorPage({ params }: { params: Promise<{ ven
     social: [vendor.instagram_url, vendor.tiktok_url, vendor.facebook_url, vendor.youtube_url, vendor.pinterest_url,
       vendor.snapchat_url, vendor.linkedin_url, vendor.whatsapp_url],
     hasCover: !!photos?.some(photo => photo.sort_order === 0),
-    hasExperience: !!savedExperience && (!!(savedExperience.cultures.length || savedExperience.ceremonies.length || savedExperience.notes.trim()) ||
+    hasExperience: !!savedExperience && (!!(savedExperience.traditions.length || savedExperience.cultures.length || savedExperience.ceremonies.length || savedExperience.notes.trim()) ||
       experienceCategories.some(category => categoryExperienceEntries(category, savedExperience.category_details).length > 0)),
   })
   const badge = (await vendorEntitlements([{ id:vendor.id, claimed_by:vendor.claimed_by, is_claimed:vendor.is_claimed }])).get(vendor.id)

@@ -22,7 +22,7 @@ export default function TermsOfServicePage() {
     </>},
     {id:'accounts',title:'Accounts and security',body:<>
       <p>You must provide accurate account information, keep your login secure and notify PlanWedly if you suspect unauthorized access. You may use email/password or available external sign-in providers such as Google. You are responsible for activity under your account except where prohibited by applicable law.</p>
-      <p>Do not impersonate a person or business, use another person's account without permission, create fake engagement or abuse the service. We may restrict accounts to investigate security risks, unlawful activity or material violations, using reasonable measures appropriate to the situation.</p>
+      <p>Do not impersonate a person or business, use another person&apos;s account without permission, create fake engagement or abuse the service. We may restrict accounts to investigate security risks, unlawful activity or material violations, using reasonable measures appropriate to the situation.</p>
     </>},
     {id:'vendors',title:'Vendor listings, claims and representation',body:<>
       <p>Vendors must be authorized to represent the businesses they claim and must keep business details, contact information, portfolios, packages and availability reasonably accurate. PlanWedly may request evidence of business ownership before approving claims or showing a <strong>Verified Business</strong> badge.</p>
@@ -34,7 +34,7 @@ export default function TermsOfServicePage() {
       <p>Vendors may use inquiry information to respond to the requested service and should not misuse it, resell it or contact couples for unrelated purposes without an appropriate legal basis. PlanWedly cannot guarantee that any vendor will respond or accept an inquiry.</p>
     </>},
     {id:'reviews',title:'Customer reviews and verification',body:<>
-      <p>Reviews must describe a genuine firsthand customer experience. A review must identify the service date. You must not submit fabricated reviews, compensated praise without disclosure, harassment, confidential third-party information or reviews designed to manipulate a competitor's reputation.</p>
+      <p>Reviews must describe a genuine firsthand customer experience. A review must identify the service date. You must not submit fabricated reviews, compensated praise without disclosure, harassment, confidential third-party information or reviews designed to manipulate a competitor&apos;s reputation.</p>
       <p>PlanWedly may moderate submissions, request optional proof of service, label substantiated customer relationships as <strong>Verified Customer</strong>, and remove content that violates these terms or applicable law. The verification label confirms a customer relationship was substantiated, not that every statement or opinion was independently proven.</p>
       <p>Vendors can submit respectful replies and report disputed reviews. <strong>Reporting a review does not automatically remove it</strong>; legitimate critical feedback is allowed. Reviews and responses may be subject to separate moderation. Reviewers retain responsibility for what they submit.</p>
     </>},

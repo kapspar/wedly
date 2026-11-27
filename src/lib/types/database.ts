@@ -913,6 +913,7 @@ export interface Database {
     }
     Views: Record<string, never>
     Functions: {
+      vendors_with_tradition: { Args: { p_tradition: string }; Returns: Database['public']['Tables']['vendors']['Row'][] }
       attach_vendor_photo: { Args: { p_vendor_id: string; p_owner_id: string; p_slot: number; p_path: string }; Returns: string | null }
       reorder_vendor_portfolio: { Args: { p_vendor_id: string; p_owner_id: string; p_current: string[]; p_order: string[] }; Returns: string }
       create_guest_rsvp_link: { Args: { p_guest:string }; Returns:string }

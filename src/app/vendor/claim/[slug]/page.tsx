@@ -46,7 +46,7 @@ export default async function ClaimListingPage({ params }: { params: Promise<{ s
           ) : previous ? (
             <div className="rounded-xl bg-white border border-border-soft p-6">
               <h2 className="text-xl font-medium text-plum">You already submitted a request</h2>
-              <p className="mt-3 text-muted">Status: {previous.status === 'more_info' ? 'More information requested' : 'Pending review'}. We haven't transferred ownership.</p>
+              <p className="mt-3 text-muted">Status: {previous.status === 'more_info' ? 'More information requested' : 'Pending review'}. We haven&apos;t transferred ownership.</p>
             </div>
           ) : (
             <ClaimRequestForm vendorId={vendor.id} vendorSlug={vendor.slug} requesterId={user.id} />

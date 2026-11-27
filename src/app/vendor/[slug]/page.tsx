@@ -65,7 +65,7 @@ export default async function VendorPage({ params, searchParams }: Props) {
   if (categoryError) console.error('Vendor category lookup failed:', categoryError.code, categoryError.message)
 
   const { data: experience } = vendor.is_claimed
-    ? await supabase.from('vendor_wedding_experience').select('cultures,ceremonies,notes,category_details').eq('vendor_id', vendor.id).maybeSingle()
+    ? await supabase.from('vendor_wedding_experience').select('traditions,cultures,ceremonies,notes,category_details').eq('vendor_id', vendor.id).maybeSingle()
     : { data: null }
   const experienceCategories = categoryRow ? [categoryRow] : []
   if (experience && Object.keys(experience.category_details).length) {
