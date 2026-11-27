@@ -14,6 +14,7 @@ import { billingAdmin } from '@/lib/billing/stripe'
 import { vendorEntitlements } from '@/lib/vendors/entitlements'
 import ListingBadges from '@/components/vendors/ListingBadges'
 import VendorAvailabilityCalendar from '@/components/vendors/VendorAvailabilityCalendar'
+import PublicVendorExperience from '@/components/vendors/PublicVendorExperience'
 import PremiumVendorDetails, { type PremiumData } from '@/components/vendors/PremiumVendorDetails'
 import type { Metadata } from 'next'
 
@@ -58,6 +59,19 @@ export default async function VendorPage({ params }: Props) {
     .eq('id', vendor.category_id)
     .maybeSingle()
   if (categoryError) console.error('Vendor category lookup failed:', categoryError.code, categoryError.message)
+
+  const { data: experience } = vendor.is_claimed
+    ? await supabase.from('vendor_wedding_experience').select('cultures,ceremonies,notes,category_details').eq('vendor_id', vendor.id).maybeSingle()
+    : { data: null }
+  const experienceCategories = categoryRow ? [categoryRow] : []
+  if (experience && Object.keys(experience.category_details).length) {
+    const { data: memberships } = await supabase.from('vendor_category_memberships').select('category_id').eq('vendor_id', vendor.id)
+    const additionalIds = (memberships ?? []).map(row => row.category_id).filter(id => id !== vendor.category_id)
+    if (additionalIds.length) {
+      const { data: additional } = await supabase.from('vendor_categories').select('id,name,slug,icon').in('id', additionalIds).order('display_order')
+      experienceCategories.push(...(additional ?? []))
+    }
+  }
 
   const { data: photos } = await supabase
     .from('vendor_photos')
@@ -273,6 +287,7 @@ export default async function VendorPage({ params }: Props) {
                 </Card>
               )}
 
+              {experience && <PublicVendorExperience experience={experience} categories={experienceCategories} />}
               {listingBadges?.premiumPreview && premiumContent && <PremiumVendorDetails data={premiumContent as PremiumData}/>}
               {listingBadges?.premiumPreview && !!calendarEntries?.length && <VendorAvailabilityCalendar initialEntries={calendarEntries} />}
 

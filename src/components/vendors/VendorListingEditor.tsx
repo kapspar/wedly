@@ -80,6 +80,8 @@ export default function VendorListingEditor({ vendor, initialPhotos, premiumPrev
   const [photos, setPhotos] = useState(initialPhotos)
   const [busy, setBusy] = useState(false)
   const [photoBusy, setPhotoBusy] = useState(false)
+  const [listingMessage, setListingMessage] = useState('')
+  const [listingError, setListingError] = useState('')
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
 
@@ -87,26 +89,26 @@ export default function VendorListingEditor({ vendor, initialPhotos, premiumPrev
 
   async function save(e: React.FormEvent) {
     e.preventDefault()
-    setError('')
-    setMessage('')
+    setListingError('')
+    setListingMessage('')
     if (!fields.name.trim() || !fields.city.trim()) {
-      setError('Business name and city are required.')
+      setListingError('Business name and city are required.')
       return
     }
     for (const key of ['website_url', 'instagram_url', 'tiktok_url', 'facebook_url', 'youtube_url', 'pinterest_url', 'snapchat_url', 'linkedin_url', 'whatsapp_url'] as const) {
       const value = fields[key].trim()
       if (value && !/^https:\/\//i.test(value)) {
-        setError('Website and social links must start with https://')
+        setListingError('Website and social links must start with https://')
         return
       }
     }
     const parsedAreas = [...new Map(serviceAreas.split(/[,\n]/).map(s=>s.trim()).filter(Boolean).map(s=>[s.toLocaleLowerCase('en-CA'),s])).values()]
-    if(parsedAreas.length>20 || parsedAreas.some(s=>s.length>80)){setError('Enter up to 20 service areas (80 characters each).');return}
+    if(parsedAreas.length>20 || parsedAreas.some(s=>s.length>80)){setListingError('Enter up to 20 service areas (80 characters each).');return}
     setBusy(true)
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
-      setError('Session expired. Please sign in again.')
+      setListingError('Session expired. Please sign in again.')
       setBusy(false)
       return
     }
@@ -135,8 +137,8 @@ export default function VendorListingEditor({ vendor, initialPhotos, premiumPrev
       .eq('id', vendor.id).eq('claimed_by', user.id).eq('is_claimed', true)
       .select('id').single()
     setBusy(false)
-    if (updateError) { setError('Could not save changes: ' + updateError.message); return }
-    setMessage('Your listing has been updated.')
+    if (updateError) { setListingError('Could not save changes: ' + updateError.message); return }
+    setListingMessage('Your listing has been updated.')
     router.refresh()
   }
 
@@ -188,36 +190,38 @@ export default function VendorListingEditor({ vendor, initialPhotos, premiumPrev
 
   return (
     <div className="mt-8 space-y-8">
-      <form onSubmit={save} className="rounded-2xl border border-border-soft bg-white p-6 sm:p-8 space-y-5">
+      <form id="business-info" onSubmit={save} className="scroll-mt-24 space-y-5 rounded-2xl border border-border-soft bg-white p-4 sm:p-8">
         <h2 className="font-[family-name:var(--font-heading)] text-xl text-plum">Business information</h2>
         <div className="grid gap-5 sm:grid-cols-2">
           {editable.map(([key, label]) => (
             <div key={key}>
               <label htmlFor={key} className="mb-2 block text-sm font-medium text-ink">{label}</label>
-              <input id={key} type={key === 'email' ? 'email' : key.includes('url') ? 'url' : 'text'}
+              <input id={key} type={key === 'email' ? 'email' : key.includes('url') ? 'url' : key === 'phone' ? 'tel' : 'text'}
                 maxLength={key === 'name' ? 180 : 500} required={key === 'name' || key === 'city'}
                 value={fields[key]} onChange={e => set(key, e.target.value)}
-                className="w-full rounded-xl border border-border-soft px-4 py-3 text-sm text-ink" />
+                className="w-full rounded-xl border border-border-soft px-3 py-3 text-base text-ink" />
             </div>
           ))}
         </div>
         <div>
           <label htmlFor="service-areas" className="mb-2 block text-sm font-medium text-ink">Where you provide services</label>
-          <textarea id="service-areas" rows={2} maxLength={1600} value={serviceAreas} onChange={e=>setServiceAreas(e.target.value)} placeholder="Ajax, Whitby, Toronto, Durham Region" className="w-full rounded-xl border border-border-soft px-4 py-3 text-sm text-ink" />
+          <textarea id="service-areas" rows={2} maxLength={1600} value={serviceAreas} onChange={e=>setServiceAreas(e.target.value)} placeholder="Ajax, Whitby, Toronto, Durham Region" className="w-full rounded-xl border border-border-soft px-3 py-3 text-base text-ink" />
           <p className="mt-1 text-xs text-muted">Enter cities or regions separated by commas. Your base city above is separate. Add only locations you actually serve.</p>
         </div>
         <div>
           <label htmlFor="description" className="mb-2 block text-sm font-medium text-ink">About your business</label>
           <textarea id="description" rows={6} maxLength={5000}
             value={fields.description} onChange={e => set('description', e.target.value)}
-            className="w-full rounded-xl border border-border-soft px-4 py-3 text-sm text-ink" />
+            className="w-full rounded-xl border border-border-soft px-3 py-3 text-base text-ink" />
         </div>
-        <button type="submit" disabled={busy} className="rounded-xl bg-plum px-6 py-3 text-sm font-semibold text-white disabled:opacity-50">
+        <button type="submit" disabled={busy} className="min-h-11 w-full rounded-xl bg-plum px-6 py-3 text-sm font-semibold text-white disabled:opacity-50 sm:w-auto">
           {busy ? 'Saving…' : 'Save listing details'}
         </button>
+        {listingError && <p role="alert" className="text-sm text-red-700">{listingError}</p>}
+        {listingMessage && <p role="status" className="text-sm text-plum">{listingMessage}</p>}
       </form>
 
-      <section className="rounded-2xl border border-border-soft bg-white p-6 sm:p-8">
+      <section id="listing-images" className="scroll-mt-24 rounded-2xl border border-border-soft bg-white p-4 sm:p-8">
         <h2 className="font-[family-name:var(--font-heading)] text-xl text-plum">Free listing images</h2>
         <p className="mt-2 text-sm text-muted">Your free listing includes a directory cover, logo and header image. Upload each separately; you can replace them at any time.</p>
         <div className="mt-4 rounded-xl bg-primary-soft/40 p-4 text-sm text-ink">
@@ -258,7 +262,7 @@ export default function VendorListingEditor({ vendor, initialPhotos, premiumPrev
           })}
         </div>
       </section>
-      <section className="rounded-2xl border border-border-soft bg-white p-6 sm:p-8">
+      <section className="rounded-2xl border border-border-soft bg-white p-4 sm:p-8">
         <h2 className="font-[family-name:var(--font-heading)] text-xl text-plum">Premium photo portfolio</h2>
         <p className="mt-2 text-sm text-muted">Showcase up to 15 additional wedding photos. These appear publicly only while your Premium Preview subscription is active. Photos are preserved if Premium expires.</p>
         {!premiumPreview&&<p className="mt-3 rounded-xl bg-primary-soft/40 p-3 text-sm text-plum">Upgrade to Premium Preview to unlock portfolio uploads. You can still remove photos previously uploaded.</p>}
