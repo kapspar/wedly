@@ -1,12 +1,19 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { publicVendorMapEnabled } from '@/lib/feature-flags'
 import { createClient } from '@/lib/supabase/server'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import ClaimedVendorMap from '@/components/vendors/ClaimedVendorMap'
 
-export const metadata = { title: 'Wedding Vendor Map' }
+export const dynamic = 'force-dynamic'
+
+export function generateMetadata() {
+  return publicVendorMapEnabled() ? { title: 'Wedding Vendor Map' } : { robots: { index: false, follow: false } }
+}
 
 export default async function VendorMapPage() {
+  if (!publicVendorMapEnabled()) redirect('/vendors')
   const supabase = await createClient()
   // Venue pins require a full public address and unexpired temporary coordinates; other vendors require claims.
   const { data, error } = await supabase.from('vendors')
@@ -15,7 +22,7 @@ export default async function VendorMapPage() {
     .order('name')
     .limit(1000)
   if (error) console.error('Claimed vendor map query failed:', error.code, error.message)
-  const now = Date.now()
+  const now = new Date().getTime()
   const vendors = (data ?? [])
     .filter(v => v.city?.trim() && (
       (v.vendor_categories?.slug === 'venues'

@@ -1,3 +1,4 @@
+import { publicVendorMapEnabled } from '@/lib/feature-flags'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import Navbar from '@/components/layout/Navbar'
@@ -94,7 +95,7 @@ export default async function VendorsPage({
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-7 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary-soft/30 px-5 py-4"><div><p className="font-semibold text-plum">Explore vendors on a map</p><p className="text-xs text-muted">Published venues and claimed vendors appear on the map. Pins are approximate.</p></div><Link href="/vendors/map" className="rounded-xl bg-plum px-5 py-3 text-sm font-medium text-white">View claimed vendor map</Link></div>
+          {publicVendorMapEnabled() && <div className="mb-7 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary-soft/30 px-5 py-4"><div><p className="font-semibold text-plum">Explore vendors on a map</p><p className="text-xs text-muted">Published venues and claimed vendors appear on the map. Pins are approximate.</p></div><Link href="/vendors/map" className="rounded-xl bg-plum px-5 py-3 text-sm font-medium text-white">View claimed vendor map</Link></div>}
           {/* Category pills */}
           {categories && (
             <div className="flex flex-wrap gap-2 mb-8">

@@ -19,6 +19,7 @@ export default function InquiryForm({ vendorId, vendorName, vendorSlug, userId }
   const router = useRouter()
   const [message, setMessage] = useState('')
   const [eventDate, setEventDate] = useState('')
+  const [eventLocation, setEventLocation] = useState('')
   const [guestCount, setGuestCount] = useState('')
   const [budget, setBudget] = useState('')
   const [loading, setLoading] = useState(false)
@@ -55,6 +56,7 @@ export default function InquiryForm({ vendorId, vendorName, vendorSlug, userId }
       couple_id: userId,
       message: message.trim(),
       event_date: eventDate || null,
+      event_location: eventLocation.trim() || null,
       guest_count: guestCount ? parseInt(guestCount) : null,
       budget_cad: budget ? Number(budget) : null,
     })
@@ -74,6 +76,7 @@ export default function InquiryForm({ vendorId, vendorName, vendorSlug, userId }
     setLoading(false)
     setMessage('')
     setEventDate('')
+    setEventLocation('')
     setGuestCount('')
     setBudget('')
   }
@@ -117,6 +120,8 @@ export default function InquiryForm({ vendorId, vendorName, vendorSlug, userId }
           placeholder="Approx. guests"
         />
       </div>
+      <Input id="eventLocation" label="Wedding city or venue (optional)" value={eventLocation} maxLength={160}
+        onChange={event => setEventLocation(event.target.value)} placeholder="For example, Ajax" />
       <div className="space-y-1.5">
         <label htmlFor="budget" className="block text-sm font-medium text-charcoal/80">Approximate budget for this service (CAD, optional)</label>
         <input id="budget" type="number" min="1" max="1000000" step="1" value={budget}

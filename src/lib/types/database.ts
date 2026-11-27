@@ -608,6 +608,7 @@ export interface Database {
           wedding_id: string | null
           message: string
           event_date: string | null
+          event_location: string | null
           guest_count: number | null
           budget_cad: number | null
           status: InquiryStatus
@@ -620,6 +621,7 @@ export interface Database {
           wedding_id?: string | null
           message: string
           event_date?: string | null
+          event_location?: string | null
           guest_count?: number | null
           budget_cad?: number | null
           status?: InquiryStatus

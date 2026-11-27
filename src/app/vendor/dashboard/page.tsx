@@ -5,6 +5,8 @@ import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import BillingActions from '@/components/vendors/BillingActions'
 import { billingAdmin } from '@/lib/billing/stripe'
+import { vendorEntitlements } from '@/lib/vendors/entitlements'
+import { inboxMetricCards, type InboxMetrics } from '@/lib/vendors/inbox'
 import ListingBadges from '@/components/vendors/ListingBadges'
 
 export const metadata = { title: 'Vendor Dashboard — PlanWedly' }
@@ -40,6 +42,14 @@ export default async function VendorDashboardPage() {
     else for (const subscription of data ?? []) subscriptions.set(subscription.vendor_id, subscription.status)
   }
 
+  const [inbox, entitlements] = await Promise.all([
+    listings?.length ? billingAdmin().rpc('vendor_inbox_metrics', { p_owner: user.id, p_vendors: listings.map(vendor => vendor.id) })
+      : { data: [], error: null },
+    vendorEntitlements((listings ?? []).map(vendor => ({ ...vendor, claimed_by: user.id }))),
+  ])
+  const inboxByVendor = new Map(((inbox.data ?? []) as InboxMetrics[]).map(item => [item.vendor_id, item]))
+  const unread = ((inbox.data ?? []) as InboxMetrics[]).reduce((count, item) => count + item.unread, 0)
+
   const pendingClaims = (claims ?? []).filter(c => c.status === 'pending' || c.status === 'more_info')
   return (
     <>
@@ -53,11 +63,12 @@ export default async function VendorDashboardPage() {
           <nav aria-label="Vendor dashboard sections" className="mt-6 flex flex-wrap gap-2 text-sm">
             {[['My listings', '#listings'], ['Ownership requests', '#claims'], ['New submissions', '#submissions']].map(([label, href]) => <a key={href} href={href} className="rounded-xl border border-border-soft bg-white px-4 py-2 font-medium text-plum hover:underline">{label}</a>)}
           </nav>
-          <section aria-label="Business overview" className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <section aria-label="Business overview" className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
             {[
               ['My businesses', listingError ? 'Unavailable' : String(listings?.length ?? 0)],
               ['Published listings', listingError ? 'Unavailable' : String((listings ?? []).filter(v => v.is_published).length)],
               ['Pending claims', claims ? String(pendingClaims.length) : 'Unavailable'],
+              ['Unread inquiries', listingError || inbox.error ? 'Unavailable' : String(unread)],
               ['Pending submissions', submissions ? String(submissions.filter(v => v.status === 'pending').length) : 'Unavailable'],
             ].map(([label, value]) => <div key={label} className="min-w-0 rounded-2xl border border-border-soft bg-white p-4 sm:p-5"><p className="text-xs font-medium text-muted sm:text-sm">{label}</p><p className="mt-2 break-words text-xl font-semibold text-plum sm:text-2xl">{value}</p></div>)}
           </section>
@@ -94,11 +105,18 @@ export default async function VendorDashboardPage() {
                     </div>
                     <p className="mt-2 text-xs text-muted">{[vendor.name, vendor.city, vendor.description].filter(v => v?.trim()).length} of 3 basic fields completed · Name, city and description</p>
                   </div>
+                  <dl className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted">
+                    {inboxMetricCards(inboxByVendor.get(vendor.id), entitlements.get(vendor.id)?.premiumPreview ?? false).map(([label, count]) => (
+                      <div key={label} className="flex items-center gap-1.5"><dt>{label}</dt><dd className="font-semibold text-plum">{inbox.error ? '—' : count}</dd></div>
+                    ))}
+                  </dl>
                   <BillingActions vendorId={vendor.id} status={subscriptions.get(vendor.id) ?? null} enabled={billingEnabled} />
                   <div className="mt-6 flex flex-wrap gap-3">
                     <Link href={`/vendor/dashboard/${vendor.id}`} className="rounded-xl bg-plum px-4 py-2.5 text-sm font-medium text-white">Manage listing</Link>
                     <Link href={`/vendor/dashboard/${vendor.id}/reviews`} className="rounded-xl border border-border-soft px-4 py-2.5 text-sm font-medium text-plum">Customer reviews</Link>
-                    <Link href={`/vendor/dashboard/${vendor.id}/inquiries`} className="rounded-xl border border-border-soft px-4 py-2.5 text-sm font-medium text-plum">Wedding inquiries</Link>
+                    <Link href={`/vendor/dashboard/${vendor.id}/inquiries`} className="rounded-xl border border-border-soft px-4 py-2.5 text-sm font-medium text-plum">Inquiry inbox
+                      {!!inboxByVendor.get(vendor.id)?.unread && <span className="ml-2 rounded-full bg-primary-soft px-2 py-0.5 text-xs text-plum">{inboxByVendor.get(vendor.id)?.unread} unread</span>}
+                    </Link>
                     <Link href={`/vendor/dashboard/${vendor.id}/analytics`} className="rounded-xl border border-border-soft px-4 py-2.5 text-sm font-medium text-plum">Analytics</Link>
                     {vendor.is_published && <Link href={`/vendor/${vendor.slug}`} className="rounded-xl border border-border-soft px-4 py-2.5 text-sm font-medium text-plum">View public page</Link>}
                   </div>
@@ -137,7 +155,7 @@ export default async function VendorDashboardPage() {
               ))}
             </div>
           ) : <p className="mt-3 text-sm text-muted">No new business submissions.</p>}
-          <p className="mt-10 text-xs text-muted">The free plan includes a directory cover, business logo, and profile banner. Premium billing is in test mode. Premium Preview badges reflect testing only; live paid benefits are not yet available.</p>
+          <p className="mt-10 text-xs text-muted">The free plan includes one directory cover photo. Premium billing is in test mode. Premium Preview badges reflect testing only; live paid benefits are not yet available.</p>
         </div>
       </main>
       <Footer />

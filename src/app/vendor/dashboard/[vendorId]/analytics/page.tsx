@@ -22,16 +22,16 @@ export default async function VendorAnalyticsDashboard({params}:{params:Promise<
     <h1 className="mt-5 font-[family-name:var(--font-heading)] text-3xl text-plum">Vendor analytics</h1>
     <p className="mt-3 rounded-xl bg-white p-6 text-sm text-muted">Analytics is available with Premium Preview. Your engagement events will be collected without storing visitor identities; analytics becomes visible when the subscription is active.</p>
   </div></main><Footer/></>
-  const since=new Date(Date.now()-30*86400000).toISOString().slice(0,10)
-  const createdSince=new Date(Date.now()-30*86400000).toISOString()
+  const createdSince = new Date(new Date().getTime() - 30 * 86400000).toISOString()
+  const since = createdSince.slice(0, 10)
   const [views,website,instagram,inquiries,allInquiries,booked,quoted]=await Promise.all([
     admin.from('vendor_metric_events').select('vendor_id',{count:'exact',head:true}).eq('vendor_id',vendor.id).gte('event_date',since).eq('kind','view'),
     admin.from('vendor_metric_events').select('vendor_id',{count:'exact',head:true}).eq('vendor_id',vendor.id).gte('event_date',since).eq('kind','website'),
     admin.from('vendor_metric_events').select('vendor_id',{count:'exact',head:true}).eq('vendor_id',vendor.id).gte('event_date',since).eq('kind','instagram'),
     admin.from('inquiries').select('id',{count:'exact',head:true}).eq('vendor_id',vendor.id).gte('created_at',createdSince),
     admin.from('inquiries').select('id',{count:'exact',head:true}).eq('vendor_id',vendor.id),
-    admin.from('vendor_lead_pipeline').select('inquiry_id',{count:'exact',head:true}).eq('vendor_id',vendor.id).eq('stage','booked'),
-    admin.from('vendor_lead_pipeline').select('inquiry_id',{count:'exact',head:true}).eq('vendor_id',vendor.id).eq('stage','quoted'),
+    admin.from('vendor_lead_pipeline').select('inquiry_id',{count:'exact',head:true}).eq('vendor_id',vendor.id).eq('owner_id',user.id).eq('stage','booked'),
+    admin.from('vendor_lead_pipeline').select('inquiry_id',{count:'exact',head:true}).eq('vendor_id',vendor.id).eq('owner_id',user.id).eq('stage','quoted'),
   ])
   const totalInquiries=inquiries.count??0
   const completed=booked.count??0
