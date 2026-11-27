@@ -1,3 +1,5 @@
+import type { WeddingExperience } from '@/lib/vendors/wedding-experience'
+
 export type Json =
   | string
   | number
@@ -34,6 +36,12 @@ export interface Database {
         Row: { id: string; wedding_id: string; email: string; token: string; expires_at: string; accepted_at: string | null; created_at: string }
         Insert: { id?: string; wedding_id: string; email: string; token?: string; expires_at?: string; accepted_at?: string | null; created_at?: string }
         Update: { email?: string; expires_at?: string; accepted_at?: string | null }
+        Relationships: []
+      }
+      vendor_wedding_experience: {
+        Row: WeddingExperience & { vendor_id: string }
+        Insert: Partial<WeddingExperience> & { vendor_id: string }
+        Update: Partial<WeddingExperience>
         Relationships: []
       }
       vendor_category_memberships: {
