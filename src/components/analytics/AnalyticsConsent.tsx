@@ -62,7 +62,7 @@ export default function AnalyticsConsent() {
         <button
           type="button"
           onClick={() => setSettingsOpen(true)}
-          className="fixed bottom-3 left-3 z-[100] rounded-full border border-[#EADCE9] bg-white px-3 py-1.5 text-xs text-[#563454] shadow-sm hover:shadow-md"
+          className="m-3 w-fit rounded-full sm:fixed sm:bottom-3 sm:left-3 sm:z-[100] border border-[#EADCE9] bg-white px-3 py-1.5 text-xs text-[#563454] shadow-sm hover:shadow-md"
         >
           Analytics settings
         </button>
@@ -72,7 +72,7 @@ export default function AnalyticsConsent() {
           role="dialog"
           aria-label="Analytics preferences"
           aria-modal="false"
-          className="fixed bottom-4 left-4 right-4 z-[100] mx-auto max-w-xl rounded-2xl border border-[#EADCE9] bg-white p-5 shadow-xl"
+          className="m-4 max-w-xl sm:fixed sm:bottom-4 sm:left-4 sm:right-4 sm:z-[100] sm:mx-auto rounded-2xl border border-[#EADCE9] bg-white p-5 shadow-xl"
         >
           <h2 className="mb-2 text-base font-semibold text-[#563454]">Help us improve PlanWedly</h2>
           <p className="mb-4 text-sm text-gray-700">
